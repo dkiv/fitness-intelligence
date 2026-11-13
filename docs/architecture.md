@@ -142,3 +142,43 @@ checkpoint after partial failure. These correctness requirements have not been i
 claimed by M2B.1. Provider account stability/feed semantics, trusted ownership, credential storage,
 retention and erasure remain gates before personal imports. M2B.2 may start implementation against
 synthetic transports; this foundation is not production synchronization.
+
+### Hevy JSON and semantic hash contract
+
+All source-model `model_validate_json()` calls and the `parse_workout`, `parse_workout_page`
+and `parse_event_page` helpers share one UTF-8 decoder. Integer and fractional JSON numbers
+are decoded directly to Decimal before validation. Responses must be objects; duplicate keys,
+nonstandard numeric constants, invalid UTF-8, malformed JSON, responses over 4,000,000 bytes and
+nesting beyond 32 levels (root at depth 0) are rejected. These bounds also inspect unknown fields.
+Python-object validation remains available for already-decoded synthetic/domain inputs; callers
+must not first decode source numbers through binary floats. No decoder can recover lost digits.
+
+Accepted timestamps use calendar `YYYY-MM-DDTHH:MM:SS[.ffffff]` with `Z` or `+/-HH:MM` offset.
+Fractions may contain 1 through 6 digits. Longer fractions, including trailing-zero fractions,
+are rejected rather than truncated. Invalid dates, naive timestamps and UTC conversion overflow
+are controlled validation errors. Original accepted strings remain in provenance; normalized
+instants use UTC with exactly six fractional digits in the semantic hash.
+
+`hevy-semantic-v1` is a SHA-256 digest of UTF-8 JSON serialized with sorted object keys, compact
+separators and Python's default ASCII escaping. The preimage contains the allowlisted workout
+projection, a `hash_contract` label, workout title/description and exercise titles/notes. Source
+workout timestamps are replaced with normalized UTC strings; null end time stays null. Exercises
+and sets are sorted by their source indexes. Original indexes, template/routine/workout IDs,
+superset IDs and original set types remain significant. Incoming array order alone is not
+significant when indexes agree; assigning different content to those indexes is significant.
+
+Weight, distance and duration are rounded HALF_EVEN to 4 places, and RPE to 2 places before
+hashing. Numeric hash strings use fixed-point notation without insignificant trailing fractional
+zeros; positive/negative zero both become `"0"`. Custom metrics have no canonical storage unit
+or rounding precision, so their exact Decimal value is hashed with the same spelling
+normalization. Repetitions and indexes use validated integers. Null and zero remain distinct.
+Changes below canonical measurement precision deliberately share a hash; custom-metric changes
+remain significant at their full source precision. Unknown fields, warning categories and local
+observation timestamps are excluded. Source created/updated instants remain significant.
+
+The hash preimage is a separate copy: original numeric values/scale and timestamp offsets remain
+in the allowlisted provenance and source measurement metadata. It is a whole-snapshot change
+detector, not an ordering version, account identity or child-only digest. Downstream ingestion
+must still compare source times and canonical child content separately. This replaces the initial
+format-sensitive digest; any persisted older digest would need recomputation/version labeling
+before comparison. No real imports or persisted hashes are introduced in M2B.1.

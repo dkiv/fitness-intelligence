@@ -1,6 +1,7 @@
 """Deterministic mapping of a validated source snapshot; no IDs, I/O or clocks."""
 
 import json
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import ROUND_HALF_EVEN, Decimal
@@ -18,6 +19,15 @@ def quantity(value: Decimal | None, places: int = 4) -> Decimal | None:
     return (
         None if value is None else value.quantize(Decimal(10) ** -places, rounding=ROUND_HALF_EVEN)
     )
+
+
+def semantic_number(value: Decimal | None) -> str | None:
+    if value is None:
+        return None
+    if value == 0:
+        return "0"
+    rendered = format(value, "f")
+    return rendered.rstrip("0").rstrip(".") if "." in rendered else rendered
 
 
 def map_set(source: HevySet, position: int) -> StrengthSet:
@@ -97,13 +107,28 @@ def map_workout(source: HevyWorkout) -> MappedWorkout:
             }
         )
     projection["exercises"] = projected_exercises
-    # Hash includes canonical text, but retained provenance excludes it.
-    content = {
-        **projection,
-        "title": source.title,
-        "description": source.description,
-        "exercise_text": [(item.title, item.notes) for item in exercises],
-    }
+    # Versioned semantic contract: provenance remains untouched by normalization.
+    content = deepcopy(projection)
+    content["hash_contract"] = "hevy-semantic-v1"
+    for field in ("start_time", "end_time", "created_at", "updated_at"):
+        value = content[field]
+        content[field] = None if value is None else utc(value).isoformat(timespec="microseconds")
+    content["title"] = source.title
+    content["description"] = source.description
+    for exercise, projected in zip(exercises, content["exercises"], strict=True):
+        projected["title"], projected["notes"] = exercise.title, exercise.notes
+        for item, values in zip(
+            sorted(exercise.sets, key=lambda item: item.index), projected["sets"], strict=True
+        ):
+            for field, places in (
+                ("weight_kg", 4),
+                ("distance_meters", 4),
+                ("duration_seconds", 4),
+                ("rpe", 2),
+            ):
+                value = quantity(getattr(item, field), places)
+                values[field] = semantic_number(value)
+            values["custom_metric"] = semantic_number(item.custom_metric)
     digest = sha256(json.dumps(content, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return MappedWorkout(
         source.id,

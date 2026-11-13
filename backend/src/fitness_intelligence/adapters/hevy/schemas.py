@@ -1,9 +1,10 @@
 """Complete-snapshot read contract based on the reviewed Hevy OpenAPI design."""
 
 import json
+import re
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StrictStr, model_validator
 
@@ -30,17 +31,27 @@ def number(value: Any) -> Decimal:
     return result
 
 
-def timestamp(value: Any) -> str:
-    if not isinstance(value, str) or "T" not in value:
-        raise ValueError("expected ISO timestamp")
-    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
-        raise ValueError("timestamp requires offset")
-    return value
+# Strict calendar ISO form; reject all fractions longer than six digits, even trailing zeros.
+TIMESTAMP = re.compile(
+    r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]{1,6})?(?:Z|[+-][0-9]{2}:[0-9]{2})"
+)
 
 
 def utc(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(UTC)
+    if not isinstance(value, str) or TIMESTAMP.fullmatch(value) is None:
+        raise ValueError("expected offset-aware ISO timestamp with microsecond precision or less")
+    if value[-1] != "Z" and (int(value[-5:-3]) > 23 or int(value[-2:]) > 59):
+        raise ValueError("invalid timestamp offset")
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(UTC)
+    except (ValueError, OverflowError):
+        raise ValueError("timestamp outside supported UTC range") from None
+
+
+def timestamp(value: Any) -> str:
+    utc(value)
+    return value
 
 
 Integer = Annotated[int, BeforeValidator(integer)]
@@ -51,6 +62,11 @@ Identity = Annotated[StrictStr, Field(min_length=1, max_length=1024)]
 
 class SourceModel(BaseModel):
     model_config = ConfigDict(extra="ignore", hide_input_in_errors=True, frozen=True)
+
+    @classmethod
+    def model_validate_json(cls, json_data: str | bytes | bytearray, **kwargs: Any) -> Self:
+        # Prevent the inherited Pydantic JSON decoder from introducing binary floats.
+        return cls.model_validate(decode_response(json_data), **kwargs)
 
     @model_validator(mode="wrap")
     @classmethod
@@ -155,14 +171,37 @@ def invalid_constant(value: str) -> None:
     raise ValueError("nonfinite JSON number")
 
 
-def parse_workout(payload: str) -> HevyWorkout:
-    if len(payload.encode("utf-8")) > 4_000_000:
-        raise ValueError("source snapshot exceeds size limit")
+MAX_RESPONSE_BYTES = 4_000_000
+MAX_RESPONSE_DEPTH = 32
+
+
+def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def decode_response(payload: str | bytes | bytearray) -> dict[str, Any]:
+    """Decode one UTF-8 JSON object without losing numeric precision."""
     try:
-        data = json.loads(payload, parse_float=Decimal, parse_constant=invalid_constant)
+        if not isinstance(payload, (str, bytes, bytearray)):
+            raise ValueError("unsupported response type")
+        encoded = payload.encode("utf-8") if isinstance(payload, str) else payload
+        if len(encoded) > MAX_RESPONSE_BYTES:
+            raise ValueError("source response exceeds size limit")
+        data = json.loads(
+            encoded.decode("utf-8"),
+            parse_float=Decimal,
+            parse_int=Decimal,
+            parse_constant=invalid_constant,
+            object_pairs_hook=unique_object,
+        )
 
         def check_depth(item: Any, depth: int = 0) -> None:
-            if depth > 32:
+            if depth > MAX_RESPONSE_DEPTH:
                 raise ValueError("source nesting limit")
             if isinstance(item, dict):
                 for child in item.values():
@@ -172,6 +211,23 @@ def parse_workout(payload: str) -> HevyWorkout:
                     check_depth(child, depth + 1)
 
         check_depth(data)
-        return HevyWorkout.model_validate(data)
-    except (ValueError, RecursionError):
-        raise ValueError("invalid Hevy snapshot") from None
+        if not isinstance(data, dict):
+            raise ValueError("response must be an object")
+        return data
+    except (ValueError, ArithmeticError, RecursionError):
+        # Keep source values out of public decoding errors.
+        raise ValueError(
+            "invalid Hevy snapshot (JSON structure, size limit or numeric value)"
+        ) from None
+
+
+def parse_workout(payload: str | bytes | bytearray) -> HevyWorkout:
+    return HevyWorkout.model_validate_json(payload)
+
+
+def parse_workout_page(payload: str | bytes | bytearray) -> WorkoutPage:
+    return WorkoutPage.model_validate_json(payload)
+
+
+def parse_event_page(payload: str | bytes | bytearray) -> EventPage:
+    return EventPage.model_validate_json(payload)
