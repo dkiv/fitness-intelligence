@@ -1,5 +1,3 @@
-import os
-from collections.abc import Iterator
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -8,14 +6,14 @@ from uuid import UUID, uuid4
 import pytest
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import create_engine, inspect, select
-from sqlalchemy.engine import make_url
+from sqlalchemy import inspect, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.db.models import (
     ExerciseSet,
     ExternalReference,
+    SourceAccount,
     User,
     Workout,
     WorkoutExercise,
@@ -24,28 +22,13 @@ from fitness_intelligence.db.models import (
 pytestmark = pytest.mark.postgres
 
 
-@pytest.fixture
-def db(monkeypatch: pytest.MonkeyPatch) -> Iterator[Session]:
-    url = os.getenv("TEST_DATABASE_URL")
-    if not url:
-        pytest.skip("Set TEST_DATABASE_URL to a disposable PostgreSQL database")
-    schema = "test_" + uuid4().hex
-    engine = create_engine(url)
-    with engine.begin() as connection:
-        connection.exec_driver_sql(f'CREATE SCHEMA "{schema}"')
-    scoped_url = make_url(url).update_query_dict({"options": f"-csearch_path={schema}"})
-    monkeypatch.setenv("DATABASE_URL", scoped_url.render_as_string(hide_password=False))
-    isolated = create_engine(scoped_url)
-    config = Config(str(Path(__file__).parents[1] / "alembic.ini"))
-    try:
-        command.upgrade(config, "head")
-        with Session(isolated) as session:
-            yield session
-    finally:
-        isolated.dispose()
-        with engine.begin() as connection:
-            connection.exec_driver_sql(f'DROP SCHEMA "{schema}" CASCADE')
-        engine.dispose()
+def make_reference(db: Session, **values: object) -> ExternalReference:
+    account = db.scalar(
+        select(SourceAccount.id).where(
+            SourceAccount.user_id == values["user_id"], SourceAccount.provider == values["provider"]
+        )
+    )
+    return ExternalReference(source_account_id=account, **values)
 
 
 def seed(db: Session) -> tuple[User, User, Workout, WorkoutExercise, ExerciseSet]:
@@ -60,6 +43,17 @@ def seed(db: Session) -> tuple[User, User, Workout, WorkoutExercise, ExerciseSet
     db.flush()
     exercise_set = ExerciseSet(user_id=owner.id, exercise_id=exercise.id, position=0)
     db.add(exercise_set)
+    for person in (owner, other):
+        for provider in ("synthetic", "another-provider", ""):
+            if provider:
+                db.add(
+                    SourceAccount(
+                        user_id=person.id,
+                        provider=provider,
+                        provider_account_id="synthetic-account",
+                        status="active",
+                    )
+                )
     db.commit()
     return owner, other, workout, exercise, exercise_set
 
@@ -106,7 +100,8 @@ def test_invalid_ownership(db: Session, target: str) -> None:
     records = {
         "exercise": WorkoutExercise(user_id=other.id, workout_id=workout.id, position=1, name="X"),
         "set": ExerciseSet(user_id=other.id, exercise_id=exercise.id, position=1),
-        "reference": ExternalReference(
+        "reference": make_reference(
+            db,
             user_id=other.id,
             provider="synthetic",
             entity_type="set",
@@ -166,7 +161,8 @@ def test_external_identity_and_sync(db: Session, entity_type: str) -> None:
     target_key = {"workout": "workout_id", "exercise": "exercise_id", "set": "set_id"}[entity_type]
 
     def reference(user_id: UUID, provider: str = "synthetic") -> ExternalReference:
-        return ExternalReference(
+        return make_reference(
+            db,
             user_id=user_id,
             provider=provider,
             entity_type=entity_type,
@@ -195,7 +191,8 @@ def test_external_identity_and_sync(db: Session, entity_type: str) -> None:
     db.add(second_workout)
     db.flush()
     db.add(
-        ExternalReference(
+        make_reference(
+            db,
             user_id=other.id,
             provider="synthetic",
             entity_type="workout",
@@ -210,7 +207,8 @@ def test_external_identity_and_sync(db: Session, entity_type: str) -> None:
 @pytest.mark.parametrize("case", ["missing", "multiple", "wrong_type", "empty_provider"])
 def test_external_target_constraints(db: Session, case: str) -> None:
     owner, _, workout, exercise, _ = seed(db)
-    item = ExternalReference(
+    item = make_reference(
+        db,
         user_id=owner.id,
         provider="synthetic",
         entity_type="workout",
@@ -266,7 +264,8 @@ def test_reference_owner_matches_target(db: Session, target: str) -> None:
     _, other, workout, exercise, _ = seed(db)
     target_id = workout.id if target == "workout" else exercise.id
     db.add(
-        ExternalReference(
+        make_reference(
+            db,
             user_id=other.id,
             provider="synthetic",
             entity_type=target,
@@ -282,7 +281,8 @@ def test_reference_owner_matches_target(db: Session, target: str) -> None:
 
 def test_source_tombstone_retains_identity_and_blocks_hard_delete(db: Session) -> None:
     owner, _, workout, _, _ = seed(db)
-    item = ExternalReference(
+    item = make_reference(
+        db,
         user_id=owner.id,
         provider="synthetic",
         entity_type="workout",

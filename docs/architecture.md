@@ -89,3 +89,56 @@ are known. Never return provider secrets or put sensitive records in logs.
 
 Reference patterns: [SQLAlchemy session lifecycle](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
 and [Alembic environment configuration](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
+
+## Implemented Hevy mapping foundation (M2B.1)
+
+M2B.1 supersedes the proposed fenced synchronization architecture above for the initial local,
+single-user importer. No HTTP client, credential handling, endpoints, orchestration or scheduler
+is implemented. The `adapters/hevy` package validates complete source snapshots and maps them
+purely to provider-independent `domain/strength.py` inputs. Ownership is supplied separately by
+a future trusted application boundary; source JSON never supplies authorization.
+
+Migration `91ab` adds `source_accounts`, `account_sync_states` and `workout_tombstones`.
+References require a source account and retain their existing target/ownership constraints;
+uniqueness now includes the account namespace. Account IDs, owners and providers are immutable
+in PostgreSQL; verified provider account identity cannot change. Active/disconnected accounts
+require a nonempty verified identity. One explicit unresolved legacy account per user/provider
+receives all old references without modifying their identifiers, targets, payloads or timestamps.
+No legacy account is automatically verified or connected. A later binding operation must verify
+identity and check conflicts transactionally; it is not implemented here. No secret locator or
+credential columns are needed at this stage.
+
+Minimal sync state stores initialization and a nullable successful **run-start** checkpoint.
+The database enforces coherent initialized/checkpoint state and refuses checkpoint regression.
+It cannot establish that pages completed: M2B.2 must advance this value only after all pages and
+events succeed, in an explicit transaction. There are no page-offset resume cursors. Tombstones
+are unique per account/workout ID and need no canonical target. A null source deletion time means
+pending/unresolved; a non-null time means timestamped source evidence. Observation time never
+substitutes for deletion time. Ownership/provider composite foreign keys protect all new rows.
+
+Downgrade preserves canonical records and old reference fields. It refuses before any destructive
+DDL when account namespaces would collide under M1 uniqueness. Operators must reconcile such
+collisions explicitly. Successful downgrade discards account, checkpoint and tombstone metadata;
+it does not reconstruct synchronization history. Stop importers before any downgrade.
+
+Mapping requires explicit nullable fields and child arrays, preserves zero/null distinctions,
+rejects malformed timestamps and nonintegral indexes/repetitions, validates nonnegative finite
+measurements against storage bounds, and quantizes Decimal values with HALF_EVEN (4 quantity
+places, 2 RPE places). Offset timestamps become UTC; original timestamp strings remain in the
+allowlisted projection. Source indexes sort children and normalize positions, retaining original
+indexes as provenance. Order mismatches and unknown fields/types yield bounded warning categories.
+Unknown set types retain quantities/provenance with null canonical kind; dropset maps to drop.
+Custom metrics retain numeric strings with unknown units. No completion time is invented.
+Source text is kept canonically, excluded from retained projections, and included only in the
+content digest. The digest is a deterministic snapshot change detector, never a revision or ID.
+JSON parsing preserves decimals and limits snapshot bytes/depth; child counts are bounded.
+No source model or validation error should be logged; the JSON entry point emits sanitized errors.
+
+Distributed fencing leases, automated reconciliation, run archives and scheduled syncing are
+explicitly deferred until concurrency/production operation requires them. Subsequent local sync
+must serialize runs, preserve idempotency, use atomic workout/reference/child transactions, retain
+first-import identity, resolve equal-time conflicts, honor tombstones and avoid advancing a
+checkpoint after partial failure. These correctness requirements have not been implemented or
+claimed by M2B.1. Provider account stability/feed semantics, trusted ownership, credential storage,
+retention and erasure remain gates before personal imports. M2B.2 may start implementation against
+synthetic transports; this foundation is not production synchronization.
