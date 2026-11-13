@@ -1,6 +1,6 @@
 # Local Hevy synchronization (M2B.2)
 
-This is a private, read-only operator tool. There are no health-data HTTP routes, provider writes,
+The importer reads Hevy and writes to local PostgreSQL. For M2B.3A use only the [verification procedure](#verify-one-live-sample-m2b3a). There are no health-data HTTP routes, provider writes,
 scheduler, analytics or UI. PostgreSQL 17 and Python 3.12+ are required. The operator must already
 control the local OS account and the database. A UUID supplied by a remote caller is never an
 authorization mechanism. Do not expose this CLI through a server, shared shell or multi-user service.
@@ -55,7 +55,7 @@ engine.dispose()
 folder = Path.home() / ".config" / "fitness-intelligence"
 folder.mkdir(mode=0o700, parents=True, exist_ok=True)
 path = folder / "hevy.json"
-with path.open("x", opener=lambda p, flags: os.open(p, flags, 0o600)) as stream:
+with open(path, "x", opener=lambda p, flags: os.open(p, flags, 0o600)) as stream:
     json.dump(binding, stream)
 ```
 
@@ -67,7 +67,29 @@ permissions on the opened descriptor. Binding identities must also match an acti
 and the identity returned for the current key. Legacy unresolved accounts are rejected; explicit
 legacy reconciliation/binding remains an operator task. Never silently transfer legacy references.
 
-## Run synchronization
+## Verify one live sample (M2B.3A)
+
+1. Use a private, access-controlled workstation with encrypted storage (including swap and the database volume). Close debuggers, disable core dumps (`ulimit -c 0` in the calling shell), shell tracing, profiling, request capture, SQL parameter logging and crash uploads. Keep binding files, database files, exports and backups outside Git and cloud-synced directories. Check that the binding directory is owned by the operator and has mode 0700, including when it already exists.
+2. Confirm the local user and expected Hevy account through a trusted operator session. Check that the active Hevy source account belongs to that user. If the expected account cannot be established independently, stop. Bootstrap above provisions identity metadata only. Use a short-lived shell with the key injected from a local secret manager. On suspicion of exposure revoke/rotate at Hevy, verify the replacement against the existing binding and close the shell.
+3. From `backend/`, use a PostgreSQL role with only connection, schema usage and SELECT access to `source_accounts` for the verification command. Inject its connection string as `DATABASE_URL`. The verifier checks the private binding against that table, compares the identity from `GET /v1/user/info`, then requests only page 1 of `GET /v1/workouts` with `pageSize=1`. It uses the importer’s bounded parser and pure mapping in memory. Transient errors can retry the same request. The client disables environment proxies and redirects. Verification rejects TLS key logging.
+4. Run this exact command. Omitting `--verify-only` selects the transactional importer.
+
+```sh
+uv run --frozen python -m fitness_intelligence.adapters.hevy.cli --verify-only \
+  --binding "$HOME/.config/fitness-intelligence/hevy.json"
+```
+
+Record only the fixed outcome and exit status. An empty page verifies the envelope only. Failure is inconclusive; check local configuration or reproduce with synthetic fixtures. Never save a live response for troubleshooting. Success covers one identity comparison and the observed list shape. Detail, events, lifecycle, pagination stability and deletion behavior require separate controlled synthetic-account tests.
+
+### Storage and recovery gates before a personal import
+
+- Record who controls the single-user database, its volume, the OS credentials and backup keys. Restrict PostgreSQL to local access. Compose loopback binding alone does not establish encryption or exclusive ownership.
+- Rehearse a backup and restore with synthetic records first. Use PostgreSQL 17 tools, a private encrypted directory and `umask 077`. With private libpq service entries for the source and a **new empty disposable target**, run `pg_dump -Fc -d service=fi_source -f "$private_dir/fitness.dump"` then `pg_restore --exit-on-error --single-transaction --no-owner --no-acl -d service=fi_restore "$private_dir/fitness.dump"`. Verify the migration revision, synthetic owner/account, workout tree and checkpoint on the restored target. Restrict restored access before use. Test recovery of the binding and backup keys separately. A successful database restore alone does not authorize a personal import.
+- Agree on a retention period for canonical workouts (including soft-deleted rows), references, tombstones, checkpoints, backups and exports. Record the owner, expiry and cleanup procedure. There is no automatic purge.
+- Rehearse an owner-scoped export and erasure on synthetic records, verifying coverage of related records and exclusion of other owners. Disconnect the source and revoke its key first for erasure. Include binding files, exports, backup expiry and how erasure will be reapplied after restoration. No owner-facing export/erasure implementation exists. A whole-database dump is only suitable for private disaster recovery.
+- Leave personal imports blocked until the owner approves these policies, verifies recovery and erasure, and resolves the provider-contract gates below. M2B.3A authorizes only the in-memory check.
+
+## Run synchronization (synthetic data only)
 
 From `backend/`, with the two secret environment variables injected:
 
@@ -157,7 +179,7 @@ Before personal-data import, approve retention, export/erasure, backup and crede
 policies; establish the trusted local owner and account binding; and validate uncertain behaviors
 using synthetic workouts in a controlled provider account. Sensitive canonical text and numeric
 measurements remain in the database even after source deletion. No retention purge is implemented.
-Authentication is still required before exposing any health-data endpoint. M2B.3 is out of scope.
+Authentication is still required before exposing any health-data endpoint.
 
 ## Validation
 
