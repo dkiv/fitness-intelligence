@@ -444,7 +444,7 @@ which must be documented rather than represented as reversible operational histo
 
 - **Provider identity:** docs expose `/v1/user/info.data.id`, but permanence across key rotation,
   username changes and reconnect is not explicitly promised. Verify with a dedicated synthetic
-  account before using real credentials. Never test against a user's personal workout history.
+  account before using real credentials. Use synthetic workouts for lifecycle tests. M2B.3A permits only the [bounded in-memory contract check](hevy-importer.md#verify-one-live-sample-m2b3a) on a trusted personal account.
 - **Workout continuity:** verify edit/title change/reorder preserve workout ID; copy/restore may
   create new IDs. Child continuity is intentionally unsupported unless Hevy adds occurrence IDs.
 - **Feed semantics:** ask Hevy or probe synthetic records for `since` inclusive/exclusive behavior,
@@ -466,6 +466,6 @@ which must be documented rather than represented as reversible operational histo
   cross-provider merge or analytics cache keyed by child identity needs a separate design.
 
 M2B.1's migrations, pure mapping and synthetic test foundation are merged. M2B.2 implements the
-local client/importer on its feature branch with synthetic transport and PostgreSQL validation. This does not establish
+local client/importer on main with synthetic transport and PostgreSQL validation. This does not establish
 production synchronization correctness or readiness to import personal data:
 account binding, synthetic API validation and privacy/access decisions remain explicit gates.

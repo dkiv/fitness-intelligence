@@ -36,6 +36,22 @@ class LocalBinding:
     provider_account_id: str
 
 
+def check_active_binding(session: Session, binding: LocalBinding) -> None:
+    account = session.scalar(
+        select(SourceAccount)
+        .where(
+            SourceAccount.id == binding.source_account_id,
+            SourceAccount.user_id == binding.user_id,
+            SourceAccount.provider == "hevy",
+            SourceAccount.status == "active",
+            SourceAccount.provider_account_id == binding.provider_account_id,
+        )
+        .execution_options(populate_existing=True)
+    )
+    if account is None:
+        raise HevyError("untrusted or inactive account binding")
+
+
 class Importer:
     def __init__(self, engine: Engine, binding: LocalBinding, client: HevyClient) -> None:
         self.engine, self.binding, self.client = engine, binding, client
@@ -82,21 +98,6 @@ class Importer:
                     # Rollback/pool reset cannot release session advisory locks.
                     connection.invalidate()
                     raise
-
-    def _account(self, session: Session) -> None:
-        account = session.scalar(
-            select(SourceAccount)
-            .where(
-                SourceAccount.id == self.binding.source_account_id,
-                SourceAccount.user_id == self.binding.user_id,
-                SourceAccount.provider == "hevy",
-                SourceAccount.status == "active",
-                SourceAccount.provider_account_id == self.binding.provider_account_id,
-            )
-            .execution_options(populate_existing=True)
-        )
-        if account is None:
-            raise HevyError("untrusted or inactive account binding")
 
     def _reference(self, session: Session, identity: str) -> ExternalReference | None:
         return session.scalar(
@@ -148,7 +149,7 @@ class Importer:
         self._clock(mapped.source_updated_at)
         needs_detail = False
         with session.begin():
-            self._account(session)
+            check_active_binding(session, self.binding)
             tombstone = self._tombstone(session, source.id)
             ref = self._reference(session, source.id)
             if tombstone is not None:
@@ -259,7 +260,7 @@ class Importer:
         if instant is not None:
             self._clock(instant)
         with session.begin():
-            self._account(session)
+            check_active_binding(session, self.binding)
             tombstone = self._tombstone(session, event.id)
             ref = self._reference(session, event.id)
             if instant is not None and ref is not None and ref.source_updated_at is not None:
@@ -301,7 +302,7 @@ class Importer:
             raise HevyError("provider account mismatch")
         with self._locked() as session:
             with session.begin():
-                self._account(session)
+                check_active_binding(session, self.binding)
                 state = session.scalar(
                     select(AccountSyncState).where(*self._scope(AccountSyncState))
                 )
@@ -349,7 +350,7 @@ class Importer:
             else:
                 events()
             with session.begin():
-                self._account(session)
+                check_active_binding(session, self.binding)
                 pending = session.scalar(
                     select(WorkoutTombstone.id)
                     .where(

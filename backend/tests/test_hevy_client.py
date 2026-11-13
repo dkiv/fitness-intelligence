@@ -138,3 +138,36 @@ def test_changing_pages_and_size_limit() -> None:
     with pytest.raises(HevyError, match="size"):
         client.identity()
     client.close()
+
+
+@pytest.mark.parametrize(
+    ("identity", "items", "outcome"),
+    [
+        ("other", [], "mismatch"),
+        ("bound", [], False),
+        ("bound", [snapshot()], True),
+        ("bound", [snapshot(), snapshot()], "pagination"),
+        ("bound", [{"title": "private synthetic text"}], "pagination"),
+    ],
+)
+def test_verification_request_scope(identity: str, items: list[dict], outcome: str | bool) -> None:
+    paths: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        paths.append(request.url.path)
+        assert request.method == "GET"
+        if len(paths) == 1:
+            return httpx.Response(200, json={"data": {"id": identity}})
+        assert dict(request.url.params) == {"page": "1", "pageSize": "1"}
+        return httpx.Response(200, json=dict(page=1, page_count=3 if items else 0, workouts=items))
+
+    client = HevyClient("synthetic", transport=httpx.MockTransport(handler))
+    try:
+        if isinstance(outcome, str):
+            with pytest.raises(HevyError, match=outcome):
+                client.verify_sample("bound")
+        else:
+            assert client.verify_sample("bound") is outcome
+    finally:
+        client.close()
+    assert paths == ["/v1/user/info"] + (["/v1/workouts"] if identity == "bound" else [])

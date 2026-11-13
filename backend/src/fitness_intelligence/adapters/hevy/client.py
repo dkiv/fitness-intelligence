@@ -9,6 +9,7 @@ from urllib.parse import quote
 
 import httpx
 
+from .mapping import map_workout
 from .schemas import (
     MAX_RESPONSE_BYTES,
     DeletedEvent,
@@ -40,6 +41,7 @@ class HevyClient:
             headers={"api-key": api_key},
             timeout=httpx.Timeout(20, connect=5, pool=5),
             follow_redirects=False,
+            trust_env=False,
             transport=transport,
         )
         self._sleep = sleep
@@ -110,10 +112,12 @@ class HevyClient:
         except ValueError:
             raise HevyError("invalid workout response") from None
 
-    def _pages(self, since: datetime | None) -> Iterator[WorkoutPage | EventPage]:
+    def _pages(
+        self, since: datetime | None, *, page_size: int = 10
+    ) -> Iterator[WorkoutPage | EventPage]:
         expected_count: int | None = None
         for page in range(1, self.max_pages + 1):
-            params: dict[str, str | int] = {"page": page, "pageSize": 10}
+            params: dict[str, str | int] = {"page": page, "pageSize": page_size}
             if since is not None:
                 params["since"] = since.isoformat()
             try:
@@ -131,7 +135,7 @@ class HevyClient:
                         result.page_count > 0
                         and (page > result.page_count or (not items and page < result.page_count))
                     )
-                    or len(items) > 10
+                    or len(items) > page_size
                 ):
                     raise ValueError
             except ValueError:
@@ -141,6 +145,17 @@ class HevyClient:
             if page >= result.page_count:
                 return
         raise HevyError("page budget exhausted")
+
+    def verify_sample(self, expected_identity: str) -> bool:
+        """Check the bound identity and map at most one first-page workout in memory."""
+        if self.identity() != expected_identity:
+            raise HevyError("provider account mismatch")
+        page = next(self._pages(None, page_size=1))
+        assert isinstance(page, WorkoutPage)
+        if not page.workouts:
+            return False
+        map_workout(page.workouts[0])
+        return True
 
     def workouts(self) -> Iterator[HevyWorkout]:
         for page in self._pages(None):
