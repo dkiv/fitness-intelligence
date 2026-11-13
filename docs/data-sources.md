@@ -1,7 +1,8 @@
 # Data sources
 
-These are intended sources, not implemented integrations. Hevy's public API documentation
-has been reviewed for M2A; authenticated behavior and access are not yet verified.
+Hevy has a private local read-only importer as of M2B.2; other integrations remain planned.
+Hevy's official contract is verified against documentation; live account behavior remains
+unverified. See [local synchronization setup and limitations](hevy-importer.md).
 
 | Source | Intended data | Planned boundary |
 | --- | --- | --- |

@@ -2,7 +2,8 @@
 
 Longitudinal analytics across strength, endurance, recovery, nutrition and body weight.
 Users keep their existing tracking apps. **Milestones 0 and 1** are implemented: API foundation, user-owned canonical strength models,
-migrations and tests. No integrations, authentication, AI or web UI.
+migrations and tests. M2B.1 mapping and M2B.2 private local Hevy synchronization are implemented.
+No health-data endpoints, authentication, AI or web UI. See [Hevy setup and synchronization](docs/hevy-importer.md).
 
 ## Repository
 

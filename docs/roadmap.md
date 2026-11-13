@@ -9,11 +9,12 @@
   - **M2A: API contract and synchronization design (reviewed and approved with adjustments).** Official documentation reviewed;
     [integration design](hevy-sync-design.md) records mapping, identity limits, account namespaces,
     synchronization and M2B acceptance criteria. M2A itself introduced no schema changes.
-  - **M2B.1: Schema and pure mapping (complete on feature branch; not merged).** Source-account
+  - **M2B.1: Schema and pure mapping (merged).** Source-account
     namespaces, legacy migration, minimal checkpoint/tombstone storage, strict source schemas,
     pure mapping and synthetic PostgreSQL/regression tests. No live API requests or ingestion.
-  - **M2B.2: Subsequent ingestion implementation (not started).** Read-only HTTP transport and
-    local serialized ingestion remain future work. Distributed fencing and elaborate automated
+  - **M2B.2: HTTP client and transactional importer (implemented on feature branch).** Read-only
+    transport, account-serialized historical/incremental import, atomic snapshots, tombstones,
+    checkpoint safety and a private local CLI. See [operating instructions](hevy-importer.md). Distributed fencing and elaborate automated
     reconciliation are deferred until concurrency or scheduled production syncing requires them.
     Idempotency and checkpoint correctness remain mandatory. Personal imports remain gated on
     trusted ownership, secrets and retention decisions.

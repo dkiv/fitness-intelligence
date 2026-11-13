@@ -126,10 +126,12 @@ credential columns are needed at this stage.
 
 Minimal sync state stores initialization and a nullable successful **run-start** checkpoint.
 The database enforces coherent initialized/checkpoint state and refuses checkpoint regression.
-It cannot establish that pages completed: M2B.2 must advance this value only after all pages and
+It cannot establish that pages completed: M2B.2 advances this value only after all pages and
 events succeed, in an explicit transaction. There are no page-offset resume cursors. Tombstones
 are unique per account/workout ID and need no canonical target. A null source deletion time means
-pending/unresolved; a non-null time means timestamped source evidence. Observation time never
+pending/unresolved; a non-null time means timestamped source evidence. Migration
+`b702_hevy_pending` adds a pending flag to retain an undated deletion intent alongside earlier
+dated evidence; downgrade refuses to discard pending intent. Observation time never
 substitutes for deletion time. Ownership/provider composite foreign keys protect all new rows.
 
 Downgrade preserves canonical records and old reference fields. It refuses before any destructive
@@ -156,8 +158,9 @@ must serialize runs, preserve idempotency, use atomic workout/reference/child tr
 first-import identity, resolve equal-time conflicts, honor tombstones and avoid advancing a
 checkpoint after partial failure. These correctness requirements have not been implemented or
 claimed by M2B.1. Provider account stability/feed semantics, trusted ownership, credential storage,
-retention and erasure remain gates before personal imports. M2B.2 may start implementation against
-synthetic transports; this foundation is not production synchronization.
+retention and erasure remain gates before personal imports. M2B.2 now implements these requirements with a local PostgreSQL session advisory lock and a
+private CLI, validated using synthetic transports. See [Hevy operations](hevy-importer.md);
+provider probes and privacy policies remain gates before personal imports.
 
 ### Hevy JSON and semantic hash contract
 
