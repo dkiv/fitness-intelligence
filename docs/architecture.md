@@ -90,6 +90,22 @@ are known. Never return provider secrets or put sensitive records in logs.
 Reference patterns: [SQLAlchemy session lifecycle](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
 and [Alembic environment configuration](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
 
+## Historical Hevy synchronization proposal (M2A)
+
+The [M2A design](hevy-sync-design.md) refines the planned importer behavior without changing
+the current schema. Hevy exposes workout IDs but no stable exercise/set occurrence IDs.
+M2B should therefore preserve workout identity and replace changed child snapshots atomically;
+position-derived child references cannot provide continuity across edits. This supersedes the
+generic stable-child-identity suggestion above for Hevy specifically.
+
+The original proposal called for source-account namespaces, fenced per-account synchronization state
+and a tombstone ledger for deleted workouts not previously imported. Existing provider/external
+ID strings retain their meaning. Raw payloads become allowlisted source projections, with
+sensitive free text stored only canonically. These changes require reviewed M2B migrations;
+none were applied in M2A. M2B.1 implements the smaller foundation described below and explicitly
+supersedes fencing and reconciliation requirements for the initial local importer. Authentication
+and real-data operational gates remain unresolved.
+
 ## Implemented Hevy mapping foundation (M2B.1)
 
 M2B.1 supersedes the proposed fenced synchronization architecture above for the initial local,
