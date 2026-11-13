@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -15,6 +16,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -131,7 +133,11 @@ class ExerciseSet(OwnedRecord, Base):
 class ExternalReference(OwnedRecord, Base):
     __tablename__ = "external_references"
     __table_args__ = (
-        UniqueConstraint("user_id", "provider", "entity_type", "external_id"),
+        UniqueConstraint("user_id", "provider", "source_account_id", "entity_type", "external_id"),
+        ForeignKeyConstraint(
+            ["user_id", "provider", "source_account_id"],
+            ["source_accounts.user_id", "source_accounts.provider", "source_accounts.id"],
+        ),
         ForeignKeyConstraint(["user_id", "workout_id"], ["workouts.user_id", "workouts.id"]),
         ForeignKeyConstraint(
             ["user_id", "exercise_id"], ["workout_exercises.user_id", "workout_exercises.id"]
@@ -154,6 +160,7 @@ class ExternalReference(OwnedRecord, Base):
         Index("ix_external_references_user_set", "user_id", "set_id"),
     )
 
+    source_account_id: Mapped[UUID]
     provider: Mapped[str]
     entity_type: Mapped[str]
     external_id: Mapped[str]
@@ -173,3 +180,76 @@ class ExternalReference(OwnedRecord, Base):
     source_version: Mapped[str | None]
     sync_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSON)
     user: Mapped["User"] = relationship(back_populates="external_references")
+
+
+class SourceAccount(OwnedRecord, Base):
+    __tablename__ = "source_accounts"
+    __table_args__ = (
+        UniqueConstraint("user_id", "provider", "id"),
+        CheckConstraint("length(provider) > 0", name="provider_nonempty"),
+        CheckConstraint(
+            "(status = 'legacy_unresolved' AND provider_account_id IS NULL) OR "
+            "(status IN ('active', 'disconnected') AND "
+            "provider_account_id IS NOT NULL AND length(provider_account_id) > 0)",
+            name="identity_state",
+        ),
+        Index(
+            "uq_source_accounts_verified",
+            "user_id",
+            "provider",
+            "provider_account_id",
+            unique=True,
+            postgresql_where=text("provider_account_id IS NOT NULL"),
+            sqlite_where=text("provider_account_id IS NOT NULL"),
+        ),
+        Index(
+            "uq_source_accounts_legacy",
+            "user_id",
+            "provider",
+            unique=True,
+            postgresql_where=text("provider_account_id IS NULL"),
+            sqlite_where=text("provider_account_id IS NULL"),
+        ),
+    )
+    provider: Mapped[str]
+    provider_account_id: Mapped[str | None]
+    status: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AccountSyncState(OwnedRecord, Base):
+    __tablename__ = "account_sync_states"
+    __table_args__ = (
+        UniqueConstraint("user_id", "provider", "source_account_id"),
+        ForeignKeyConstraint(
+            ["user_id", "provider", "source_account_id"],
+            ["source_accounts.user_id", "source_accounts.provider", "source_accounts.id"],
+        ),
+        CheckConstraint(
+            "(initialized AND checkpoint IS NOT NULL) OR (NOT initialized AND checkpoint IS NULL)",
+            name="checkpoint_state",
+        ),
+    )
+    provider: Mapped[str]
+    source_account_id: Mapped[UUID]
+    initialized: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    checkpoint: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class WorkoutTombstone(OwnedRecord, Base):
+    __tablename__ = "workout_tombstones"
+    __table_args__ = (
+        UniqueConstraint("user_id", "provider", "source_account_id", "external_id"),
+        ForeignKeyConstraint(
+            ["user_id", "provider", "source_account_id"],
+            ["source_accounts.user_id", "source_accounts.provider", "source_accounts.id"],
+        ),
+        CheckConstraint("length(external_id) > 0", name="identity_nonempty"),
+    )
+    provider: Mapped[str]
+    source_account_id: Mapped[UUID]
+    external_id: Mapped[str]
+    source_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    observed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )

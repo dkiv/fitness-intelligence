@@ -1,6 +1,7 @@
 # Data sources
 
-These are intended sources, not implemented integrations or verified API access contracts.
+These are intended sources, not implemented integrations. Hevy's public API documentation
+has been reviewed for M2A; authenticated behavior and access are not yet verified.
 
 | Source | Intended data | Planned boundary |
 | --- | --- | --- |
@@ -17,3 +18,13 @@ committing to ingestion behavior. Record original source attribution to prevent 
 Future ingestion must be idempotent, user-scoped and explicit about units, UTC timestamps,
 time zones, provenance, updates and deletions. Preserve missing values. Use synthetic fixtures.
 No provider credentials or real source exports belong in this repository.
+
+## Hevy M2A research
+
+See the [proposed Hevy integration contract and synchronization design](hevy-sync-design.md)
+for official sources reviewed on 2026-11-13, source-to-canonical mapping, unsupported child
+identity continuity, account namespace migration, deletion limitations and M2B implementation
+gates. The design uses only official schema examples and synthetic illustrations, not personal
+workout responses. M2B.1 now implements the account schema and pure mapping foundation;
+[architecture.md](architecture.md) defines the implemented JSON, timestamp and semantic hash
+contracts. No live provider client or synchronization orchestration has been implemented.
