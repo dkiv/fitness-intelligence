@@ -1,7 +1,7 @@
 # Fitness Intelligence
 
 Longitudinal analytics across strength, endurance, recovery, nutrition and body weight.
-Users keep their existing tracking apps. **Milestone 0 only** is implemented: API, database,
+Users keep their existing tracking apps. **Milestones 0 and 1** are implemented: API foundation, user-owned canonical strength models,
 migrations and tests. No integrations, authentication, AI or web UI.
 
 ## Repository
@@ -67,7 +67,7 @@ uv run ruff format --check .
 ```
 
 The default suite uses in-memory SQLite for a portable model smoke test and skips the PostgreSQL
-integration test. SQLite alone does not validate PostgreSQL behavior. Run the full suite with
+integration tests. SQLite alone does not validate PostgreSQL behavior. Run the full suite with
 Compose (from repository root, after `docker compose up --build -d`):
 
 ```sh
@@ -80,8 +80,9 @@ Or, from `backend/`, set TEST_DATABASE_URL to a disposable PostgreSQL database:
 TEST_DATABASE_URL='postgresql+psycopg://USER:PASSWORD@localhost:5432/TEST_DB' uv run pytest
 ```
 
-The PostgreSQL test uses a unique temporary schema, runs upgrade, metadata drift check,
-user persistence, downgrade and re-upgrade, then removes that schema. The test account needs
+PostgreSQL tests use unique temporary schemas, exercise ownership and measurement constraints,
+ordering, external identities, upgrades, metadata drift checks, downgrade and re-upgrade,
+then remove those schemas. Downgrading M1 preserves existing users. The test account needs
 schema creation privileges. Never point tests at production. No real health data is used.
 
 ## Migrations

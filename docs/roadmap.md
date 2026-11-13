@@ -1,9 +1,10 @@
 # Roadmap
 
-- **M0: Project foundation (current).** Repository, documentation, FastAPI health endpoint,
+- **M0: Project foundation (complete).** Repository, documentation, FastAPI health endpoint,
   PostgreSQL, user identity model, Alembic, tests and local Compose. No integrations, AI or UI.
-- **M1: Canonical data model and ownership.** Authentication design, enforced user isolation,
-  canonical measurement/workout schema, synthetic fixtures and access tests.
+- **M1: Canonical data model and ownership (complete).** Canonical strength schema, database-enforced
+  ownership links, synthetic constraint and migration tests. Authentication and authorized data
+  access remain required before exposing fitness endpoints.
 - **M2: Hevy ingestion.** Validate API access; implement a modular adapter, per-user connections,
   idempotent workout imports and provenance.
 - **M3: Garmin ingestion.** Validate Garmin Personal API access; implement a separate adapter
@@ -16,4 +17,4 @@
   address privacy, retention/deletion, operational safeguards and public-release requirements
   before launch.
 
-M1 through M6 are planned, not implemented. Strava remains out of scope.
+M2 through M6 are planned, not implemented. Strava remains out of scope.
