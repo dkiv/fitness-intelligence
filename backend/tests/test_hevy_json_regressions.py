@@ -9,7 +9,7 @@ import pytest
 from pydantic import ValidationError
 from test_hevy_mapping import snapshot
 
-from fitness_intelligence.adapters.hevy.mapping import map_workout
+from fitness_intelligence.adapters.hevy.mapping import map_workout, semantic_number
 from fitness_intelligence.adapters.hevy.schemas import (
     EventPage,
     HevyWorkout,
@@ -153,6 +153,36 @@ def test_deleted_event_timestamp_policy() -> None:
 
 def digest(data: dict) -> str:
     return map_workout(HevyWorkout.model_validate(data)).content_hash
+
+
+@pytest.mark.parametrize("exponent", [1_000, 1_000_000])
+def test_semantic_number_does_not_expand_exponents(exponent: int) -> None:
+    assert semantic_number(Decimal(f"1e-{exponent}")) == f"1e-{exponent}"
+    assert semantic_number(Decimal(f"10e-{exponent + 1}")) == f"1e-{exponent}"
+
+
+@pytest.mark.parametrize("kind", KINDS)
+def test_tiny_custom_metric_hash_is_bounded_exact_and_preserves_provenance(kind: str) -> None:
+    def mapped(literal: str) -> Any:
+        payload = json.dumps(snapshot()).replace(
+            '"custom_metric": 2.25', '"custom_metric": ' + literal
+        )
+        return map_workout(parse(wrap(payload, kind), kind))
+
+    result = mapped("1e-1000000")
+    assert result.content_hash == mapped("10e-1000001").content_hash
+    assert result.content_hash != mapped("2e-1000000").content_hash
+    assert result.content_hash != mapped("0").content_hash
+    assert result.content_hash != mapped("null").content_hash
+    assert result.raw_payload["exercises"][0]["sets"][0]["custom_metric"] == "1E-1000000"
+    assert result.workout.exercises[0].sets[0].source_measurements["custom_metric"] == "1E-1000000"
+
+
+def test_semantic_number_preserves_precision_beyond_decimal_context() -> None:
+    value = "123456789012345678901234567890123456789"
+    assert semantic_number(Decimal(value + "e-100")) == value + "e-100"
+    assert semantic_number(Decimal(value + "0e-101")) == value + "e-100"
+    assert semantic_number(Decimal("-0.000")) == "0"
 
 
 @pytest.mark.parametrize("literal", ["20", "20.0", "20.0000", "2e1"])

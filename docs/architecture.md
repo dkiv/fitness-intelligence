@@ -175,7 +175,7 @@ are rejected rather than truncated. Invalid dates, naive timestamps and UTC conv
 are controlled validation errors. Original accepted strings remain in provenance; normalized
 instants use UTC with exactly six fractional digits in the semantic hash.
 
-`hevy-semantic-v1` is a SHA-256 digest of UTF-8 JSON serialized with sorted object keys, compact
+`hevy-semantic-v2` is a SHA-256 digest of UTF-8 JSON serialized with sorted object keys, compact
 separators and Python's default ASCII escaping. The preimage contains the allowlisted workout
 projection, a `hash_contract` label, workout title/description and exercise titles/notes. Source
 workout timestamps are replaced with normalized UTC strings; null end time stays null. Exercises
@@ -184,10 +184,12 @@ superset IDs and original set types remain significant. Incoming array order alo
 significant when indexes agree; assigning different content to those indexes is significant.
 
 Weight, distance and duration are rounded HALF_EVEN to 4 places, and RPE to 2 places before
-hashing. Numeric hash strings use fixed-point notation without insignificant trailing fractional
-zeros; positive/negative zero both become `"0"`. Custom metrics have no canonical storage unit
-or rounding precision, so their exact Decimal value is hashed with the same spelling
-normalization. Repetitions and indexes use validated integers. Null and zero remain distinct.
+hashing. Nonzero numeric hash strings use coefficient/exponent notation with trailing coefficient
+zeros removed (for example, `20`, `20.0` and `2e1` all become `"2e1"`);
+positive/negative zero both become `"0"`. Formatting preserves exact digits independently of
+Decimal context precision and never expands exponent-sized runs of zeros. Custom metrics have no
+canonical storage unit or rounding precision, so their exact Decimal value is hashed with the same
+spelling normalization. Repetitions and indexes use validated integers. Null and zero remain distinct.
 Changes below canonical measurement precision deliberately share a hash; custom-metric changes
 remain significant at their full source precision. Unknown fields, warning categories and local
 observation timestamps are excluded. Source created/updated instants remain significant.
@@ -195,6 +197,7 @@ observation timestamps are excluded. Source created/updated instants remain sign
 The hash preimage is a separate copy: original numeric values/scale and timestamp offsets remain
 in the allowlisted provenance and source measurement metadata. It is a whole-snapshot change
 detector, not an ordering version, account identity or child-only digest. Downstream ingestion
-must still compare source times and canonical child content separately. This replaces the initial
-format-sensitive digest; any persisted older digest would need recomputation/version labeling
-before comparison. No real imports or persisted hashes are introduced in M2B.1.
+must still compare source times and canonical child content separately. V2 replaces V1's fixed-point
+numeric formatting to prevent tiny custom metrics from causing unbounded expansion. Any persisted
+older digest would need recomputation/version labeling before comparison. No real imports or
+persisted hashes are introduced in M2B.1.

@@ -26,8 +26,13 @@ def semantic_number(value: Decimal | None) -> str | None:
         return None
     if value == 0:
         return "0"
-    rendered = format(value, "f")
-    return rendered.rstrip("0").rstrip(".") if "." in rendered else rendered
+    # Work on coefficient digits, never expand exponent-sized runs of zeros or
+    # normalize through the Decimal context (which could round source precision).
+    sign, digits, exponent = value.as_tuple()
+    coefficient = "".join(str(digit) for digit in digits)
+    trimmed = coefficient.rstrip("0")
+    exponent += len(coefficient) - len(trimmed)
+    return f"{'-' if sign else ''}{trimmed}e{exponent}"
 
 
 def map_set(source: HevySet, position: int) -> StrengthSet:
@@ -109,7 +114,7 @@ def map_workout(source: HevyWorkout) -> MappedWorkout:
     projection["exercises"] = projected_exercises
     # Versioned semantic contract: provenance remains untouched by normalization.
     content = deepcopy(projection)
-    content["hash_contract"] = "hevy-semantic-v1"
+    content["hash_contract"] = "hevy-semantic-v2"
     for field in ("start_time", "end_time", "created_at", "updated_at"):
         value = content[field]
         content[field] = None if value is None else utc(value).isoformat(timespec="microseconds")
