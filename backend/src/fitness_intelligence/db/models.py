@@ -250,6 +250,7 @@ class WorkoutTombstone(OwnedRecord, Base):
     source_account_id: Mapped[UUID]
     external_id: Mapped[str]
     source_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    pending: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
     observed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

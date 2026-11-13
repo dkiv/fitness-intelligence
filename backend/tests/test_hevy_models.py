@@ -204,3 +204,39 @@ def test_legacy_binding_conflict_rolls_back(db: Session) -> None:
     with pytest.raises(DBAPIError):
         db.commit()
     db.rollback()
+
+
+def test_pending_migration_downgrade_guard_and_roundtrip(db: Session) -> None:
+    owner, _, _, _, _ = seed(db)
+    source = account(db, owner.id)
+    tombstone = WorkoutTombstone(
+        user_id=owner.id,
+        provider="hevy",
+        source_account_id=source.id,
+        external_id="pending",
+        pending=True,
+    )
+    db.add(tombstone)
+    db.commit()
+    tombstone_id = tombstone.id
+    db.close()
+    config = Config(str(Path(__file__).parents[1] / "alembic.ini"))
+    with pytest.raises(RuntimeError, match="pending Hevy"):
+        command.downgrade(config, "91ab")
+    assert "pending" in {
+        column["name"] for column in inspect(db.bind).get_columns("workout_tombstones")
+    }
+    with db.bind.begin() as connection:
+        connection.execute(
+            text("UPDATE workout_tombstones SET pending=false WHERE id=:id"), {"id": tombstone_id}
+        )
+    command.downgrade(config, "91ab")
+    command.upgrade(config, "head")
+    command.check(config)
+    with db.bind.connect() as connection:
+        assert (
+            connection.scalar(
+                text("SELECT pending FROM workout_tombstones WHERE id=:id"), {"id": tombstone_id}
+            )
+            is False
+        )

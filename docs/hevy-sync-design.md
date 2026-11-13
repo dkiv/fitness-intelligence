@@ -3,7 +3,7 @@
 Status: M2A reviewed and approved with the M2B.1 scope adjustments below. This document preserves
 the original synchronization proposal as future design context, not a claim of implemented sync.
 Reviewed 2026-11-13 against clean `main` at `5f4345dcc936ef7823e3c80dc4349c69bb410bdd`.
-M2B.1 schema, pure mapping and synthetic tests are complete on the feature branch. Production imports
+M2B.1 schema, pure mapping and synthetic tests are merged into main. Production imports
 remain gated on credential handling, trusted ownership and the validation questions in section 11.
 
 ## Current implementation and approved scope adjustments
@@ -12,7 +12,9 @@ M2B.1 implements user-owned source accounts with immutable verified identity, ac
 references and legacy backfill, minimal initialization/run-start checkpoint state, account-scoped
 tombstones, Pydantic read schemas and pure source-to-canonical mapping. Mapping and migration
 behavior are tested with synthetic data; no API requests, authentication, endpoints, ingestion
-orchestration, scheduler or real health data are included. M2B.2 has not begun.
+orchestration, scheduler or real health data are included in M2B.1. M2B.2 adds the private local
+HTTP client and transactional importer; see [operating instructions](hevy-importer.md).
+Session advisory locks replace the original proposed distributed leases for local serialization.
 
 The initial importer is local and single-user. Distributed fencing leases and elaborate automated
 reconciliation are deferred until concurrency or scheduled production syncing requires them.
@@ -463,7 +465,7 @@ which must be documented rather than represented as reversible operational histo
 - **Product tradeoff:** child UUIDs change after child snapshot edits. Any future annotations,
   cross-provider merge or analytics cache keyed by child identity needs a separate design.
 
-M2B.1's migrations, pure mapping and synthetic test foundation are implemented and validated on
-the feature branch. Remaining ingestion work is not implemented. This does not establish
+M2B.1's migrations, pure mapping and synthetic test foundation are merged. M2B.2 implements the
+local client/importer on its feature branch with synthetic transport and PostgreSQL validation. This does not establish
 production synchronization correctness or readiness to import personal data:
 account binding, synthetic API validation and privacy/access decisions remain explicit gates.
