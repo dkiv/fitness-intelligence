@@ -47,7 +47,7 @@ def main() -> None:
         # No traceback, SQL parameters, provider bodies or credential-bearing exceptions.
         parser.exit(
             1,
-            "Hevy synchronization failed; checkpoint not advanced. Check local binding, "
+            "Hevy synchronization failed; inspect checkpoint before retrying. Check local binding, "
             "credentials, provider availability and unresolved source conflicts.\n",
         )
     finally:

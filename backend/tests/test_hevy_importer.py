@@ -5,7 +5,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import event, select
+from sqlalchemy import event, select, text
 from sqlalchemy.orm import Session
 from test_hevy_mapping import snapshot
 
@@ -345,6 +345,79 @@ def test_pending_after_confirmed_deletion_preserves_evidence(db: Session) -> Non
         importer.sync()
     assert db.scalar(select(AccountSyncState.checkpoint)) == checkpoint
     client.feed = [dated]
+    with pytest.raises(HevyError, match="unresolved"):
+        importer.sync()
+    client.feed = [
+        DeletedEvent(type="deleted", id=client.data["id"], deleted_at="2026-01-04T00:00:00Z")
+    ]
     importer.sync()
     db.expire_all()
     assert not db.scalar(select(WorkoutTombstone)).pending
+
+
+def test_pending_update_does_not_prevent_later_deletion_resolution(db: Session) -> None:
+    importer, client = setup(db)
+    importer.sync()
+    client.feed = [DeletedEvent(type="deleted", id=client.data["id"])]
+    with pytest.raises(HevyError):
+        importer.sync()
+    checkpoint = db.scalar(select(AccountSyncState.checkpoint))
+    edit(client, 3)
+    client.feed.append(
+        DeletedEvent(type="deleted", id=client.data["id"], deleted_at="2026-01-04T00:00:00Z")
+    )
+    with pytest.raises(HevyError, match="unresolved"):
+        importer.sync()
+    db.expire_all()
+    assert not db.scalar(select(WorkoutTombstone)).pending
+    assert db.scalar(select(AccountSyncState.checkpoint)) == checkpoint
+    importer.sync()
+    assert read(db).deleted_at == datetime(2026, 1, 4, tzinfo=UTC)
+
+
+def test_unlock_failure_discards_locked_connection(db: Session) -> None:
+    importer, _ = setup(db)
+
+    def fail_unlock(
+        connection: Any, cursor: Any, statement: str, parameters: Any, context: Any, many: bool
+    ) -> None:
+        if "pg_advisory_unlock" in statement:
+            raise RuntimeError("synthetic unlock failure")
+
+    event.listen(db.bind, "before_cursor_execute", fail_unlock)
+    try:
+        with pytest.raises(RuntimeError, match="unlock failure"):
+            with importer._locked() as session:
+                old_backend = session.scalar(text("SELECT pg_backend_pid()"))
+    finally:
+        event.remove(db.bind, "before_cursor_execute", fail_unlock)
+    # A pool reset alone leaves a session lock behind; invalidation closes its backend.
+    with importer._locked() as session:
+        assert session.scalar(text("SELECT pg_backend_pid()")) != old_backend
+
+
+def test_shared_workout_deletion_rolls_back_tombstone_and_checkpoint(db: Session) -> None:
+    importer, client = setup(db)
+    importer.sync()
+    workout = read(db)
+    checkpoint = db.scalar(select(AccountSyncState.checkpoint))
+    db.add(
+        ExternalReference(
+            user_id=importer.binding.user_id,
+            provider="hevy",
+            source_account_id=importer.binding.source_account_id,
+            entity_type="exercise",
+            external_id="shared-child",
+            exercise_id=workout.exercises[0].id,
+            raw_payload={},
+        )
+    )
+    db.commit()
+    client.feed = [
+        DeletedEvent(type="deleted", id=client.data["id"], deleted_at="2026-01-04T00:00:00Z")
+    ]
+    with pytest.raises(HevyError, match="ownership"):
+        importer.sync()
+    assert read(db).deleted_at is None
+    assert db.scalar(select(WorkoutTombstone)) is None
+    assert db.scalar(select(AccountSyncState.checkpoint)) == checkpoint

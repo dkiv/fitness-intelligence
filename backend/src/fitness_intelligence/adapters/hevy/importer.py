@@ -40,6 +40,7 @@ class Importer:
     def __init__(self, engine: Engine, binding: LocalBinding, client: HevyClient) -> None:
         self.engine, self.binding, self.client = engine, binding, client
         self.now = datetime.now(UTC)
+        self._deferred_update = False
 
     def _scope(
         self, model: type[AccountSyncState] | type[ExternalReference] | type[WorkoutTombstone]
@@ -60,17 +61,27 @@ class Importer:
         with self.engine.connect() as connection:
             if connection.dialect.name != "postgresql":
                 raise HevyError("PostgreSQL required")
-            locked = connection.scalar(text("SELECT pg_try_advisory_lock(:key)"), {"key": key})
-            connection.commit()
+            try:
+                locked = connection.scalar(text("SELECT pg_try_advisory_lock(:key)"), {"key": key})
+                connection.commit()
+            except BaseException:
+                # Acquisition may have succeeded before a commit/connection failure.
+                connection.invalidate()
+                raise
             if not locked:
                 raise HevyError("account synchronization already running")
             try:
                 with Session(connection, expire_on_commit=False) as session:
                     yield session
             finally:
-                connection.rollback()
-                connection.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": key})
-                connection.commit()
+                try:
+                    connection.rollback()
+                    connection.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": key})
+                    connection.commit()
+                except BaseException:
+                    # Rollback/pool reset cannot release session advisory locks.
+                    connection.invalidate()
+                    raise
 
     def _account(self, session: Session) -> None:
         account = session.scalar(
@@ -142,7 +153,10 @@ class Importer:
             ref = self._reference(session, source.id)
             if tombstone is not None:
                 if tombstone.pending or tombstone.source_deleted_at is None:
-                    raise HevyError("unresolved deletion")
+                    # Continue the feed so later timestamped evidence can resolve intent.
+                    # This run must still fail: this skipped update needs a fresh replay.
+                    self._deferred_update = True
+                    return
                 if mapped.source_updated_at <= tombstone.source_deleted_at:
                     return
                 needs_detail = not confirmed
@@ -262,7 +276,8 @@ class Importer:
             if instant is None:
                 tombstone.pending = True
             if instant is not None:
-                tombstone.pending = False
+                if tombstone.source_deleted_at is None or instant > tombstone.source_deleted_at:
+                    tombstone.pending = False
                 if tombstone.source_deleted_at is None or instant > tombstone.source_deleted_at:
                     tombstone.source_deleted_at = instant
                 if ref is not None:
@@ -281,6 +296,7 @@ class Importer:
 
     def sync(self, *, reconcile: bool = False) -> None:
         self.now = datetime.now(UTC)
+        self._deferred_update = False
         if self.client.identity() != self.binding.provider_account_id:
             raise HevyError("provider account mismatch")
         with self._locked() as session:
@@ -345,7 +361,7 @@ class Importer:
                     )
                     .limit(1)
                 )
-                if pending is not None:
+                if pending is not None or self._deferred_update:
                     raise HevyError("unresolved deletion")
                 if state is None:
                     state = AccountSyncState(

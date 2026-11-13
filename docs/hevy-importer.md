@@ -109,7 +109,11 @@ timestamps persist pending intent and fail the run. Invalid timestamps reject th
 application. Neither case advances the checkpoint. Reconciliation compares source IDs against live
 references; missing IDs trigger detail reads but remain unresolved even if detail is available.
 A 404 never implies deletion. Such a run retains data and leaves the previous checkpoint intact.
-Unresolved states require later feed evidence or deliberate operator investigation; there is no
+A repeated deletion at or before the last confirmed deletion time cannot clear pending intent.
+Only strictly newer timestamped deletion evidence can automatically clear it (an unverified
+provider policy); otherwise operator investigation is required. Updates encountered while pending
+are deferred so later deletion evidence can be read, but the run still fails without checkpointing
+until a fresh replay processes those updates. Unresolved states require later feed evidence or deliberate operator investigation; there is no
 quarantine-and-skip or automatic destructive repair command.
 
 ## Failures and diagnostics
@@ -122,6 +126,9 @@ errors, 429 and 5xx retry. Valid Retry-After seconds or HTTP dates are honored u
 longer waits fail for a later operator retry. Redirects and other 4xx fail immediately. Every API
 operation is GET against the fixed official HTTPS origin. Decimal JSON validation precedes mapping.
 
+Lock acquisition/cleanup failures invalidate the dedicated connection rather than returning a
+session advisory lock to the pool. A cleanup failure after checkpoint commit cannot undo that
+commit; inspect checkpoint state and safely replay instead of assuming it did not advance.
 The CLI exits nonzero with a generic sanitized message on failure and prints a fixed success
 message otherwise. It emits no provider response bodies, profile fields, credentials, SQL parameters
 or health payloads. Library `HevyError` categories distinguish operational failures for trusted
