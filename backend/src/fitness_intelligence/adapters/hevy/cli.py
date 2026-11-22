@@ -8,9 +8,10 @@ from pathlib import Path
 from uuid import UUID
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 from .client import HevyClient, HevyError
-from .importer import Importer, LocalBinding
+from .importer import Importer, LocalBinding, check_active_binding
 
 
 def load_binding(path: Path) -> LocalBinding:
@@ -34,17 +35,33 @@ def load_binding(path: Path) -> LocalBinding:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Private local Hevy synchronization")
     parser.add_argument("--binding", required=True, type=Path)
-    parser.add_argument("--reconcile", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--reconcile", action="store_true")
+    mode.add_argument("--verify-only", action="store_true", help="check identity and one sample")
     args = parser.parse_args()
     client = None
     engine = None
     try:
         binding = load_binding(args.binding)
+        if args.verify_only and os.environ.get("SSLKEYLOGFILE"):
+            raise HevyError("TLS key logging enabled")
         client = HevyClient(os.environ["HEVY_API_KEY"])
         engine = create_engine(os.environ["DATABASE_URL"], echo=False, hide_parameters=True)
+        if args.verify_only:
+            with Session(engine) as session:
+                check_active_binding(session, binding)
+            sampled = client.verify_sample(binding.provider_account_id)
+            print(
+                "Identity matched. Workout schema and mapping passed."
+                if sampled
+                else "Identity matched. Page schema passed. No workout available to validate."
+            )
+            return
         Importer(engine, binding, client).sync(reconcile=args.reconcile)
     except Exception:
         # No traceback, SQL parameters, provider bodies or credential-bearing exceptions.
+        if args.verify_only:
+            parser.exit(1, "Hevy verification failed. Check binding, credentials and contract.\n")
         parser.exit(
             1,
             "Hevy synchronization failed; inspect checkpoint before retrying. Check local binding, "
