@@ -469,3 +469,52 @@ M2B.1's migrations, pure mapping and synthetic test foundation are merged. M2B.2
 local client/importer on main with synthetic transport and PostgreSQL validation. This does not establish
 production synchronization correctness or readiness to import personal data:
 account binding, synthetic API validation and privacy/access decisions remain explicit gates.
+
+### M2B.3B controlled lifecycle rehearsal
+
+M2B.3A verified REST identity and one workout sample on the operator's account. The
+operator also confirmed the local privacy controls, migrations, synthetic backup/restore
+and erasure rehearsals. Those results cover prerequisites. The observations below require
+a separate live run. Synthetic transport tests establish probe behavior only.
+
+Use an **empty, dedicated test account with REST access**. Establish its account ID
+independently and inject `HEVY_TEST_ACCOUNT_ID` and `HEVY_TEST_API_KEY` in a private
+shell via your secret manager. Leave personal keys and binding files in place. Apply the
+[local privacy controls](hevy-importer.md#verify-one-live-sample-m2b3a), including disabling
+core dumps and request capture. Use a synchronized system clock. The standalone command
+requires neither a database nor an importer binding. From `backend/` run:
+
+```sh
+uv run --frozen python -m fitness_intelligence.adapters.hevy.probe
+```
+
+Keep the same process open. The operator makes each change in the Hevy app and presses
+Enter after the app confirms the save. No API write operation is required. The probe
+checks the test identity before reading workouts and stops on a nonempty baseline.
+
+| Stage | Operator action in test account | REST observations |
+| --- | --- | --- |
+| Create | Save one workout titled `Contract A`. Use two distinct rep-based exercise templates. Log sets of 3 and 7 reps for the first, and one set of 5 reps for the second. Use invented values throughout. | Validate fixture shape. Compare list and detail via the importer's semantic hash. Look for its complete matching updated event. |
+| Edit | In one save, rename to `Contract B`, swap the exercises and reverse the two sets (or swap their rep values). Keep other fields the same. | Compare workout ID, creation/update instants, title and index-ordered result. Count visible revisions and compare the updated event snapshot to current detail. Set observations describe the resulting positions and values only. |
+| Delete | Delete that fixture in the test app. | Check empty workout list, matching deletion ID, presence of deletion time and its ordering against the last edit. A missing list entry alone is insufficient. |
+
+Event reads use one fixed UTC lower bound from before creation, one item per page, and at
+most four pages per traversal. The probe also queries at the exact observed source instant
+to check whether the same revision is visible. Counts expose multiple pages, coalescing or
+repetition when present. It reports source-time ordering and nonzero fractional seconds.
+A missing timestamp, zero matches, a shrinking count, an unchanged update time or a
+boundary miss warrants investigation. A single read cannot distinguish delay from omission.
+One observed timestamp cannot establish server clock resolution. If only one event survives
+each edit, multi-page traversal remains unverified live.
+
+Record only the stage and printed counts, booleans or fixed error categories. Inspect
+every result even on exit zero. The probe keeps comparisons in process memory, disables
+Python logging and never opens a database. Each stage performs one bounded observation
+without polling. Read retries follow the existing client's four-attempt limit. On an
+interruption, clean up the identified synthetic fixture manually in the test app before
+a fresh rehearsal. Do not substitute a personal account.
+
+**Live result pending.** No M2B.3B discrepancy has been established. Retention, delivery
+latency, concurrent page shifts, identity after restore and key rotation remain open even
+after a successful single-fixture rehearsal. Historical import remains gated on review of
+live observations and separate operator authorization.

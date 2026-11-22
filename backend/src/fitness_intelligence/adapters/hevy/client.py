@@ -162,7 +162,11 @@ class HevyClient:
             assert isinstance(page, WorkoutPage)
             yield from page.workouts
 
-    def events(self, since: datetime) -> Iterator[UpdatedEvent | DeletedEvent]:
-        for page in self._pages(since):
+    def event_pages(self, since: datetime, *, page_size: int) -> Iterator[EventPage]:
+        for page in self._pages(since, page_size=page_size):
             assert isinstance(page, EventPage)
+            yield page
+
+    def events(self, since: datetime) -> Iterator[UpdatedEvent | DeletedEvent]:
+        for page in self.event_pages(since, page_size=10):
             yield from page.events
