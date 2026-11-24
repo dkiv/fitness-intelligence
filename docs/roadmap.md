@@ -1,34 +1,138 @@
 # Roadmap
 
-- **M0: Project foundation (complete).** Repository, documentation, FastAPI health endpoint,
-  PostgreSQL, user identity model, Alembic, tests and local Compose. No integrations, AI or UI.
-- **M1: Canonical data model and ownership (complete).** Canonical strength schema, database-enforced
-  ownership links, synthetic constraint and migration tests. Authentication and authorized data
-  access remain required before exposing fitness endpoints.
-- **M2: Hevy ingestion.**
-  - **M2A: API contract and synchronization design (reviewed and approved with adjustments).** Official documentation reviewed;
-    [integration design](hevy-sync-design.md) records mapping, identity limits, account namespaces,
-    synchronization and M2B acceptance criteria. M2A itself introduced no schema changes.
-  - **M2B.1: Schema and pure mapping (merged).** Source-account
-    namespaces, legacy migration, minimal checkpoint/tombstone storage, strict source schemas,
-    pure mapping and synthetic PostgreSQL/regression tests. No live API requests or ingestion.
-  - **M2B.2: HTTP client and transactional importer (implemented on feature branch).** Read-only
-    transport, account-serialized historical/incremental import, atomic snapshots, tombstones,
-    checkpoint safety and a private local CLI. See [operating instructions](hevy-importer.md). Distributed fencing and elaborate automated
-    reconciliation are deferred until concurrency or scheduled production syncing requires them.
-    Idempotency and checkpoint correctness remain mandatory. Personal imports remain gated on
-    trusted ownership, secrets and retention decisions.
-  - **M2B.3: Verification and historical import (complete).** Private operational rehearsal and historical ingestion.
-- **M3A: Strength analytics foundation (implemented for review).** Internal, user-scoped
-  progression, weekly volume and training consistency. See [metric definitions](strength-analytics.md).
-- **M3 follow-up: Garmin ingestion.** Validate Garmin Personal API access; implement a separate adapter
-  for running, sleep, HRV and resting heart rate with user-scoped, idempotent imports.
-- **M4: Health Connect integration.** Kotlin bridge with permissions and sync for RENPHO-origin
-  weight and MyFitnessPal-origin calorie intake; validate upstream record availability first.
-- **M5: Analytics and dashboard.** Provider-independent Polars longitudinal calculations,
-  followed by a Next.js/TypeScript dashboard with documented missing-data behavior.
-- **M6: Personalized intelligence.** Validate personalized performance recommendations and
-  address privacy, retention/deletion, operational safeguards and public-release requirements
-  before launch.
+## Implementation history
 
-Garmin ingestion and M4 through M6 remain planned. Strava remains out of scope.
+| Milestone | Status and evidence |
+| --- | --- |
+| M0 · Project foundation | Complete. FastAPI health endpoint, PostgreSQL, user identity model, Alembic, tests and local Compose. |
+| M1 · Canonical data model and ownership | Complete. Canonical strength records, database-enforced ownership links and synthetic constraint and migration tests. Authenticated access remains a public-release dependency. |
+| M2A · Hevy API contract and synchronization design | Reviewed and approved with adjustments. Established mapping, identity limits, account namespaces and synchronization criteria. [Integration design](hevy-sync-design.md) |
+| M2B.1 · Schema and pure mapping | Merged. Source-account migration, checkpoints, tombstones and strict mapping tested with synthetic data. |
+| M2B.2 · HTTP client and transactional importer | Merged. Private read-only client and local CLI support account-serialized historical and incremental import, atomic snapshots and safe checkpoints. Distributed fencing and unattended synchronization are deferred. [Operating instructions](hevy-importer.md) |
+| M2B.3A · Live verification readiness | Merged. A bounded read-only check matched the bound account and mapped one live workout sample. That observation covers identity and sample shape. |
+| M2B.3B · Controlled contract probe | Merged. The tool and runbook cover synthetic create, edit, reorder and delete operations in a controlled account. The controlled live synthetic lifecycle rehearsal remains unverified. [Rehearsal and limits](hevy-sync-design.md#m2b3b-controlled-lifecycle-rehearsal) |
+| M3A · Strength analytics foundation | Merged through PR #5. The internal, owner-scoped Polars reports cover exercise progression, weekly volume and training consistency. [Metric definitions](strength-analytics.md) [PR #5](https://github.com/dkiv/fitness-intelligence/pull/5) |
+
+On November 22, 2026, the personal historical Hevy import completed locally with 303 workouts,
+1,618 exercise entries and 4,818 sets. A repeat reconciliation and a read-only integrity audit
+both passed. The personal records are held outside Git. This evidence covers the local import
+and its integrity. Production synchronization and public access still require separate validation
+and the safeguards in workstream I.
+
+## Delivery sequence
+
+A–J identify workstreams that can advance in parallel. The first coaching milestone is an
+athlete-reviewed seven-day plan using strength history and feedback. With the M3A foundation in place,
+start E alongside the initial evidence and periodization work in J. Use both for the first review cycle in F. Neither milestone requires live Garmin data,
+nutrition history, a dashboard or provider write access. Development and tests use synthetic histories.
+
+Research Garmin read eligibility (B) and Training API eligibility (G) alongside A. Validate
+on-device record availability (C) independently. D incorporates each validated source as it
+arrives. F can then use those additional observations. G adds delivery of approved plans and H
+evaluates their outcomes. Apply ownership and privacy controls throughout, with I as the gate
+for public access. A has a merged internal implementation. B–J describe planned capabilities.
+
+## Workstreams and acceptance criteria
+
+### A · Strength analytics MVP
+
+Build on M1 canonical records and the M3A foundation. Acceptance requires reproducible
+exercise-level estimated one-repetition maximum (1RM) progression, weekly volume and training
+frequency from normalized sets. Synthetic histories must reproduce expected results for
+comparable exercises, document units and eligibility rules, distinguish missing measurements
+from zero and exclude another owner's records. The MVP is an internal query and report.
+
+### B · Endurance and recovery ingestion
+
+Validate Garmin eligibility, permissions and terms separately for personal use and commercial
+deployment. Record which activities, running metrics, sleep, HRV and resting heart rate each
+authorized read path provides. Implementation depends on that access decision. Accept each
+supported feed when replaying and updating a synthetic activity or recovery observation yields
+one user-owned, provider-independent record with units, time and provenance. Document unavailable
+fields so planning can proceed with partial coverage.
+
+### C · Nutrition and body-weight ingestion
+
+Validate what the upstream apps actually write and what Android Health Connect permissions and
+history access allow. Accept the Kotlin bridge when permitted RENPHO-origin weight and
+MyFitnessPal-origin daily calorie totals, where available, retain their dates, units and origin
+across repeated syncs without double counting. Report days with missing intake as unknown.
+The MVP reads existing records. Macronutrients are a later option conditional on availability.
+
+### D · Unified athlete analytics
+
+Start with A and extend the same reproducible analysis as B and C deliver normalized records.
+Acceptance requires an athlete-scoped report showing strength and endurance progression,
+training exposure and consistency, recovery relative to individual baselines, and calorie
+intake alongside weight trends for available dates. Show coverage and distinguish measured
+values from estimates. Flag possible strength/endurance interference as a hypothesis with
+supporting observations and uncertainty. Sparse history must leave baselines unknown.
+
+### E · Canonical training plan and scheduling
+
+Begin after A, using J to define the active block behind each week. Capture goals, preferences, available days, injury constraints and exercise
+preferences. Accept the first milestone when a deterministic planner produces a seven-day
+plan of structured strength and running sessions with explicit progression limits from the
+same inputs and rules. An infeasible schedule must surface the conflicting constraints.
+Preserve the original prescription and each approved revision, link completed sessions to
+the applicable version, and distinguish missed sessions from unknown completion in adherence.
+
+### F · Adaptive coaching MVP
+
+Depends on A, E and the initial reviewed claims and evaluation cases from J. Summarize the week from planned and completed sessions and athlete feedback.
+Accept a full review cycle when the athlete can inspect a proposed adjustment to the next
+seven days, see the evidence, uncertainty and exact changes, and approve or decline. Enforce
+conservative limits on progression and schedule changes before approval. A declined suggestion
+leaves the schedule intact. Record the recommendation, decision, resulting version and later
+outcome. Demonstrate the cycle with strength data alone and missing recovery signals. Add
+running load, recovery and fueling guidance as B–D supply evidence for them.
+
+### G · Workout publishing integrations
+
+Research Hevy routine write authorization and Garmin developer eligibility for the Training API
+while A proceeds. Verify structured workout and training-calendar permissions separately from
+activity read access. Publishing depends on E, explicit athlete approval of the exact version
+and destination, and authorized APIs. Separate provider adapters handle Hevy routine creation
+and updates and Garmin structured workout and calendar publishing.
+
+Accept each adapter when retrying the same approved version avoids duplicates, an update maps
+to its intended remote item, and a partial failure shows which items succeeded and which need
+reconciliation before retry. Keep the canonical plan and per-version delivery status available
+through failures. Where writes are unavailable, accept a manual or export path when an athlete
+can enter the approved week using its dates, exercises, sets and running steps.
+
+### H · Personalized modeling and evaluation
+
+Depends on D for longitudinal observations and E–F for versioned decisions and outcomes.
+Estimate individual performance and recovery responses and energy expenditure from weight
+trends and available intake. Document assumptions and uncertainty. Evaluate nutrition
+estimation bias and mean absolute error (MAE) only where independent labels exist. Acceptance
+requires evaluation on held-out observations with coverage, sample size and baseline comparison.
+Link coaching suggestions and decisions to subsequent adherence and performance. Report the
+limits of attributing those outcomes to the recommendation. Use J’s offline evaluations alongside
+these longitudinal measures when reviewing coaching quality.
+
+### I · Public-release hardening
+
+Start security and privacy work with each data flow. Before exposing health data or provider
+credentials, resolve identity from authentication, scope every query by that identity and pass
+cross-tenant access-denial tests. Before public release, verify OAuth or applicable provider
+authorization, least-privilege scopes, revocation and secret storage for each enabled adapter.
+Demonstrate user data export and deletion, documented retention and backup handling, operational
+monitoring without health payloads or secrets, and review of provider terms for the intended
+deployment. Enable only the integrations cleared for that use. Strava remains out of scope.
+
+### J · Scientific knowledge and longitudinal periodization
+
+Start with E on the strength foundation. Scope the first corpus release to questions needed to
+generate and revise a week within a multiweek block. Accept it when a reviewer can trace each
+scientific assertion in a sample recommendation to a reviewed claim and source, inspect its
+applicability and competing findings, and reproduce the evidence selection from the pinned
+release. Practical programs and individual observations must retain their distinct provenance.
+
+Accept the planning milestone when two successive seven-day schedules advance the same block
+objective toward an athlete's goal or event. Demonstrate an approved session adjustment that
+preserves the objective and a conflict that requires explicit block revision. Before accepting
+the first adaptive cycle in F, evaluate it against versioned synthetic cases with expected
+decisions and rationales. Repeat the evaluation on corpus, planner and explanation changes.
+The [coaching science specification](coaching-science.md) defines the review criteria.

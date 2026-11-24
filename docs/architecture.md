@@ -76,17 +76,46 @@ base/head round trips against disposable PostgreSQL schemas.
 
 ## Planned boundaries
 
-Provider adapters -> normalized, user-owned records -> analytics -> API -> dashboard.
-Adapters handle provider credentials, pagination, mapping and provenance. Domain records define
-canonical units, timestamps and identities. The M3A analytics package computes Polars tables from canonical observations. Its PostgreSQL
-reader projects the required fields in one owner-scoped statement. The caller supplies exercise
-identity and load interpretation for longitudinal comparisons. See [strength analytics](strength-analytics.md).
-Next.js/TypeScript and the Kotlin Health Connect bridge arrive in later milestones.
+Read adapters and the planned Kotlin Health Connect bridge feed normalized, user-owned records
+with canonical units, timestamps and source provenance. M3A already computes Polars reports from
+canonical strength observations. Its PostgreSQL reader selects the required fields in one
+owner-scoped statement. The caller supplies exercise identity and load interpretation for
+longitudinal comparisons. See [strength analytics](strength-analytics.md).
 
-Before health-data APIs exist: add authentication, mandatory user foreign keys, ownership filters,
-cross-user access tests, per-user provider credentials, deletion/retention policies and appropriate
-secret storage. Consider PostgreSQL row-level security as defense in depth when access patterns
-are known. Never return provider secrets or put sensitive records in logs.
+The planned knowledge layer will retrieve reviewed claims from a named corpus release using
+the coaching question, population, outcome and training context. Results carry source
+identifiers, applicability limits, uncertainty and conflicting claims. Method descriptions
+have a separate source type. Athlete observations stay in the owner-scoped analytics path.
+The initial retrieval contract can be tested against a small catalog using structured filters
+and text search. The storage and indexing strategy can evolve with measured retrieval needs.
+
+The canonical plan will link long-term goals and target events to multiweek cycles, blocks,
+weeks and individual sessions. Each block carries an objective, training emphasis and intended
+progression of volume, intensity and specificity. It can include planned recovery, deloads,
+tapers and assessments where appropriate. Each weekly schedule records its parent block
+version. Session prescriptions carry targets and permitted autoregulation ranges. Record actual
+work, deviations and athlete feedback against the prescription in force at execution time.
+
+The deterministic planner will check a proposed change against session limits, block progression,
+recovery and event timing. If a change would invalidate a block objective, it must propose the
+affected block and week revisions together for athlete review. Preserve the earlier versions.
+Record the applicable corpus and rule versions, retrieved claim IDs and athlete observations
+with the rationale. The language model can capture preferences, call structured tools and
+explain the result. Analytics, progression checks and approval remain independently enforceable.
+See [coaching science and evaluation](coaching-science.md).
+
+The platform will store canonical plan versions, recommendations, approval decisions and links
+to completed sessions and outcomes. A proposed revision becomes scheduled only with athlete
+approval. Publishing adapters receive a specific approved version and destination, track remote
+identifiers and delivery outcomes, and reconcile ambiguous failures before retrying. Hevy routine
+writes and Garmin structured workout and calendar writes depend on authorized access. The same
+plan can support manual entry or export. A future Next.js/TypeScript interface can present the
+plan, evidence and revision history.
+
+Before exposing health-data APIs, require authentication, user ownership filters, cross-user
+access tests, per-user authorization, secret storage and deletion/retention policies. Consider
+PostgreSQL row-level security when access patterns are known. Keep secrets and sensitive records
+out of logs.
 
 Reference patterns: [SQLAlchemy session lifecycle](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
 and [Alembic environment configuration](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
@@ -104,8 +133,7 @@ and a tombstone ledger for deleted workouts not previously imported. Existing pr
 ID strings retain their meaning. Raw payloads become allowlisted source projections, with
 sensitive free text stored only canonically. These changes require reviewed M2B migrations;
 none were applied in M2A. M2B.1 implements the smaller foundation described below and explicitly
-supersedes fencing and reconciliation requirements for the initial local importer. Authentication
-and real-data operational gates remain unresolved.
+supersedes fencing and reconciliation requirements for the initial local importer. Authentication and real-data operational gates were outside M2A.
 
 ## Implemented Hevy mapping foundation (M2B.1)
 
@@ -157,11 +185,11 @@ Distributed fencing leases, automated reconciliation, run archives and scheduled
 explicitly deferred until concurrency/production operation requires them. Subsequent local sync
 must serialize runs, preserve idempotency, use atomic workout/reference/child transactions, retain
 first-import identity, resolve equal-time conflicts, honor tombstones and avoid advancing a
-checkpoint after partial failure. These correctness requirements have not been implemented or
-claimed by M2B.1. Provider account stability/feed semantics, trusted ownership, credential storage,
-retention and erasure remain gates before personal imports. M2B.2 now implements these requirements with a local PostgreSQL session advisory lock and a
-private CLI, validated using synthetic transports. See [Hevy operations](hevy-importer.md);
-provider probes and privacy policies remain gates before personal imports.
+checkpoint after partial failure. M2B.2 implements these local sync requirements with a PostgreSQL session advisory
+lock and a private CLI. The personal historical import, repeat reconciliation and read-only
+integrity audit have since completed locally. The controlled live synthetic lifecycle rehearsal
+remains unverified. See the [operating instructions](hevy-importer.md) and
+[implementation history](roadmap.md#implementation-history).
 
 ### Hevy JSON and semantic hash contract
 
