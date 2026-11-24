@@ -1,14 +1,45 @@
 # Fitness Intelligence
 
-Fitness Intelligence unifies strength training, endurance, recovery, nutrition and body-weight
-history into longitudinal analytics and, eventually, personalized performance recommendations.
-Users continue recording in their existing apps. This product is neither a food logger nor a
-workout tracker.
+Fitness Intelligence aims to be an adaptive coaching platform for athletes seriously pursuing
+both strength and endurance performance. It will create and continuously improve coordinated
+strength, running and nutrition plans using each athlete's training history, recovery signals,
+actual performance and feedback. Athletes will keep recording workouts and food in their
+existing apps. Food logging, GPS tracking and workout recording are outside the product scope.
 
-Start with a personal, local development foundation, while preserving a path to public release.
-Useful future questions include how training volume changes alongside recovery, running load,
-energy intake and weight trends. Missing data must remain distinguishable from zero values.
-Recommendations require reliable data and validated analytics first; no AI is part of Milestone 0.
+## The athlete's week
 
-Success for Milestone 0 means a runnable API, versioned PostgreSQL schema, passing tests and
-reproducible development instructions. No source connections, health ingestion or dashboard.
+An athlete sets goals, available days, injury constraints and exercise preferences. The coach
+uses these alongside longitudinal history to propose a seven-day schedule. The athlete can see
+how lifting and running sessions fit together and, as evidence permits, how to fuel them.
+Fitness Intelligence owns the canonical prescription and its revision history. Hevy and Garmin
+serve as execution platforms. With athlete approval and authorized write access, the platform
+can publish strength routines to Hevy and structured running workouts to Garmin. An approved
+plan must also be usable through manual entry or export.
+
+At review time, the coach compares the prescription with completed sessions, tracks progress,
+adherence and training exposure, and asks how the week felt. For example, if the athlete says
+a hard run left their legs tired for a scheduled squat session, the coach can propose moving
+next week's run. It shows the original and proposed schedules, cites the athlete's report and
+available performance history, and explains how uncertain the benefit is. Every change to a
+scheduled workout and every publication requires explicit athlete approval. Recommendations,
+decisions, plan versions and subsequent outcomes remain available for review and evaluation.
+
+## Evidence behind the plan
+
+Hevy, Garmin, Android Health Connect and compatible future sources will contribute to a unified
+history of lifting, running, sleep, heart-rate variability, resting heart rate, body weight and
+calorie intake as permissions and record availability allow. Analytics must be reproducible
+independently of the language model. Reports distinguish measured observations from estimates
+and describe correlations as hypotheses. Missing recovery data leaves recovery uncertain.
+
+Planning uses explicit constraints and conservative progression and adaptation rules. The
+language model supports conversation, captures preferences, orchestrates structured tools and
+explains their results. The minimal coach can start with strength history and athlete feedback.
+Endurance, recovery and nutrition evidence will improve its prescriptions incrementally.
+
+## Current scope
+
+Development started with a local API and PostgreSQL foundation. Main includes the canonical
+strength schema, a private read-only Hevy importer and bounded verification tools. Adaptive
+plans, fueling recommendations and workout publishing are future capabilities. The
+[roadmap](roadmap.md) records implementation status, dependencies and acceptance criteria.

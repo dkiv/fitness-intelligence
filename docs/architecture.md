@@ -76,16 +76,25 @@ base/head round trips against disposable PostgreSQL schemas.
 
 ## Planned boundaries
 
-Provider adapters -> normalized, user-owned records -> analytics -> API -> dashboard.
-Adapters handle provider credentials, pagination, mapping and provenance. Domain records define
-canonical units, timestamps and identities. Analytics will use Polars on these internal records,
-without importing provider clients. No unused adapter or analytics packages are created yet.
-Next.js/TypeScript and the Kotlin Health Connect bridge arrive in later milestones.
+Read adapters and the planned Kotlin Health Connect bridge feed normalized, user-owned records
+with canonical units, timestamps and source provenance. Provider-independent Polars calculations
+derive athlete trends and coverage from those records. A deterministic planner consumes these
+results, athlete goals, feedback and explicit constraints to propose coordinated sessions.
+The language model can capture preferences, call structured tools and explain evidence and
+uncertainty. Analytics and progression rules must run independently of the model.
 
-Before health-data APIs exist: add authentication, mandatory user foreign keys, ownership filters,
-cross-user access tests, per-user provider credentials, deletion/retention policies and appropriate
-secret storage. Consider PostgreSQL row-level security as defense in depth when access patterns
-are known. Never return provider secrets or put sensitive records in logs.
+The platform will store canonical plan versions, recommendations, approval decisions and links
+to completed sessions and outcomes. A proposed revision becomes scheduled only with athlete
+approval. Publishing adapters receive a specific approved version and destination, track remote
+identifiers and delivery outcomes, and reconcile ambiguous failures before retrying. Hevy routine
+writes and Garmin structured workout and calendar writes depend on authorized access. The same
+plan can support manual entry or export. A future Next.js/TypeScript interface can present the
+plan, evidence and revision history.
+
+Before exposing health-data APIs, require authentication, user ownership filters, cross-user
+access tests, per-user authorization, secret storage and deletion/retention policies. Consider
+PostgreSQL row-level security when access patterns are known. Keep secrets and sensitive records
+out of logs.
 
 Reference patterns: [SQLAlchemy session lifecycle](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
 and [Alembic environment configuration](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
