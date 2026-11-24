@@ -18,7 +18,10 @@
     reconciliation are deferred until concurrency or scheduled production syncing requires them.
     Idempotency and checkpoint correctness remain mandatory. Personal imports remain gated on
     trusted ownership, secrets and retention decisions.
-- **M3: Garmin ingestion.** Validate Garmin Personal API access; implement a separate adapter
+  - **M2B.3: Verification and historical import (complete).** Private operational rehearsal and historical ingestion.
+- **M3A: Strength analytics foundation (implemented for review).** Internal, user-scoped
+  progression, weekly volume and training consistency. See [metric definitions](strength-analytics.md).
+- **M3 follow-up: Garmin ingestion.** Validate Garmin Personal API access; implement a separate adapter
   for running, sleep, HRV and resting heart rate with user-scoped, idempotent imports.
 - **M4: Health Connect integration.** Kotlin bridge with permissions and sync for RENPHO-origin
   weight and MyFitnessPal-origin calorie intake; validate upstream record availability first.
@@ -28,4 +31,4 @@
   address privacy, retention/deletion, operational safeguards and public-release requirements
   before launch.
 
-The remainder of M2 and M3 through M6 are planned, not implemented. Strava remains out of scope.
+Garmin ingestion and M4 through M6 remain planned. Strava remains out of scope.

@@ -78,8 +78,9 @@ base/head round trips against disposable PostgreSQL schemas.
 
 Provider adapters -> normalized, user-owned records -> analytics -> API -> dashboard.
 Adapters handle provider credentials, pagination, mapping and provenance. Domain records define
-canonical units, timestamps and identities. Analytics will use Polars on these internal records,
-without importing provider clients. No unused adapter or analytics packages are created yet.
+canonical units, timestamps and identities. The M3A analytics package computes Polars tables from canonical observations. Its PostgreSQL
+reader projects the required fields in one owner-scoped statement. The caller supplies exercise
+identity and load interpretation for longitudinal comparisons. See [strength analytics](strength-analytics.md).
 Next.js/TypeScript and the Kotlin Health Connect bridge arrive in later milestones.
 
 Before health-data APIs exist: add authentication, mandatory user foreign keys, ownership filters,
