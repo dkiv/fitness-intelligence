@@ -9,7 +9,10 @@ existing apps. Food logging, GPS tracking and workout recording are outside the 
 ## The athlete's week
 
 An athlete sets goals, available days, injury constraints and exercise preferences. The coach
-uses these alongside longitudinal history to propose a seven-day schedule. The athlete can see
+uses these alongside longitudinal history, long-term goals and target events to select a
+multiweek training block. Even the first seven-day schedule must advance that block's objective.
+The coach can use different periodization approaches as the evidence, athlete's constraints
+and individual response warrant. The athlete can see
 how lifting and running sessions fit together and, as evidence permits, how to fuel them.
 Fitness Intelligence owns the canonical prescription and its revision history. Hevy and Garmin
 serve as execution platforms. With athlete approval and authorized write access, the platform
@@ -20,7 +23,9 @@ At review time, the coach compares the prescription with completed sessions, tra
 adherence and training exposure, and asks how the week felt. For example, if the athlete says
 a hard run left their legs tired for a scheduled squat session, the coach can propose moving
 next week's run. It shows the original and proposed schedules, cites the athlete's report and
-available performance history, and explains how uncertain the benefit is. Every change to a
+available performance history, and explains how uncertain the benefit is. The proposed move
+must still fit the block's training emphasis and recovery plan. If that intent needs to change,
+the athlete reviews a block revision. Every change to a
 scheduled workout and every publication requires explicit athlete approval. Recommendations,
 decisions, plan versions and subsequent outcomes remain available for review and evaluation.
 
@@ -31,6 +36,12 @@ history of lifting, running, sleep, heart-rate variability, resting heart rate, 
 calorie intake as permissions and record availability allow. Analytics must be reproducible
 independently of the language model. Reports distinguish measured observations from estimates
 and describe correlations as hypotheses. Missing recovery data leaves recovery uncertain.
+
+The coach must ground scientific claims in a curated, versioned body of peer-reviewed exercise
+science. Athletes should be able to trace a claim to its source, see whom it applies to and
+understand where findings disagree. A coaching method offers a way to structure a block.
+An athlete's own observations help decide whether to continue it. Neither establishes that
+the method caused an outcome. See [coaching science and evaluation](coaching-science.md).
 
 Planning uses explicit constraints and conservative progression and adaptation rules. The
 language model supports conversation, captures preferences, orchestrates structured tools and

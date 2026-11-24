@@ -21,16 +21,16 @@ and the safeguards in workstream I.
 
 ## Delivery sequence
 
-A–I identify workstreams that can advance in parallel. The first coaching milestone is an
+A–J identify workstreams that can advance in parallel. The first coaching milestone is an
 athlete-reviewed seven-day plan using strength history and feedback. With the M3A foundation in place,
-start E and deliver the first review cycle in F. Neither milestone requires live Garmin data,
+start E alongside the initial evidence and periodization work in J. Use both for the first review cycle in F. Neither milestone requires live Garmin data,
 nutrition history, a dashboard or provider write access. Development and tests use synthetic histories.
 
 Research Garmin read eligibility (B) and Training API eligibility (G) alongside A. Validate
 on-device record availability (C) independently. D incorporates each validated source as it
 arrives. F can then use those additional observations. G adds delivery of approved plans and H
 evaluates their outcomes. Apply ownership and privacy controls throughout, with I as the gate
-for public access. A has a merged internal implementation. B–I describe planned capabilities.
+for public access. A has a merged internal implementation. B–J describe planned capabilities.
 
 ## Workstreams and acceptance criteria
 
@@ -70,7 +70,7 @@ supporting observations and uncertainty. Sparse history must leave baselines unk
 
 ### E · Canonical training plan and scheduling
 
-Begin after A. Capture goals, preferences, available days, injury constraints and exercise
+Begin after A, using J to define the active block behind each week. Capture goals, preferences, available days, injury constraints and exercise
 preferences. Accept the first milestone when a deterministic planner produces a seven-day
 plan of structured strength and running sessions with explicit progression limits from the
 same inputs and rules. An infeasible schedule must surface the conflicting constraints.
@@ -79,7 +79,7 @@ the applicable version, and distinguish missed sessions from unknown completion 
 
 ### F · Adaptive coaching MVP
 
-Depends on A and E. Summarize the week from planned and completed sessions and athlete feedback.
+Depends on A, E and the initial reviewed claims and evaluation cases from J. Summarize the week from planned and completed sessions and athlete feedback.
 Accept a full review cycle when the athlete can inspect a proposed adjustment to the next
 seven days, see the evidence, uncertainty and exact changes, and approve or decline. Enforce
 conservative limits on progression and schedule changes before approval. A declined suggestion
@@ -109,7 +109,8 @@ trends and available intake. Document assumptions and uncertainty. Evaluate nutr
 estimation bias and mean absolute error (MAE) only where independent labels exist. Acceptance
 requires evaluation on held-out observations with coverage, sample size and baseline comparison.
 Link coaching suggestions and decisions to subsequent adherence and performance. Report the
-limits of attributing those outcomes to the recommendation.
+limits of attributing those outcomes to the recommendation. Use J’s offline evaluations alongside
+these longitudinal measures when reviewing coaching quality.
 
 ### I · Public-release hardening
 
@@ -120,3 +121,18 @@ authorization, least-privilege scopes, revocation and secret storage for each en
 Demonstrate user data export and deletion, documented retention and backup handling, operational
 monitoring without health payloads or secrets, and review of provider terms for the intended
 deployment. Enable only the integrations cleared for that use. Strava remains out of scope.
+
+### J · Scientific knowledge and longitudinal periodization
+
+Start with E on the strength foundation. Scope the first corpus release to questions needed to
+generate and revise a week within a multiweek block. Accept it when a reviewer can trace each
+scientific assertion in a sample recommendation to a reviewed claim and source, inspect its
+applicability and competing findings, and reproduce the evidence selection from the pinned
+release. Practical programs and individual observations must retain their distinct provenance.
+
+Accept the planning milestone when two successive seven-day schedules advance the same block
+objective toward an athlete's goal or event. Demonstrate an approved session adjustment that
+preserves the objective and a conflict that requires explicit block revision. Before accepting
+the first adaptive cycle in F, evaluate it against versioned synthetic cases with expected
+decisions and rationales. Repeat the evaluation on corpus, planner and explanation changes.
+The [coaching science specification](coaching-science.md) defines the review criteria.

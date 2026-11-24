@@ -82,9 +82,27 @@ canonical strength observations. Its PostgreSQL reader selects the required fiel
 owner-scoped statement. The caller supplies exercise identity and load interpretation for
 longitudinal comparisons. See [strength analytics](strength-analytics.md).
 
-A planned deterministic planner will use these results, athlete goals, feedback and explicit constraints to propose coordinated sessions.
-The language model can capture preferences, call structured tools and explain evidence and
-uncertainty. Analytics and progression rules must run independently of the model.
+The planned knowledge layer will retrieve reviewed claims from a named corpus release using
+the coaching question, population, outcome and training context. Results carry source
+identifiers, applicability limits, uncertainty and conflicting claims. Method descriptions
+have a separate source type. Athlete observations stay in the owner-scoped analytics path.
+The initial retrieval contract can be tested against a small catalog using structured filters
+and text search. The storage and indexing strategy can evolve with measured retrieval needs.
+
+The canonical plan will link long-term goals and target events to multiweek cycles, blocks,
+weeks and individual sessions. Each block carries an objective, training emphasis and intended
+progression of volume, intensity and specificity. It can include planned recovery, deloads,
+tapers and assessments where appropriate. Each weekly schedule records its parent block
+version. Session prescriptions carry targets and permitted autoregulation ranges. Record actual
+work, deviations and athlete feedback against the prescription in force at execution time.
+
+The deterministic planner will check a proposed change against session limits, block progression,
+recovery and event timing. If a change would invalidate a block objective, it must propose the
+affected block and week revisions together for athlete review. Preserve the earlier versions.
+Record the applicable corpus and rule versions, retrieved claim IDs and athlete observations
+with the rationale. The language model can capture preferences, call structured tools and
+explain the result. Analytics, progression checks and approval remain independently enforceable.
+See [coaching science and evaluation](coaching-science.md).
 
 The platform will store canonical plan versions, recommendations, approval decisions and links
 to completed sessions and outcomes. A proposed revision becomes scheduled only with athlete
