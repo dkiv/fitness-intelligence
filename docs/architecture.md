@@ -76,6 +76,9 @@ base/head round trips against disposable PostgreSQL schemas.
 
 ## Planned boundaries
 
+The proposed first coaching cycle is specified in the [canonical training plan design](training-plan-design.md),
+[scientific knowledge design](scientific-knowledge-design.md) and [coaching evaluation design](coaching-evaluation-design.md).
+
 Read adapters and the planned Kotlin Health Connect bridge feed normalized, user-owned records
 with canonical units, timestamps and source provenance. M3A already computes Polars reports from
 canonical strength observations. Its PostgreSQL reader selects the required fields in one
