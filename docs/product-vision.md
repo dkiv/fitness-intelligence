@@ -40,6 +40,8 @@ Endurance, recovery and nutrition evidence will improve its prescriptions increm
 ## Current scope
 
 Development started with a local API and PostgreSQL foundation. Main includes the canonical
-strength schema, a private read-only Hevy importer and bounded verification tools. Adaptive
+strength schema, a private read-only Hevy importer, bounded verification tools and internal
+strength analytics. The personal historical import and subsequent integrity checks completed
+locally. Public access requires authentication and tenant-isolation testing. Adaptive
 plans, fueling recommendations and workout publishing are future capabilities. The
 [roadmap](roadmap.md) records implementation status, dependencies and acceptance criteria.

@@ -77,9 +77,12 @@ base/head round trips against disposable PostgreSQL schemas.
 ## Planned boundaries
 
 Read adapters and the planned Kotlin Health Connect bridge feed normalized, user-owned records
-with canonical units, timestamps and source provenance. Provider-independent Polars calculations
-derive athlete trends and coverage from those records. A deterministic planner consumes these
-results, athlete goals, feedback and explicit constraints to propose coordinated sessions.
+with canonical units, timestamps and source provenance. M3A already computes Polars reports from
+canonical strength observations. Its PostgreSQL reader selects the required fields in one
+owner-scoped statement. The caller supplies exercise identity and load interpretation for
+longitudinal comparisons. See [strength analytics](strength-analytics.md).
+
+A planned deterministic planner will use these results, athlete goals, feedback and explicit constraints to propose coordinated sessions.
 The language model can capture preferences, call structured tools and explain evidence and
 uncertainty. Analytics and progression rules must run independently of the model.
 
@@ -112,8 +115,7 @@ and a tombstone ledger for deleted workouts not previously imported. Existing pr
 ID strings retain their meaning. Raw payloads become allowlisted source projections, with
 sensitive free text stored only canonically. These changes require reviewed M2B migrations;
 none were applied in M2A. M2B.1 implements the smaller foundation described below and explicitly
-supersedes fencing and reconciliation requirements for the initial local importer. Authentication
-and real-data operational gates remain unresolved.
+supersedes fencing and reconciliation requirements for the initial local importer. Authentication and real-data operational gates were outside M2A.
 
 ## Implemented Hevy mapping foundation (M2B.1)
 
@@ -165,11 +167,11 @@ Distributed fencing leases, automated reconciliation, run archives and scheduled
 explicitly deferred until concurrency/production operation requires them. Subsequent local sync
 must serialize runs, preserve idempotency, use atomic workout/reference/child transactions, retain
 first-import identity, resolve equal-time conflicts, honor tombstones and avoid advancing a
-checkpoint after partial failure. These correctness requirements have not been implemented or
-claimed by M2B.1. Provider account stability/feed semantics, trusted ownership, credential storage,
-retention and erasure remain gates before personal imports. M2B.2 now implements these requirements with a local PostgreSQL session advisory lock and a
-private CLI, validated using synthetic transports. See [Hevy operations](hevy-importer.md);
-provider probes and privacy policies remain gates before personal imports.
+checkpoint after partial failure. M2B.2 implements these local sync requirements with a PostgreSQL session advisory
+lock and a private CLI. The personal historical import, repeat reconciliation and read-only
+integrity audit have since completed locally. The controlled live synthetic lifecycle rehearsal
+remains unverified. See the [operating instructions](hevy-importer.md) and
+[implementation history](roadmap.md#implementation-history).
 
 ### Hevy JSON and semantic hash contract
 

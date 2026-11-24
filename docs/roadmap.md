@@ -10,22 +10,27 @@
 | M2B.1 · Schema and pure mapping | Merged. Source-account migration, checkpoints, tombstones and strict mapping tested with synthetic data. |
 | M2B.2 · HTTP client and transactional importer | Merged. Private read-only client and local CLI support account-serialized historical and incremental import, atomic snapshots and safe checkpoints. Distributed fencing and unattended synchronization are deferred. [Operating instructions](hevy-importer.md) |
 | M2B.3A · Live verification readiness | Merged. A bounded read-only check matched the bound account and mapped one live workout sample. That observation covers identity and sample shape. |
-| M2B.3B · Controlled contract probe | Merged. The tool and runbook cover synthetic create, edit, reorder and delete operations in a controlled account. The live rehearsal is pending. Personal historical import remains gated on review of the observations and separate operator authorization. [Rehearsal and limits](hevy-sync-design.md#m2b3b-controlled-lifecycle-rehearsal) |
-| M3A · Strength analytics foundation | Implemented on a feature branch and under review at this roadmap revision. The internal, owner-scoped Polars reports are the foundation for A. [PR #5](https://github.com/dkiv/fitness-intelligence/pull/5) |
+| M2B.3B · Controlled contract probe | Merged. The tool and runbook cover synthetic create, edit, reorder and delete operations in a controlled account. The controlled live synthetic lifecycle rehearsal remains unverified. [Rehearsal and limits](hevy-sync-design.md#m2b3b-controlled-lifecycle-rehearsal) |
+| M3A · Strength analytics foundation | Merged through PR #5. The internal, owner-scoped Polars reports cover exercise progression, weekly volume and training consistency. [Metric definitions](strength-analytics.md) [PR #5](https://github.com/dkiv/fitness-intelligence/pull/5) |
+
+On November 22, 2026, the personal historical Hevy import completed locally with 303 workouts,
+1,618 exercise entries and 4,818 sets. A repeat reconciliation and a read-only integrity audit
+both passed. The personal records are held outside Git. This evidence covers the local import
+and its integrity. Production synchronization and public access still require separate validation
+and the safeguards in workstream I.
 
 ## Delivery sequence
 
 A–I identify workstreams that can advance in parallel. The first coaching milestone is an
-athlete-reviewed seven-day plan using strength history and feedback. Once A is available,
+athlete-reviewed seven-day plan using strength history and feedback. With the M3A foundation in place,
 start E and deliver the first review cycle in F. Neither milestone requires live Garmin data,
-nutrition history, a dashboard or provider write access. Synthetic histories support local
-development while personal import gates are open.
+nutrition history, a dashboard or provider write access. Development and tests use synthetic histories.
 
 Research Garmin read eligibility (B) and Training API eligibility (G) alongside A. Validate
 on-device record availability (C) independently. D incorporates each validated source as it
 arrives. F can then use those additional observations. G adds delivery of approved plans and H
 evaluates their outcomes. Apply ownership and privacy controls throughout, with I as the gate
-for public access. All capabilities below are planned except for the branch work identified above.
+for public access. A has a merged internal implementation. B–I describe planned capabilities.
 
 ## Workstreams and acceptance criteria
 
