@@ -5,6 +5,8 @@ Users keep their existing tracking apps. **Milestones 0 and 1** are implemented:
 migrations and tests. M2B.1 mapping and M2B.2 private local Hevy synchronization are implemented.
 No health-data endpoints, authentication, AI or web UI. See [Hevy setup and synchronization](docs/hevy-importer.md).
 
+M3A adds internal [strength progression, weekly volume and activity metrics](docs/strength-analytics.md).
+
 ## Repository
 
 - `backend/src/fitness_intelligence/`: API, settings and persistence
