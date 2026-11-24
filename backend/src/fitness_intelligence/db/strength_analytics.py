@@ -5,7 +5,7 @@ from datetime import UTC, datetime, time
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import and_, select
+from sqlalchemy import Select, and_, select
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.analytics.strength import (
@@ -19,17 +19,17 @@ from fitness_intelligence.analytics.strength import (
 from fitness_intelligence.db.models import ExerciseSet, ExternalReference, Workout, WorkoutExercise
 
 
-def strength_observations(
-    session: Session, *, owner_id: UUID, period: Period
-) -> Iterator[Observation]:
-    """Stream one owner's active canonical observations, including workouts without children."""
-    refs = select(ExternalReference.id).where(
-        ExternalReference.user_id == owner_id, ExternalReference.workout_id == Workout.id
+def active_strength_statement(owner_id: UUID, period: Period) -> Select:
+    """Base projection, including a UTC envelope around the requested local dates."""
+    refs = (
+        select(ExternalReference.id)
+        .where(ExternalReference.user_id == owner_id, ExternalReference.workout_id == Workout.id)
+        .correlate(Workout)
     )
     # Cover every possible local UTC offset, including days with a midnight transition.
     lower = datetime.combine(period.start, time.min, UTC) - DAY
     upper = datetime.combine(period.stop, time.min, UTC) + DAY
-    statement = (
+    return (
         select(
             Workout.id.label("workout_id"),
             Workout.started_at,
@@ -63,7 +63,13 @@ def strength_observations(
         )
         .execution_options(yield_per=1000)
     )
-    for row in session.execute(statement).mappings():
+
+
+def strength_observations(
+    session: Session, *, owner_id: UUID, period: Period
+) -> Iterator[Observation]:
+    """Stream one owner's active canonical observations, including workouts without children."""
+    for row in session.execute(active_strength_statement(owner_id, period)).mappings():
         if period.start <= row["started_at"].astimezone(period.zone).date() < period.stop:
             yield Observation(**row)
 

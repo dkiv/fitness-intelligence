@@ -80,3 +80,45 @@ Exercises performed counts distinct exercise keys with at least one completed se
 table identifies those exercises by week. Completed sets include every category. Workout change
 is the signed difference from the preceding displayed week, null for the first. Partial weeks
 are compared using their observed counts. A zero records absence of eligible observations.
+
+## Hevy historical profile
+
+Use `query_hevy_history` for imported history from a single source account. The mapper leaves
+set completion timestamps empty. The profile counts a timestamped set as confirmed and infers
+completion for an untimestamped set only when its workout has ended and the set has positive
+repetitions, duration or distance. Weight alone is insufficient. The provider-independent
+`query_strength` continues to require confirmed completion by default.
+
+```python
+from fitness_intelligence.adapters.hevy.analytics import HevyHistoryProfile, query_hevy_history
+
+# Supply the internal source-account UUID and exact template IDs reviewed for this account.
+profile = HevyHistoryProfile(account_id, external_load_templates=frozenset({"synthetic-press"}))
+report = query_hevy_history(session, owner_id=owner_id, period=period, profile=profile)
+```
+
+Both query functions expose completion evidence. In weekly activity and volume, `inferred_sets`
+is the subset of `completed_sets` counted by inference. Subtraction gives the confirmed count.
+Each progression row carries a `completion_inferred` flag for the selected set. A week can have
+a mix of both. Inference establishes eligibility for a report and never writes a completion time.
+
+The profile reads an owner’s active workouts with exactly one workout reference, belonging to the
+selected Hevy account. Shared references are ambiguous and the profile omits those workouts.
+The reader retrieves canonical measurements and template metadata in a single PostgreSQL
+statement so concurrent imports cannot mix snapshots. It recognizes the current importer and
+hash-contract tags, matches the retained workout ID and checks exercise count, contiguous
+canonical positions and increasing source indexes. The source index may have gaps. Its sorted
+position identifies the exercise in the retained projection. A count or ordering mismatch, or
+unrecognized metadata, leaves the whole workout occurrence-scoped. A missing template ID leaves
+that exercise occurrence-scoped. Eligible sets in these cases still count toward activity and reps.
+
+A longitudinal series uses the account UUID and the exact template ID. The same name can identify
+different templates, and the same template string in a second account produces a distinct series.
+Even a valid template identity establishes no load convention. The default empty allowlist gives
+set and repetition totals. Only explicitly listed external-resistance templates can supply
+kg·reps or Epley estimates. Leave bodyweight, assistance and uncertain conventions off the list.
+
+The mapping relies on the importer's atomic paired snapshot. Manual edits to canonical exercise
+order or provenance can invalidate it, and structural checks cannot detect every such edit. A
+template reused for different equipment or loading practices can also break comparability.
+There is no cross-account matching, name-based fallback or automatic equipment classification.

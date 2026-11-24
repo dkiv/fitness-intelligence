@@ -69,6 +69,7 @@ SET_SCHEMA = {
     "set_id": pl.String,
     "kind": pl.String,
     "category": pl.String,
+    "completion_inferred": pl.Boolean,
     "repetitions": pl.Int64,
     "weight_kg": KG,
     "rpe": pl.Decimal(4, 2),
@@ -166,6 +167,7 @@ def analyze_strength(
                     str(row.set_id),
                     row.kind,
                     category,
+                    row.completed_at is None,
                     reps if known_reps else None,
                     weight if loaded else None,
                     row.rpe if valid_rpe else None,
@@ -186,6 +188,7 @@ def _weekly_volume(sets: pl.DataFrame) -> pl.DataFrame:
         sets.group_by("week", "exercise_key", "category")
         .agg(
             pl.len().alias("completed_sets"),
+            pl.col("completion_inferred").sum().alias("inferred_sets"),
             pl.col("workout_id").n_unique().alias("workouts"),
             pl.col("name").drop_nulls().unique().sort().alias("names"),
             pl.col("repetitions").count().alias("sets_with_reps"),
@@ -233,6 +236,7 @@ def _weekly_activity(
             sets.group_by("week").agg(
                 pl.col("exercise_key").n_unique().alias("exercises_performed"),
                 pl.len().alias("completed_sets"),
+                pl.col("completion_inferred").sum().alias("inferred_sets"),
             ),
             on="week",
             how="left",

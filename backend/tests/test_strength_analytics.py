@@ -61,11 +61,12 @@ def test_progression_and_volume_across_workouts() -> None:
     series = {**SERIES, UUID(int=10): SERIES[MOVEMENT]}
     report = analyze_strength(reversed(rows), PERIOD, series=series)
     assert report.weekly_activity.rows() == [
-        (PERIOD.start, 1, 1, 5, None),
-        (date(2025, 1, 6), 0, 0, 0, -1),
-        (date(2025, 1, 13), 1, 1, 1, 1),
+        (PERIOD.start, 1, 1, 5, 0, None),
+        (date(2025, 1, 6), 0, 0, 0, 0, -1),
+        (date(2025, 1, 13), 1, 1, 1, 0, 1),
     ]
     assert report.progression["estimated_1rm_kg"].to_list() == [Decimal("66.83"), Decimal("66")]
+    assert report.progression["completion_inferred"].to_list() == [False, False]
     working = report.weekly_volume.row(2, named=True)
     assert working["category"] == "working" and working["completed_sets"] == 3
     assert working["volume_load_kg"] == Decimal("1052.5914")
@@ -119,7 +120,9 @@ def test_completion_evidence_and_missing_metrics() -> None:
     assert (
         bucket["completed_sets"] == 2 and bucket["sets_with_load"] == bucket["sets_with_reps"] == 1
     )
-    assert inferred.progression.height == 1
+    assert bucket["inferred_sets"] == 1
+    assert strict.weekly_volume["inferred_sets"].sum() == 0
+    assert inferred.progression["completion_inferred"].to_list() == [True]
 
 
 def test_bodyweight_assistance_and_duplicate_names() -> None:
@@ -164,8 +167,8 @@ def test_empty_partial_weeks_and_fall_back() -> None:
     ]
     activity = analyze_strength(rows, period).weekly_activity
     assert activity.rows() == [
-        (date(2025, 10, 27), 3, 0, 0, None),
-        (date(2025, 11, 3), 1, 0, 0, -2),
+        (date(2025, 10, 27), 3, 0, 0, 0, None),
+        (date(2025, 11, 3), 1, 0, 0, 0, -2),
     ]
     empty = analyze_strength([], period)
     assert empty.weekly_activity["workouts"].to_list() == [0, 0]
@@ -261,6 +264,7 @@ def test_query_isolation_deletion_supersets_and_local_range(db: Session) -> None
         2,
         2,
         2,
+        0,
         None,
     )
 
