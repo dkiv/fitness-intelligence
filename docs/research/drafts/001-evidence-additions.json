@@ -1,0 +1,304 @@
+{
+  "sources": [
+    {
+      "key": "plotkin@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "citation": "Plotkin D et al. Progressive overload without progressing load? The effects of load or repetition progression on muscular adaptations. PeerJ. 2022;10:e14142.",
+      "doi": "10.7717/peerj.14142",
+      "record_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9528903/",
+      "published_on": "2022-09-30",
+      "design": "Randomized parallel-group trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Open access CC BY as stated in article; catalog use limited to metadata, links and original factual summaries; confirm deployment rights.",
+      "appraisal": "Table 1 and strength result checked. Small study and unequal attrition; no equivalence test.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "enes-males@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "screening",
+      "citation": "Enes A, De Souza EO, Souza-Junior TP. Effects of Different Weekly Set Progressions on Muscular Adaptations in Trained Males: Is There a Dose–Response Effect? Med Sci Sports Exerc. 2024;56(3):553–563.",
+      "doi": "10.1249/MSS.0000000000003317",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37796222/",
+      "published_on": "2023-10-05",
+      "design": "Randomized parallel-group trial",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Abstract confirms direction of strength contrast. Extract magnitude, uncertainty, accumulated dose, protocol and bias from full text before acceptance.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "enes-females@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "screening",
+      "citation": "Enes A et al. Does increasing the resistance-training volume lead to greater gains? The effects of weekly set progressions on muscular adaptations in females. J Sports Sci. 2025;43(4):381–392.",
+      "doi": "10.1080/02640414.2025.2459003",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/39869076/",
+      "published_on": "2025-01-27",
+      "design": "Randomized parallel-group trial",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Abstract confirms direction of leg-press contrast. Full-text magnitude, uncertainty, dose and risk-of-bias extraction outstanding.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "currier-acsm@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "screening",
+      "citation": "Currier BS et al. American College of Sports Medicine Position Stand. Resistance Training Prescription for Muscle Function, Hypertrophy, and Physical Performance in Healthy Adults: An Overview of Reviews. Med Sci Sports Exerc. 2026;58(4):851–872.",
+      "doi": "10.1249/MSS.0000000000003897",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/41843416/",
+      "published_on": "2026-03-05",
+      "design": "Overview of systematic reviews / position stand",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Article states CC BY-NC-ND 4.0; confirm intended use and licensing before deployment; metadata, links and original factual summaries only.",
+      "appraisal": "Broad synthesis; periodization results and overlap with Moesgaard require detailed appraisal.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "pelland@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "screening",
+      "citation": "Pelland JC, Remmert JF, Robinson ZP, Hinson SR, Zourdos MC. The Resistance Training Dose Response: Meta-Regressions Exploring the Effects of Weekly Volume and Frequency on Muscle Hypertrophy and Strength Gains. Sports Med. 2026;56(2):481–505.",
+      "doi": "10.1007/s40279-025-02344-w",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/41343037/",
+      "published_on": "2025-12-04",
+      "design": "Systematic review and multilevel meta-regressions",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Dose-response direction and diminishing returns in abstract; inspect models, uncertainty, set definitions, population and overlap.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "spiering@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "screening",
+      "citation": "Spiering BA, Mujika I, Sharp MA, Foulis SA. Maintaining Physical Performance: The Minimal Dose of Exercise Needed to Preserve Endurance and Strength Over Time. J Strength Cond Res. 2021;35(5):1449–1458.",
+      "doi": "10.1519/JSC.0000000000003964",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/33629972/",
+      "published_on": "2021-05-01",
+      "design": "Narrative review",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "General-population maintenance synthesis; athlete-specific evidence insufficient. Primary studies and outcome-specific effects need appraisal. Publication date is issue date.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "coleman@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "screening",
+      "citation": "Coleman M et al. Gaining more from doing less? The effects of a one-week deload period during supervised resistance training on muscular adaptations. PeerJ. 2024;12:e16777.",
+      "doi": "10.7717/peerj.16777",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/38274324/",
+      "published_on": "2024-01-22",
+      "design": "Comparative resistance-training intervention",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; comprehensive correction/retraction and rights checks outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Cessation intervention differs from reduced-dose deloads or tapering. Full-text estimates and appraisal outstanding.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "key": "periodized-vs-constant-strength@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "periodization",
+        "objective": "strength-development",
+        "population": "resistance-training-participants",
+        "experience": "mixed",
+        "intervention": "volume-equated-periodized",
+        "comparator": "volume-equated-nonperiodized",
+        "outcome": "one-rm-strength",
+        "horizon": "trial-endpoint",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The pooled 1RM change estimate favored periodized over nonperiodized resistance training when volume was equated.",
+      "limitations": "Heterogeneous protocols and methodological quality; exact contrast durations and updated tables require review. Does not establish an optimal block structure.",
+      "quality": "low",
+      "assessment": "Small pooled standardized estimate; uncertain directness to experienced hybrid athletes. Abstract-level extraction.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "moesgaard@1",
+          "locator": "Abstract, Results, periodized vs nonperiodized 1RM comparison",
+          "result": "ES 0.31 (95% CI 0.04 to 0.57).",
+          "restriction": "Volume-equated studies; no hybrid-specific transfer approved."
+        }
+      ]
+    },
+    {
+      "key": "undulating-trained-strength@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "periodization",
+        "objective": "strength-development",
+        "population": "resistance-training-participants",
+        "experience": "trained",
+        "intervention": "volume-equated-undulating",
+        "comparator": "volume-equated-linear",
+        "outcome": "one-rm-strength",
+        "horizon": "trial-endpoint",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The pooled trained-subgroup 1RM estimate favored undulating over linear periodization, with substantial uncertainty.",
+      "limitations": "Subgroup duration range outstanding; imprecise, heterogeneous evidence. Overall sensitivity and trial quality need full-text confirmation. No proof of interaction or block sequence superiority.",
+      "quality": "low",
+      "assessment": "Interval reaches zero at reported precision. Abstract-level subgroup extraction; directness to hybrid training low.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "moesgaard@1",
+          "locator": "Abstract, Results, LP vs UP, trained subgroup",
+          "result": "ES 0.61 (95% CI 0.00 to 1.22).",
+          "restriction": "Trained subgroup only; no approved hybrid transfer."
+        }
+      ]
+    },
+    {
+      "key": "load-vs-repetition-progression@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "lower-body-resistance-trained-adults",
+        "experience": "at-least-one-year",
+        "intervention": "load-progression",
+        "comparator": "repetition-progression",
+        "outcome": "smith-machine-squat-one-rm",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Both strategies improved Smith-machine squat 1RM; adjusted between-group estimate modestly favored load progression with uncertainty.",
+      "limitations": "Small sample and unequal attrition; short duration; specific lower-body program; no equivalence test or controlled concurrent endurance intervention.",
+      "quality": "moderate",
+      "assessment": "Moderate provisional confidence in study-specific estimate; low for transfer to upper-body or hybrid programming.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "plotkin@1",
+          "locator": "Results, Strength; Table 1, squat 1RM row; Figure 3A",
+          "result": "Adjusted LOAD minus REPS 2.0 kg (90% CI -2.4 to 7.8); unadjusted mean changes 21.8 and 19.3 kg. Table 1 expresses REPS minus LOAD.",
+          "restriction": "Study-specific effect; 90% interval; not a validated double-progression policy."
+        }
+      ]
+    },
+    {
+      "key": "progressive-sets-trained-males@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "trained-adult-males",
+        "experience": "trained",
+        "intervention": "scheduled-weekly-set-increases",
+        "comparator": "constant-weekly-sets",
+        "outcome": "back-squat-one-rm",
+        "horizon": "twelve-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "In a randomized trial of trained men, both fixed set-progression arms improved back-squat 1RM more than the constant-volume arm.",
+      "limitations": "Small groups; cumulative volume differs; fixed rather than adaptive increases. Numerical contrast magnitudes and intervals outstanding.",
+      "quality": "low",
+      "assessment": "Abstract-derived draft held for further screening; no full-text appraisal or approved transfer.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "enes-males@1",
+          "locator": "Abstract, Results, 1RM multiple comparisons",
+          "result": "Reported p=0.023 for +4 sets vs constant and p<0.0001 for +6 sets vs constant; magnitude and CI not extracted.",
+          "restriction": "Specific lower-limb program and doses; no individual increase rule established."
+        }
+      ]
+    },
+    {
+      "key": "progressive-sets-trained-females@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "trained-adult-females",
+        "experience": "trained",
+        "intervention": "scheduled-weekly-set-increases",
+        "comparator": "constant-weekly-sets",
+        "outcome": "leg-press-one-rm",
+        "horizon": "twelve-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "In a randomized trial of trained women, both fixed set-progression arms improved leg-press 1RM more than the constant-volume arm.",
+      "limitations": "Small groups; differing cumulative dose; fixed increases; exact contrast magnitudes and intervals outstanding.",
+      "quality": "low",
+      "assessment": "Abstract-derived draft held for further screening; not evidence of optimal dose or sex-specific policy.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "enes-females@1",
+          "locator": "Abstract, 1RM comparison results",
+          "result": "Reported p=0.032 for +2 sets vs constant and p<0.001 for +4 sets vs constant; magnitude and CI not extracted.",
+          "restriction": "Specific lower-limb program; no approved hybrid transfer."
+        }
+      ]
+    }
+  ],
+  "methods": [
+    {
+      "key": "phase-aware-undulating-specialization@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "approval": null,
+      "status": "pending",
+      "question": "periodization",
+      "description": "Candidate strength-specialization method with changing phase emphasis and undulating session prescriptions, retaining agreed secondary training objectives and reviewing one week at a time.",
+      "provenance": "Original programming proposal in research packet 001, sections 3 and 4.",
+      "tradeoffs": "Exact phase lengths, dose, progression and assessment strategy not empirically established. Feasibility and non-priority outcomes constrain adjustments.",
+      "claims": [
+        "periodized-vs-constant-strength@1",
+        "undulating-trained-strength@1"
+      ]
+    }
+  ]
+}

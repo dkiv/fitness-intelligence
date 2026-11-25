@@ -1,0 +1,278 @@
+{
+  "questions": [
+    {
+      "id": "volume-burden",
+      "description": "How do different resistance working-set doses affect training burden?",
+      "gap": "No reviewed causal comparison of feedback-triggered volume adjustments on chronic strength and burden in experienced hybrid athletes."
+    }
+  ],
+  "sources": [
+    {
+      "key": "enes-males@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "approval": null,
+      "status": "pending",
+      "citation": "Enes A, De Souza EO, Souza-Junior TP. Effects of Different Weekly Set Progressions on Muscular Adaptations in Trained Males: Is There a Dose–Response Effect? Med Sci Sports Exerc. 2024;56(3):553–563.",
+      "doi": "10.1249/MSS.0000000000003317",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37796222/",
+      "published_on": "2023-10-05",
+      "design": "Randomized parallel-group trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic record checked on 2026-11-24; complete correction/retraction check and edition verification outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Journal text copy on ResearchGate inspected: Methods, Table 1, Results, Fig. 4A-C result descriptions and Discussion. Higher cumulative set dose, common start, small groups and attrition; verify publisher version, figures and supplements.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "enes-females@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "approval": null,
+      "status": "pending",
+      "citation": "Enes A et al. Does increasing the resistance-training volume lead to greater gains? The effects of weekly set progressions on muscular adaptations in females. J Sports Sci. 2025;43(4):381–392.",
+      "doi": "10.1080/02640414.2025.2459003",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/39869076/",
+      "published_on": "2025-01-27",
+      "design": "Randomized parallel-group trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic record checked on 2026-11-24; complete correction/retraction check and edition verification outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Manuscript text on Scribd inspected and cross-checked against publisher abstract. Study design, Tables 1-2, Results and Fig. 4 descriptions: starts 22/16/18, unequal preparatory exposures and main-phase totals 264/252/336. Version-of-record verification required.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "pelland@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "approval": null,
+      "status": "pending",
+      "citation": "Pelland JC, Remmert JF, Robinson ZP, Hinson SR, Zourdos MC. The Resistance Training Dose Response: Meta-Regressions Exploring the Effects of Weekly Volume and Frequency on Muscle Hypertrophy and Strength Gains. Sports Med. 2026;56(2):481–505.",
+      "doi": "10.1007/s40279-025-02344-w",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/41343037/",
+      "published_on": "2025-12-04",
+      "design": "Systematic review and multilevel meta-regressions",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic record checked on 2026-11-24; complete correction/retraction check and edition verification outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Typeset text reproduction on Studylib inspected; publisher abstract agrees on direction. Strength model §3.6.2, Fig. 8 and Table 4; mixed populations, nonlinear dose association, direct contrast sensitivity, no adaptive-policy estimand. Verify version and OSF outputs.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "status": "pending",
+      "approval": null,
+      "key": "barsuhn@1",
+      "citation": "Barsuhn A et al. Training volume increases or maintenance based on previous volume: the effects on muscular adaptations in trained males. J Appl Physiol. 2025;138(1):259–269.",
+      "doi": "10.1152/japplphysiol.00476.2024",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/39665246/",
+      "published_on": "2024-12-12",
+      "design": "Randomized parallel-group trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; complete correction/retraction check outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only, pending rights review.",
+      "appraisal": "Indexed original-paper Methods, baseline table and Discussion passages inspected; publisher direct access blocked. 29/55 completed, baseline imbalance, time effect but no group-by-time interaction for squat 1RM. Verify full version and analysis.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "status": "pending",
+      "approval": null,
+      "key": "enes-perceptual@1",
+      "citation": "Enes A et al. Exploring the Dose-Response Relationship between Resistance-Training Volume and Psychophysiological Responses in Trained Males. J Hum Kinet. 2026;103:303–318.",
+      "doi": "10.5114/jhk/209051",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/42713159/",
+      "published_on": "2025-11-19",
+      "design": "Secondary analysis of randomized parallel-group trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic publication record inspected; complete correction/retraction check outstanding.",
+      "rights": "Reuse rights not verified; metadata, links and original factual summaries only, pending rights review.",
+      "appraisal": "Publisher full-text Results and Table 1 examined. Same cohort as Enes 2024, not independent; strain includes exposure, correlations exploratory.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "key": "progressive-sets-trained-males@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "trained-adult-males",
+        "experience": "trained",
+        "intervention": "scheduled-weekly-set-increases",
+        "comparator": "constant-weekly-sets",
+        "outcome": "back-squat-one-rm",
+        "horizon": "twelve-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "In the male trial, the two scheduled escalation groups improved squat 1RM more than the fixed-set group.",
+      "limitations": "37 randomized, 31 completed; small groups; all started at 22 quadriceps sets, cumulative assigned sets 264/384/444; no dose-matched trajectory comparator; additional high-intensity lower-body exercise restricted.",
+      "quality": "moderate",
+      "assessment": "Trial-specific randomized contrasts with uncertainty; no approved transfer to press or hybrid blocks.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "enes-males@2",
+          "locator": "Results, Maximum Dynamic Strength, Fig. 4A",
+          "result": "4SG minus CG +6.3 kg (95% CI 0.8 to 11.8); 6SG minus CG +14.5 kg (9.2 to 19.9); 6SG minus 4SG +8.2 kg (2.8 to 13.7).",
+          "restriction": "Assigned whole-program contrasts over 12 weeks, not an isolated escalation effect or individualized policy."
+        }
+      ]
+    },
+    {
+      "key": "progressive-sets-trained-females@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "approval": null,
+      "status": "pending",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "trained-adult-females",
+        "experience": "trained",
+        "intervention": "scheduled-weekly-set-increases",
+        "comparator": "constant-weekly-sets",
+        "outcome": "leg-press-one-rm",
+        "horizon": "twelve-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "In the female trial, the two scheduled escalation groups improved leg-press 1RM more than the fixed-set group.",
+      "limitations": "38 allocated, 30 completed; unequal starting and preparatory set counts; main-phase totals 264/252/336; no demonstrated equivalence in realized dose; manuscript requires version confirmation.",
+      "quality": "low",
+      "assessment": "Publisher abstract confirms direction; detailed effects extracted from manuscript. No feedback or hybrid transfer. Smaller progression arm accumulated fewer prescribed sets than CG; do not claim all escalation arms accumulated more.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "enes-females@2",
+          "locator": "Manuscript Results, Muscular adaptations; Table 2 and Fig. 3",
+          "result": "2SG minus CG +15.7 kg (95% CI 1.1 to 30.3); 4SG minus CG +27.4 kg (12.5 to 42.3); 4SG minus 2SG +11.7 kg (-2.4 to 25.9).",
+          "restriction": "Specific 12-week lower-body trajectories; not matched-dose causal isolation."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "status": "pending",
+      "approval": null,
+      "key": "weekly-fractional-volume-strength@1",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "higher-weekly-fractional-set-volume",
+        "comparator": "lower-weekly-fractional-set-volume",
+        "outcome": "maximal-strength",
+        "horizon": "at-least-four-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The fitted meta-regression relates higher fractional weekly set volume to greater strength gains with strong diminishing returns.",
+      "limitations": "Aggregate mixed-experience model; varying endpoints and protocols; adjustment does not identify individual causal response; no timing/feedback comparison.",
+      "quality": "moderate",
+      "assessment": "66 studies, 490 effects, 2020 participants for strength. Direct-only analyses qualitatively corroborate primary result per authors; verify OSF. Full-text reproduction version requires confirmation.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "pelland@2",
+          "locator": "Results §3.6.2, Fig. 8, Table 4",
+          "result": "Marginal slope at mean fractional weekly volume 0.21% per set (95% CrI 0.16 to 0.26); reciprocal best fit.",
+          "restriction": "Model-dependent mean association conditional on frequency, duration and training status, not a universal slope or dose limit."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "status": "pending",
+      "approval": null,
+      "key": "habitual-set-maintenance-strength@1",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "trained-adult-males",
+        "experience": "trained",
+        "intervention": "maintain-habitual-weekly-sets",
+        "comparator": "increase-habitual-weekly-sets",
+        "outcome": "back-squat-one-rm",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Trained men maintaining their prior weekly set count improved back-squat 1RM; the trial did not establish a difference in strength gains between maintenance and increases.",
+      "limitations": "55 allocated, 29 completed; baseline strength imbalance; no significant group-by-time interaction; lack of significance is not equivalence; group main effect not a change contrast.",
+      "quality": "low",
+      "assessment": "Directly relevant habitual-dose comparator. Indexed paper excerpts only; direct between-group change intervals not extracted.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "barsuhn@1",
+          "locator": "Results and Discussion, maximal strength; baseline table",
+          "result": "Pooled change about 22 kg; maintenance change about 32 kg; within-group effect sizes 0.86/0.73/0.72; no significant group-by-time interaction.",
+          "restriction": "Do not claim superiority or equivalence; no threshold or hybrid transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "status": "pending",
+      "approval": null,
+      "key": "set-progression-derived-strain@1",
+      "scope": {
+        "question": "volume-burden",
+        "objective": "monitor-training-burden",
+        "population": "trained-adult-males",
+        "experience": "trained",
+        "intervention": "scheduled-weekly-set-increases",
+        "comparator": "constant-weekly-sets",
+        "outcome": "derived-training-strain",
+        "horizon": "twelve-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Derived training strain was greater in the higher scheduled set progression conditions in the male Enes cohort.",
+      "limitations": "Derived metric contains exposure; same cohort as Enes strength trial; not a clinical fatigue, injury or overtraining endpoint; no decision intervention.",
+      "quality": "low",
+      "assessment": "Secondary same-cohort outcomes; do not count as independent evidence of strength adaptation.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "enes-perceptual@1",
+          "locator": "Results, Fig. 3D; Abstract Results",
+          "result": "6S > 4S > FS, p < 0.001; effect magnitude/CI not extracted.",
+          "restriction": "Derived strain only; not evidence of a fatigue-triggered adjustment benefit."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 002)",
+      "status": "pending",
+      "approval": null,
+      "key": "working-set-volume-review@1",
+      "question": "strength-dose",
+      "description": "Retain a safe productive set dose as an admissible conservative option; consider a bounded volume change only after reviewing goals, achieved exposure, comparable performance, subjective burden, feasibility and competing priorities. Request information or defer when these are insufficient.",
+      "provenance": "Research Packet 002 RT-P02 revision 0.2, candidate methodology; not an empirical claim.",
+      "tradeoffs": "May forgo possible gains from additional sets or introduce unnecessary burden if escalated; no validated individual trigger, increment, window or ceiling. Requires parameter and human review.",
+      "claims": [
+        "progressive-sets-trained-males@2",
+        "progressive-sets-trained-females@2",
+        "weekly-fractional-volume-strength@1",
+        "habitual-set-maintenance-strength@1"
+      ]
+    }
+  ]
+}
