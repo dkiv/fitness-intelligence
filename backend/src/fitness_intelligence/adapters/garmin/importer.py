@@ -21,7 +21,16 @@ from .binding import (
     verify,
 )
 from .client import Endpoint, GarminClient, GarminError
-from .mapping import DETAIL_STAMP, WorkoutResponse, map_activity, map_day, obj, stamp
+from .mapping import (
+    DETAIL_STAMP,
+    GarminBinding,
+    Row,
+    WorkoutResponse,
+    map_activity,
+    map_day,
+    obj,
+    stamp,
+)
 from .nutrition import WeightUnit, map_weights, read_intake, save_intake, save_weight
 from .persistence import Snapshot, save_activity, save_observation
 from .projection import activity_inputs
@@ -38,6 +47,27 @@ class Mode(StrEnum):
     @property
     def takes_day(self) -> bool:
         return self in (Mode.ACTIVITIES, Mode.RECOVERY, Mode.INTAKE, Mode.WEIGHT)
+
+
+def activity_snapshot(
+    binding: GarminBinding, summary: Row, detail: Row, workouts: WorkoutResponse | None
+) -> Snapshot:
+    activity = map_activity(binding, summary, detail=detail, workouts=workouts)
+    meta = detail.get("metadataDTO")
+    updated = obj(meta).get("lastUpdateDate") if meta is not None else None
+    split_source = None
+    if activity.splits is not None:
+        split_source = (
+            "ActivitySummaryDTO"
+            if detail.get("splitSummaries") is not None
+            else "SummarizedActivityDTO"
+        ) + ".splitSummaries"
+    return Snapshot(
+        activity,
+        None if updated is None else stamp(updated, DETAIL_STAMP).replace(tzinfo=UTC),
+        split_source,
+        activity_inputs(activity, summary, detail, workouts),
+    )
 
 
 class Importer:
@@ -60,24 +90,7 @@ class Importer:
                 workouts = WorkoutResponse(
                     binding.source, ident, self.client.read(Endpoint.WORKOUTS, activity_id=ident)
                 )
-            activity = map_activity(binding, summary, detail=detail, workouts=workouts)
-            meta = detail.get("metadataDTO")
-            updated = obj(meta).get("lastUpdateDate") if meta is not None else None
-            split_source = None
-            if activity.splits is not None:
-                split_source = (
-                    "ActivitySummaryDTO"
-                    if detail.get("splitSummaries") is not None
-                    else "SummarizedActivityDTO"
-                ) + ".splitSummaries"
-            result.append(
-                Snapshot(
-                    activity,
-                    None if updated is None else stamp(updated, DETAIL_STAMP).replace(tzinfo=UTC),
-                    split_source,
-                    activity_inputs(activity, summary, detail, workouts),
-                )
-            )
+            result.append(activity_snapshot(binding, summary, detail, workouts))
         return result
 
     def run(

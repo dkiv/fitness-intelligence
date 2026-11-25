@@ -99,7 +99,7 @@ def test_account_fk_and_populated_downgrade_guard(db: Session, factory) -> None:
         command.downgrade(config, "b302")
     db.expire_all()
     assert db.get(type(good), ident) is not None
-    assert db.scalar(text("SELECT version_num FROM alembic_version")) == "b320"
+    assert db.scalar(text("SELECT version_num FROM alembic_version")) == "b330"
     db.delete(good)
     db.commit()
     command.downgrade(config, "b302")

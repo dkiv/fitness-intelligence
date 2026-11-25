@@ -8,6 +8,7 @@ import sys
 from contextlib import ExitStack
 from datetime import date
 from pathlib import Path
+from uuid import UUID, uuid4
 
 from sqlalchemy import create_engine
 
@@ -15,6 +16,8 @@ from fitness_intelligence.adapters.local_account import LocalAccountError
 
 from .binding import Evidence
 from .client import GarminClient, GarminError
+from .history import synchronize
+from .history_state import Category, Scope, WeightSegment
 from .importer import Importer, Mode
 from .mapping import MappingError
 from .nutrition import WeightUnit
@@ -39,6 +42,19 @@ def main() -> int:
             )
         if mode == Mode.ACTIVITIES:
             command.add_argument("--steps", action="store_true")
+    historical = ("backfill", "incremental", "repair")
+    for name in historical:
+        command = commands.add_parser(name)
+        command.add_argument("--start", required=True, type=date.fromisoformat)
+        command.add_argument("--end", required=True, type=date.fromisoformat)
+        command.add_argument(
+            "--categories", nargs="+", required=True, type=Category, choices=list(Category)
+        )
+        command.add_argument("--request-limit", type=int, default=40)
+        command.add_argument("--pass-id", type=UUID, help="Reuse to resume an interrupted refresh")
+        command.add_argument("--weight-segment", type=Path)
+        if name == "incremental":
+            command.add_argument("--overlap", type=int, default=7)
     args = parser.parse_args()
     previous = logging.root.manager.disable
     logging.disable(logging.CRITICAL)
@@ -49,14 +65,35 @@ def main() -> int:
             evidence = Evidence.load(args.binding)
             engine = create_engine(os.environ["DATABASE_URL"], echo=False, hide_parameters=True)
             stack.callback(engine.dispose)
-            client = GarminClient(keychain_key())
-            stack.callback(client.close)
-            counts = Importer(engine, evidence, client).run(
-                Mode(args.mode),
-                day=getattr(args, "day", None),
-                steps=getattr(args, "steps", False),
-                weight_unit=getattr(args, "weight_unit", None),
-            )
+            if args.mode in historical:
+                weight = (
+                    WeightSegment.load(args.weight_segment, evidence.source)
+                    if args.weight_segment
+                    else None
+                )
+                pass_id = args.pass_id or (UUID(int=0) if args.mode == "backfill" else uuid4())
+                scope = Scope(
+                    args.mode,
+                    args.start,
+                    args.end,
+                    tuple(args.categories),
+                    pass_id,
+                    getattr(args, "overlap", 7),
+                    weight,
+                )
+                scope.validate()
+                client = GarminClient(keychain_key(), request_limit=args.request_limit)
+                stack.callback(client.close)
+                counts = synchronize(engine, evidence, client, scope)
+            else:
+                client = GarminClient(keychain_key())
+                stack.callback(client.close)
+                counts = Importer(engine, evidence, client).run(
+                    Mode(args.mode),
+                    day=getattr(args, "day", None),
+                    steps=getattr(args, "steps", False),
+                    weight_unit=getattr(args, "weight_unit", None),
+                )
     except (GarminError, MappingError, LocalAccountError) as exc:
         # These adapter errors carry fixed categories or comparison labels only.
         print(str(exc), file=sys.stderr)
@@ -70,7 +107,7 @@ def main() -> int:
     finally:
         logging.disable(previous)
     print(json.dumps(counts, sort_keys=True))
-    return 0
+    return 1 if counts.get("stopped") else 0
 
 
 if __name__ == "__main__":
