@@ -186,7 +186,7 @@ The seven packet questions guide review of individual history. The draft’s two
 
 ## J3 scientific curation
 
-Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). Packet 007 adds A17–A19, B5–B8 and C4–C5. Packet 009 adds A20–A22 to those 32 priorities, giving **35 review entries** (22 essential, eight early extensions, five deferred). The narrow J3A.1 scientific appraisal can proceed independently. The overlaps below allow several decisions to share evidence and method review. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist) · [Packet 007 source and claim keys, review requirements and data feasibility for each decision](007-individual-energy-expenditure-estimation.md#72-j3-curation-extension-decision-oriented-additions-to-packet-006008-shortlist) · [Packet 009 decision references and fallbacks](009-individual-training-history.md#72-narrow-extension-of-j3-curation-shortlist)
+Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). Packet 007 adds A17–A19, B5–B8 and C4–C5. Packet 009 adds A20–A22 to those 32 priorities, giving **35 review entries** (22 essential, eight early extensions, five deferred). J3A.1 and J3B.1 cover selected parts of these decisions. All 35 entries remain open. The overlaps below allow several decisions to share evidence and method review. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist) · [Packet 007 source and claim keys, review requirements and data feasibility for each decision](007-individual-energy-expenditure-estimation.md#72-j3-curation-extension-decision-oriented-additions-to-packet-006008-shortlist) · [Packet 009 decision references and fallbacks](009-individual-training-history.md#72-narrow-extension-of-j3-curation-shortlist)
 
 | Priority | Coaching decision | First review action |
 | --- | --- | --- |
@@ -226,9 +226,26 @@ Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (esse
 | C4 | Consider absolute or daily physiological expenditure and its components (EE-P05/10) | With priorities C1/C3, review the identifiability proof and prior sensitivity. Model C2 requires a suitable independent reference. Compare Model C1 forecasts with Models A and B on future observed outcomes. |
 | C5 | Test whether acting on an estimate improves outcomes (EE-P10) | With P008/RE-11 and P007/EE-13, retain the open prospective comparison, endpoints and observation burden. Synthetic conformance can test behavior. Causal benefit needs a policy comparison. |
 
-Consolidate overlapping candidate methods into a narrow policy set. For example, one review of completed work and comparable performance (A9/A13) can inform a bounded lift change (A2/A11), a calendar proposal (A4/A15) or a reduction (A3/A10/A12/A16). Each proposal needs its own authority check against the approved block. J3 can start with one such decision while other claims await review.
+Consolidate overlapping candidate methods into a narrow policy set. For example, one review of completed work and comparable performance (A9/A13) can inform a bounded lift change (A2/A11), a calendar proposal (A4/A15) or a reduction (A3/A10/A12/A16). Each proposal needs its own authority check against the approved block. The first tranche applies this approach to the next resistance exposure within an approved block.
 
 For each decision, **source verification** establishes access, version, locator and study identity. **Claim appraisal** evaluates the measured contrast, uncertainty and limitations. **Population transfer** requires a rationale for applying that result to the intended athlete. **Candidate method review** assesses the action, alternatives and revision authority. **Numerical parameter review** examines provenance, units, bounds and validation. **Data readiness** identifies which observations support prescription, adherence and outcome evaluation. **Operational authorization** is a separate decision for a specific reviewed release and planner rule. Staging grants none of these approvals. [Parameter appraisal](006-integrated-hybrid-periodization.md#45-quantitative-parameter-appraisal) · [Review and release procedure](../scientific-evidence-catalog.md#review-and-release-procedure)
+
+### Strength progression curation
+
+| Tranche | Status and handoff |
+| --- | --- |
+| J3A.1 | AI-assisted appraisal complete. Independent scientific review of six papers, transfer and the two pending Barsuhn revisions is outstanding. [Source findings and dependencies](curation/README.md#scientific-decisions-awaiting-independent-review) |
+| J3B.1 | Candidate J3-M01 revision 0.1 complete. Independent review of the three bundles, parameters and conformance cases is outstanding. [Methodology and review questions](curation/README.md#candidate-methodology-for-review) |
+| J3C.1 | Approval and operational release preparation pending. Each accepted evidence revision, method and operational rule needs its own applicable review and authorization. |
+| J3A.2 | Next scientific appraisal tranche covers multiweek block construction and protected secondary strength and running outcomes (A1/A7). Follow with practical block methodology in J3B.2. |
+
+Continue alternating focused scientific appraisal and practical method development by capability. Packet 010 continues independently on longer-term planning, interruptions, resumption and adherence.
+
+| J3-M01 review bundle | Existing priorities addressed in part |
+| --- | --- |
+| M01a · Movement prescription and progression | A2/A11 for bounded load or rep changes. A9/A13/A20 for comparable historical references and confirmed work. A14 for interpretable effort feedback. |
+| M01b · Working-set exposure | A3/A12 for holding, trialing or reducing set counts. A9/A13/A21 for representative exposure and changes in context. A10/A16 for burden and escalation. |
+| M01c · Concurrent scheduling and constraints | A4/A15 for feasible moves around priority sessions. A7 for protection of secondary outcomes. A10/A14/A16 for local burden, conflicts and authority. A22 for tentative contextual patterns. |
 
 ## Earlier strength-focused priorities
 
