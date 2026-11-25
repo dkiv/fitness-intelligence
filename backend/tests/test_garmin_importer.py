@@ -16,6 +16,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import event, select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from test_garmin import jwt
 
@@ -941,3 +942,38 @@ def test_preexisting_account_requires_independent_evidence(
     assert importer.run(Mode.ENROLL) == {"already_enrolled": 1}
     policy = db.scalars(select(GarminEnrollment)).one()
     assert policy.evidence_type == "independent" and policy.approved_pin is None
+
+
+def test_sleep_epoch_recovery_replay_and_transaction_rollback(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, provider = setup
+    enroll(importer)
+    provider.sleep.update(
+        sleepStartTimestampGMT=1_730_591_852_123, sleepEndTimestampGMT=1_730_617_741_987
+    )
+    assert importer.run(Mode.RECOVERY, day=DAY) == {"observed": 11, "created": 11}
+    observations = {r.metric: r for r in db.scalars(select(DailyRecoveryObservation))}
+    ids = {metric: r.id for metric, r in observations.items()}
+    sleep = observations["sleep_duration"]
+    assert sleep.local_date == DAY
+    assert sleep.window_start == datetime(2024, 11, 2, 23, 57, 32, 123000, tzinfo=UTC)
+    assert sleep.window_end == datetime(2024, 11, 3, 7, 9, 1, 987000, tzinfo=UTC)
+    assert importer.run(Mode.RECOVERY, day=DAY) == {"observed": 11, "unchanged": 11}
+    assert {r.metric: r.id for r in db.scalars(select(DailyRecoveryObservation))} == ids
+
+    # Fail the sleep update after the earlier daily observations have flushed.
+    db.execute(
+        text(
+            "ALTER TABLE daily_recovery_observations ADD CHECK "
+            "(metric <> 'sleep_duration' OR value <> 20001)"
+        )
+    )
+    db.commit()
+    provider.daily["restingHeartRate"] += 1
+    provider.sleep["sleepTimeSeconds"] = 20001
+    with pytest.raises(IntegrityError):
+        importer.run(Mode.RECOVERY, day=DAY)
+    db.expire_all()
+    assert observations["resting_hr"].value == 52
+    assert sleep.value == 20000 and sleep.window_end.microsecond == 987000
