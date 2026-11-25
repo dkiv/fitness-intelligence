@@ -1,0 +1,535 @@
+{
+  "questions": [
+    {
+      "id": "energy-rmr-equation-agreement",
+      "description": "How do population equations agree with resting calorimetry in athletes?",
+      "gap": "Individual external prediction, PAL and joint-athlete validation unresolved."
+    },
+    {
+      "id": "energy-controlled-maintenance-agreement",
+      "description": "How does controlled weight-maintenance intake compare with DLW expenditure?",
+      "gap": "Free-living app intake and individual equivalence not established."
+    },
+    {
+      "id": "energy-device-criterion-agreement",
+      "description": "How do activity or total expenditure estimates agree with reference measurements?",
+      "gap": "Specific device, construct, time window, repeated-change reliability and calibration required."
+    },
+    {
+      "id": "energy-mass-observation-variability",
+      "description": "How variable are comparable body-mass observations under defined conditions?",
+      "gap": "No universal tissue-change detection threshold or sampling window."
+    },
+    {
+      "id": "energy-longitudinal-intake-model-validation",
+      "description": "How do weight-based models estimate changes in intake against reference intake-balance methods?",
+      "gap": "Absolute TEE, athlete transfer and decision benefit not established."
+    },
+    {
+      "id": "energy-athlete-weight-loss-rate",
+      "description": "How do different planned loss rates affect athlete body composition?",
+      "gap": "Different duration and realized exposure; no universal safe loss rate or hybrid policy."
+    },
+    {
+      "id": "energy-operational-maintenance-methodology",
+      "description": "How should eligible reported intake and weight response inform nutrition review?",
+      "gap": "Structural ambiguity, reporting stability and prospective decision value require review."
+    }
+  ],
+  "sources": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "heymsfield-controlled-maintenance@1",
+      "citation": "Heymsfield SB, Peterson CM, Thomas DM, et al. Establishing energy requirements for body weight maintenance: validation of an intake-balance method. BMC Res Notes. 2017;10:220.",
+      "doi": "10.1186/s13104-017-2546-4",
+      "record_url": "https://doi.org/10.1186/s13104-017-2546-4",
+      "published_on": "2017-06-26",
+      "design": "Controlled inpatient intake-balance criterion comparison",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "CC BY 4.0 reported by publisher; independent rights review outstanding.",
+      "appraisal": "E03: six non-obese adults, 10-day balance protocol, group similarity not individual equivalence. Verify exact paired data and DLW timing.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "oneill-athlete-rmr@1",
+      "citation": "O’Neill JER, Corish CA, Horner K. Accuracy of resting metabolic rate prediction equations in athletes: a systematic review with meta-analysis. Sports Med. 2023;53:2373–2398.",
+      "doi": "10.1007/s40279-023-01896-z",
+      "record_url": "https://doi.org/10.1007/s40279-023-01896-z",
+      "published_on": "2023-08-26",
+      "design": "Systematic review and meta-analysis of prediction agreement",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "CC BY 4.0 reported by publisher; independent rights review outstanding.",
+      "appraisal": "E05: study subsets differ by equation and metric, derivation overlap, calorimetry preparation heterogeneous. Verify Table 3 denominators and subgroup scope.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "shcherbina-device-energy@1",
+      "citation": "Shcherbina A, Mattsson CM, Waggott D, et al. Accuracy in wrist-worn, sensor-based measurements of heart rate and energy expenditure in a diverse cohort. J Pers Med. 2017;7:3.",
+      "doi": "10.3390/jpm7020003",
+      "record_url": "https://doi.org/10.3390/jpm7020003",
+      "published_on": "2017-05-24",
+      "design": "Laboratory device criterion comparison",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "E07: abstract result for seven older devices and specific tasks. Verify error definition, device and activity strata in full text.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "ma-runner-dlw@1",
+      "citation": "Ma D, Hashii-Arishima Y, Yokoyama K, et al. Validity of triaxial accelerometer for estimating total energy expenditure in elite female university athletes: a doubly labeled water study. Eur J Appl Physiol. 2026;126:5841–5850.",
+      "doi": "10.1007/s00421-026-06458-5",
+      "record_url": "https://doi.org/10.1007/s00421-026-06458-5",
+      "published_on": "2026-10-24",
+      "design": "Seven-day accelerometer versus DLW criterion comparison",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "E08: 16 elite female university runners; waist Actimarker, PAL/BMR method; verify BMR and DIT definition and repeated-measure limits.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "murakami-paee-agreement@1",
+      "citation": "Murakami H, Kawakami R, Nakae S, et al. Accuracy of 12 wearable devices for estimating physical activity energy expenditure using a metabolic chamber and the doubly labeled water method: validation study. JMIR Mhealth Uhealth. 2019;7:e13938.",
+      "doi": "10.2196/13938",
+      "record_url": "https://doi.org/10.2196/13938",
+      "published_on": "2019-08-02",
+      "design": "Chamber and free-living wearable criterion comparison",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "E09: abstract and indexed original passages; residual PAEE not directly measured. Verify device-specific distributions and multiple comparisons.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "cheuvront-morning-mass@1",
+      "citation": "Cheuvront SN, Carter R III, Montain SJ, Sawka MN. Daily body mass variability and stability in active men undergoing exercise-heat stress. Int J Sport Nutr Exerc Metab. 2004;14:532–540.",
+      "doi": "10.1123/ijsnem.14.5.532",
+      "record_url": "https://doi.org/10.1123/ijsnem.14.5.532",
+      "published_on": "2004-10-01",
+      "design": "Retrospective repeated morning mass observation",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "E11: issue month October 2004, OpenAlex bibliographic date 2004-10-01 (day may be issue convention; verify). Heat and fluid protocol specific.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "sanghvi-intake-change-validation@1",
+      "citation": "Sanghvi A, Redman LM, Martin CK, Ravussin E, Hall KD. Validation of an inexpensive and accurate mathematical method to measure long-term changes in free-living energy intake. Am J Clin Nutr. 2015;102:353–358.",
+      "doi": "10.3945/ajcn.115.111070",
+      "record_url": "https://doi.org/10.3945/ajcn.115.111070",
+      "published_on": "2015-06-03",
+      "design": "Secondary model validation using CALERIE restriction-arm data",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "E14: abstract and indexed Methods, Results and Discussion passages; direct PMC open blocked. Change in EI from baseline, not absolute TEE; obtain full Table 1 and supplement before approval.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "garthe-athlete-loss-rate@1",
+      "citation": "Garthe I, Raastad T, Refsnes PE, Koivisto A, Sundgot-Borgen J. Effect of two different weight-loss rates on body composition and strength and power-related performance in elite athletes. Int J Sport Nutr Exerc Metab. 2011;21:97–104.",
+      "doi": "10.1123/ijsnem.21.2.97",
+      "record_url": "https://doi.org/10.1123/ijsnem.21.2.97",
+      "published_on": "2011-04-01",
+      "design": "Randomized comparison of planned weight-loss rates",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publication record and specified result located; comprehensive correction, version, retraction and independent review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "E20: issue month April 2011, bibliographic issue date 2011-04-01; verify day. Different achieved rates and durations, DXA hydration, training exposure; verify dispersion and follow-up overlap.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "controlled-maintenance-intake-dlw-ratio@1",
+      "scope": {
+        "question": "energy-controlled-maintenance-agreement",
+        "objective": "assess-measurement-quality",
+        "population": "non-obese-adults",
+        "experience": "unknown",
+        "intervention": "controlled-constant-metabolizable-intake",
+        "comparator": "doubly-labeled-water-tee",
+        "outcome": "intake-to-expenditure-ratio",
+        "horizon": "ten-days",
+        "block_context": "controlled-maintenance"
+      },
+      "assertion": "In the small controlled maintenance sample, group mean intake was close to DLW expenditure but individual ratios differed.",
+      "limitations": "Six adults, inpatient control and weight bound; no equivalence test or free-living log validation.",
+      "quality": "moderate",
+      "assessment": "Study-specific descriptive agreement, not a general error distribution.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "heymsfield-controlled-maintenance@1",
+          "locator": "Results and Fig. 3",
+          "result": "Intake 2390 ±543 vs DLW 2373 ±713 kcal/day; mean ratio 1.03 ±0.15, range 0.87–1.27.",
+          "restriction": "Constant controlled food intake during ten-day balance period."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "ten-haaf-athlete-rmr-group-agreement@1",
+      "scope": {
+        "question": "energy-rmr-equation-agreement",
+        "objective": "assess-measurement-quality",
+        "population": "adult-athletes",
+        "experience": "mixed",
+        "intervention": "ten-haaf-age-height-weight-equation",
+        "comparator": "indirect-calorimetry-rmr",
+        "outcome": "standardized-rmr-difference",
+        "horizon": "single-assessment",
+        "block_context": "resting-energy-assessment"
+      },
+      "assertion": "The pooled standardized difference between Ten-Haaf predicted and measured RMR was near zero in the assessed athlete comparisons.",
+      "limitations": "Four studies, seven comparisons, 204 participants; possible local derivation bias and heterogeneous methods; not equivalence.",
+      "quality": "moderate",
+      "assessment": "Accuracy of group estimate is not individual precision or TEE validity.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "oneill-athlete-rmr@1",
+          "locator": "Results §3.4.3 Fig. 2",
+          "result": "ES 0.04 (95% CI −0.16 to 0.23); I²=0%.",
+          "restriction": "Resting energy expenditure only; no PAL or exercise estimate."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "ten-haaf-athlete-rmr-within-bound@1",
+      "scope": {
+        "question": "energy-rmr-equation-agreement",
+        "objective": "assess-measurement-quality",
+        "population": "adult-athletes",
+        "experience": "mixed",
+        "intervention": "ten-haaf-age-height-weight-equation",
+        "comparator": "indirect-calorimetry-rmr",
+        "outcome": "fraction-within-ten-percent",
+        "horizon": "single-assessment",
+        "block_context": "resting-energy-assessment"
+      },
+      "assertion": "The review reported that 80.2% of participants in its Ten-Haaf precision synthesis had predictions within 10% of measured RMR.",
+      "limitations": "Precision subset differs from accuracy subset; verify exact denominator and overlap; 10% is study criterion not personal uncertainty.",
+      "quality": "moderate",
+      "assessment": "Prediction agreement criterion, not reliability or confidence interval.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "oneill-athlete-rmr@1",
+          "locator": "Results §3.4.6 Table 3",
+          "result": "80.2% within ±10%; other reviewed equation estimates 40.7–63.7%.",
+          "restriction": "Not a claim of TEE accuracy; verify individual denominator before approval."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "laboratory-wrist-energy-error@1",
+      "scope": {
+        "question": "energy-device-criterion-agreement",
+        "objective": "assess-measurement-quality",
+        "population": "diverse-adult-volunteers",
+        "experience": "mixed",
+        "intervention": "seven-wrist-worn-device-estimates",
+        "comparator": "indirect-calorimetry",
+        "outcome": "median-energy-expenditure-error",
+        "horizon": "laboratory-session",
+        "block_context": "activity-energy-assessment"
+      },
+      "assertion": "None of seven studied wrist devices achieved median energy expenditure error below 20% in the reported laboratory comparison.",
+      "limitations": "Older specific devices, seated/walk/run/cycle tasks; no daily TEE or strength-specific validation.",
+      "quality": "moderate",
+      "assessment": "Check exact error definition and strata; not signed correction.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "shcherbina-device-energy@1",
+          "locator": "Abstract Results",
+          "result": "No device median EE error below 20%.",
+          "restriction": "Laboratory tasks; does not quantify current devices or longitudinal change."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "runner-accelerometer-dlw-tee-agreement@1",
+      "scope": {
+        "question": "energy-device-criterion-agreement",
+        "objective": "assess-measurement-quality",
+        "population": "elite-female-university-runners",
+        "experience": "endurance-trained",
+        "intervention": "waist-triaxial-accelerometer-tee",
+        "comparator": "doubly-labeled-water-tee",
+        "outcome": "mean-tee-method-difference",
+        "horizon": "seven-days",
+        "block_context": "free-living-energy-assessment"
+      },
+      "assertion": "The tested accelerometer-based TEE method overestimated mean DLW expenditure in this runner sample.",
+      "limitations": "16 young women, single method and seven-day period; no repeated change validation or hybrid population.",
+      "quality": "moderate",
+      "assessment": "Criterion agreement, not causal effect; no universal correction.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ma-runner-dlw@1",
+          "locator": "Results Fig. 2B-2; Methods DLW and triaxial accelerometer",
+          "result": "Bias +416 ±242 kcal/day (~12.5%); LoA −59 to +891 kcal/day; r=.828.",
+          "restriction": "Waist Actimarker EW4800 PAL/BMR method; not other devices."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "free-living-wearable-paee-underestimation@1",
+      "scope": {
+        "question": "energy-device-criterion-agreement",
+        "objective": "assess-measurement-quality",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "twelve-wearable-paee-estimates",
+        "comparator": "dlw-derived-residual-paee",
+        "outcome": "device-level-underestimation",
+        "horizon": "fifteen-days",
+        "block_context": "free-living-energy-assessment"
+      },
+      "assertion": "Ten of twelve tested wearable PAEE estimates were significantly below the DLW-derived PAEE comparator.",
+      "limitations": "19 adults; comparator subtracts BMR and assumed TEF; devices outdated; no equivalence from nonsignificance.",
+      "quality": "moderate",
+      "assessment": "Device-count finding not person-level error or total expenditure.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "murakami-paee-agreement@1",
+          "locator": "Abstract Results, 15-day free-living comparison",
+          "result": "Reference PAEE 728.0 ±162.7 kcal/day; 10/12 devices significantly underestimated.",
+          "restriction": "Residual PAEE, not TEE; verify multiplicity and device-level results."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "morning-mass-variability-active-men@1",
+      "scope": {
+        "question": "energy-mass-observation-variability",
+        "objective": "assess-measurement-quality",
+        "population": "active-men",
+        "experience": "active",
+        "intervention": "repeated-first-morning-weighing",
+        "comparator": "within-person-repeated-measurements",
+        "outcome": "day-to-day-body-mass-variability",
+        "horizon": "four-to-fifteen-days",
+        "block_context": "exercise-heat-fluid-monitoring"
+      },
+      "assertion": "First-morning body mass varied across days in active men exercising in heat under fluid replacement guidance.",
+      "limitations": "Retrospective; specific environment, sex and hydration protocol; no tissue inference.",
+      "quality": "moderate",
+      "assessment": "Descriptive variability not universal minimum detectable change.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "cheuvront-morning-mass@1",
+          "locator": "Abstract Results",
+          "result": "Daily variability 0.51 ±0.20 kg; CV 0.66 ±0.24%.",
+          "restriction": "65 men; 4–15 consecutive days."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "calerie-weight-model-intake-change-agreement@1",
+      "scope": {
+        "question": "energy-longitudinal-intake-model-validation",
+        "objective": "assess-measurement-quality",
+        "population": "calerie-calorie-restriction-adults",
+        "experience": "unknown",
+        "intervention": "demographic-and-weight-dynamic-model",
+        "comparator": "dlw-dxa-intake-balance",
+        "outcome": "energy-intake-change-agreement",
+        "horizon": "two-years-four-intervals",
+        "block_context": "calorie-restriction"
+      },
+      "assertion": "The model-estimated changes in intake were close to intake-balance estimates at group level but showed substantial individual disagreement.",
+      "limitations": "140 CALERIE restriction participants; reference estimated, not independent absolute intake; body-weight model assumptions and selected completers; not daily EE.",
+      "quality": "moderate",
+      "assessment": "Change from baseline only; agreement not prospective hybrid intervention efficacy.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "sanghvi-intake-change-validation@1",
+          "locator": "Abstract Results; Results Table 1 and Fig. 3; Discussion agreement paragraph",
+          "result": "Mean ΔEI within 40 kcal/day; overall individual RMS deviation 215 kcal/day; Discussion reports total LoA span ~800–1000 kcal/day.",
+          "restriction": "Four intervals in two-year calorie restriction; verify complete Table 1 and supplement."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "athlete-slower-loss-lean-mass@1",
+      "scope": {
+        "question": "energy-athlete-weight-loss-rate",
+        "objective": "body-composition-during-training",
+        "population": "elite-athletes",
+        "experience": "trained",
+        "intervention": "slower-planned-weight-loss",
+        "comparator": "faster-planned-weight-loss",
+        "outcome": "dxa-lean-body-mass-change",
+        "horizon": "intervention-endpoint",
+        "block_context": "energy-restriction-with-resistance-training"
+      },
+      "assertion": "The slower-loss group had a greater lean-body-mass change than the faster-loss group in the studied intervention.",
+      "limitations": "Small groups, different durations, realized rates and accumulated resistance exposure; DXA hydration; no direct hybrid running outcome.",
+      "quality": "moderate",
+      "assessment": "Target rates 0.7 and 1.4% per week, actual rates differ; no universal target.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "garthe-athlete-loss-rate@1",
+          "locator": "Abstract Results",
+          "result": "Lean mass +2.1 ±0.4% vs −0.2 ±0.7%; between-group p<.01.",
+          "restriction": "24 randomized athletes; verify dispersion, attrition and duration."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "energy-regime-eligible-observation-review@1",
+      "question": "energy-operational-maintenance-methodology",
+      "description": "Review intake completeness, weight comparability and activity regime before quantitative recalibration.",
+      "provenance": "Original Fitness Intelligence candidate programming methodology, Packet 007 §§3–4; independent review required.",
+      "tradeoffs": "May defer useful changes when data sparse; never infer missing as zero or demand unnecessary tracking.",
+      "claims": [
+        "athlete-logged-intake-dlw-disagreement@1",
+        "morning-mass-variability-active-men@1",
+        "wearable-energy-expenditure-validity@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "energy-logging-adjusted-maintenance-review@1",
+      "question": "energy-operational-maintenance-methodology",
+      "description": "Use representative logged mean and observed mass trend as conditional operational reference, with explicit estimand and uncertainty.",
+      "provenance": "Original Fitness Intelligence candidate programming methodology, Packet 007 §§3–4; independent review required.",
+      "tradeoffs": "Does not identify physiological TEE or adequacy; relies on stable logging and representative context.",
+      "claims": [
+        "controlled-maintenance-intake-dlw-ratio@1",
+        "calerie-weight-model-intake-change-agreement@1",
+        "athlete-logged-intake-dlw-disagreement@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "energy-activity-aware-target-review@1",
+      "question": "energy-operational-maintenance-methodology",
+      "description": "Review changed training demand, fueling opportunities and acceptable mass trajectory; compare hold, adjustment, redistribution and deferral.",
+      "provenance": "Original Fitness Intelligence candidate programming methodology, Packet 007 §§3–4; independent review required.",
+      "tradeoffs": "No exact wearable eat-back or validated numerical change; safety and performance goals prevail.",
+      "claims": [
+        "runner-accelerometer-dlw-tee-agreement@1",
+        "energy-deficit-rt-lean-mass@1",
+        "lea-combined-myofibrillar-synthesis@1",
+        "athlete-slower-loss-lean-mass@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 007)",
+      "status": "pending",
+      "approval": null,
+      "key": "energy-identifiability-first-model-comparison@1",
+      "question": "energy-operational-maintenance-methodology",
+      "description": "Compare simple baselines with longitudinal and anchored richer models using explicit identification and prospective validation.",
+      "provenance": "Original Fitness Intelligence candidate programming methodology, Packet 007 §§3–4; independent review required.",
+      "tradeoffs": "Additional complexity may not improve decision outcomes; unanchored physiological claims deferred.",
+      "claims": [
+        "calerie-weight-model-intake-change-agreement@1",
+        "ten-haaf-athlete-rmr-group-agreement@1",
+        "runner-accelerometer-dlw-tee-agreement@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
