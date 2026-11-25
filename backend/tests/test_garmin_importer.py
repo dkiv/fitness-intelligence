@@ -36,6 +36,7 @@ from fitness_intelligence.adapters.garmin.client import (
 )
 from fitness_intelligence.adapters.garmin.importer import Importer, Mode
 from fitness_intelligence.adapters.garmin.mapping import GarminBinding, MappingError
+from fitness_intelligence.adapters.garmin.nutrition import WeightUnit
 from fitness_intelligence.adapters.garmin.projection import replay_activity
 from fitness_intelligence.adapters.local_account import LocalAccountError, locked_account
 from fitness_intelligence.db.endurance_models import (
@@ -46,7 +47,9 @@ from fitness_intelligence.db.endurance_models import (
     GarminEnrollment,
 )
 from fitness_intelligence.db.models import ExternalReference, SourceAccount, User, Workout
+from fitness_intelligence.db.nutrition_models import BodyWeightObservation, DailyIntakeObservation
 from fitness_intelligence.domain.endurance import Source
+from fitness_intelligence.nutrition.intake import select_daily_intake
 
 DAY = date(2024, 11, 3)
 OTHER_DAY = DAY + timedelta(days=1)
@@ -128,6 +131,19 @@ class Provider:
             endTimestampGMT="2024-11-03T10:00:00.000",
             hrvReadings=[PRIVATE],
         )
+        self.food = {
+            "mealDate": str(DAY),
+            "dailyNutritionContent": {"calories": 1900},
+            "mealDetails": [{"loggedFoods": [{"foodName": PRIVATE, "logSource": PRIVATE}]}],
+        }
+        self.weights = [
+            {
+                "calendarDate": str(DAY),
+                "weight": 72125.0,
+                "timestampGMT": 1730691000123,
+                "bodyFat": PRIVATE,
+            }
+        ]
         self.errors: dict[str, int] = {}
 
     def handle(self, req: httpx.Request) -> httpx.Response:
@@ -152,6 +168,13 @@ class Provider:
         elif path == Endpoint.DAILY:
             assert "calendarDate" in params
             payload = self.daily
+        elif path.startswith("/nutrition-service/"):
+            assert params["includeMedia"] == params["includeGoals"] == "false"
+            assert params["includeNutrition"] == "true"
+            payload = self.food
+        elif path.startswith("/weight-service/weight/all/"):
+            assert path.split("/")[-1] == path.split("/")[-2]
+            payload = self.weights
         elif path == Endpoint.SLEEP:
             assert "date" in params
             payload = self.sleep
@@ -512,7 +535,11 @@ def test_lock_and_owner_isolation(db: Session, setup: tuple[Importer, Provider])
     calls = len(provider.calls)
     for mode in Mode:
         with pytest.raises((MappingError, GarminError)):
-            importer.run(mode, day=DAY if mode in (Mode.ACTIVITIES, Mode.RECOVERY) else None)
+            importer.run(
+                mode,
+                day=DAY if mode.takes_day else None,
+                weight_unit=WeightUnit.GRAMS if mode == Mode.WEIGHT else None,
+            )
     assert calls == len(provider.calls)
 
 
@@ -977,3 +1004,334 @@ def test_sleep_epoch_recovery_replay_and_transaction_rollback(
     db.expire_all()
     assert observations["resting_hr"].value == 52
     assert sleep.value == 20000 and sleep.window_end.microsecond == 987000
+
+
+def test_intake_corrections_absences_disagreement_and_evidence(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, provider = setup
+    enroll(importer)
+    owner = importer.evidence.source.owner_id
+    provider.daily.update(consumedKilocalories=1900, includesCalorieConsumedData=True)
+    assert importer.run(Mode.INTAKE, day=DAY) == {"observed": 2, "created": 2}
+    first = select_daily_intake(db, owner, DAY)
+    assert first.reported_kcal == 1900 and first.completeness == "unknown"
+    assert len(first.observation_ids) == 2
+    assert importer.run(Mode.INTAKE, day=DAY) == {"observed": 2, "unchanged": 2}
+    provider.daily["consumedKilocalories"] = 1975
+    provider.food["dailyNutritionContent"] = None
+    assert importer.run(Mode.INTAKE, day=DAY) == {"observed": 1, "updated": 1}
+    assert select_daily_intake(db, owner, DAY).status == "conflict"
+    provider.food["dailyNutritionContent"] = {"calories": 1975}
+    assert importer.run(Mode.INTAKE, day=DAY) == {"observed": 2, "unchanged": 1, "updated": 1}
+    assert select_daily_intake(db, owner, DAY).reported_kcal == 1975
+    assert select_daily_intake(db, owner, DAY).observation_ids == first.observation_ids
+    provider.daily.pop("consumedKilocalories")
+    provider.food = {}
+    assert importer.run(Mode.INTAKE, day=DAY) == {"observed": 0}
+    provider.daily.update(consumedKilocalories=0, includesCalorieConsumedData=True)
+    provider.food.update(
+        mealDate=str(DAY),
+        dailyNutritionContent={"calories": 0},
+        mealDetails=[{"loggedFoods": [{"name": PRIVATE}]}],
+    )
+    # A new CLI invocation starts a new bounded transport budget.
+    client = GarminClient(KEY, transport=httpx.MockTransport(provider.handle))
+    try:
+        assert (
+            Importer(db.bind, importer.evidence, client).run(Mode.INTAKE, day=DAY)["updated"] == 2
+        )
+    finally:
+        client.close()
+    assert select_daily_intake(db, owner, DAY).status == "explicit_zero"
+    for row in db.scalars(select(DailyIntakeObservation)):
+        assert row.upstream_writer is None and row.retrieved_at.tzinfo is not None
+        assert PRIVATE not in repr(vars(row))
+
+
+def test_suppressed_zero_and_bad_intake_atomicity(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    p.daily.update(consumedKilocalories=0, includesCalorieConsumedData=False)
+    p.food.update(dailyNutritionContent={"calories": 0}, mealDetails=[])
+    assert importer.run(Mode.INTAKE, day=DAY) == {"observed": 0}
+    p.daily.update(consumedKilocalories=100, includesCalorieConsumedData=True)
+    for bad in (
+        {"mealDate": str(OTHER_DAY)},
+        {"userProfileId": PROFILE + 1},
+        {"dailyNutritionContent": {"calories": -1}},
+    ):
+        original = p.food
+        p.food = original | bad
+        with pytest.raises(MappingError):
+            importer.run(Mode.INTAKE, day=DAY)
+        p.food = original
+        assert db.scalar(select(DailyIntakeObservation.id)) is None
+
+
+@pytest.mark.parametrize("mode", [Mode.INTAKE, Mode.WEIGHT])
+def test_nutrition_requires_active_pinned_account_through_commit(
+    db: Session, setup: tuple[Importer, Provider], mode: Mode
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    with locked_account(db.bind, importer.evidence.source.source_account_id):
+        with pytest.raises(LocalAccountError, match="already running"):
+            importer.run(
+                mode, day=DAY, weight_unit=WeightUnit.GRAMS if mode == Mode.WEIGHT else None
+            )
+    calls = len(p.calls)
+    p.details[IDENT]["userProfileId"] = PROFILE + 1
+    with pytest.raises(ComparisonError):
+        importer.run(mode, day=DAY, weight_unit=WeightUnit.GRAMS if mode == Mode.WEIGHT else None)
+    assert not any("nutrition-service" in c or "weight-service" in c for c in p.calls[calls:])
+    p.details[IDENT]["userProfileId"] = PROFILE
+
+    def disconnect(req: httpx.Request) -> httpx.Response:
+        if req.url.path.startswith(("/nutrition-service/", "/weight-service/")):
+            account = db.get(SourceAccount, importer.evidence.source.source_account_id)
+            account.status = "disconnected"
+            db.commit()
+        return p.handle(req)
+
+    client = GarminClient(KEY, transport=httpx.MockTransport(disconnect))
+    try:
+        with pytest.raises(MappingError):
+            Importer(db.bind, importer.evidence, client).run(
+                mode, day=DAY, weight_unit=WeightUnit.GRAMS if mode == Mode.WEIGHT else None
+            )
+    finally:
+        client.close()
+    assert db.scalar(select(DailyIntakeObservation.id)) is None
+    assert db.scalar(select(BodyWeightObservation.id)) is None
+
+
+def test_authenticated_feed_401_does_not_switch_bearers(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    p.errors[Endpoint.FOOD.format(day=DAY)] = 401
+    exchanges = p.calls.count(TOKEN_PATH)
+    with pytest.raises(GarminError, match="unauthorized"):
+        importer.run(Mode.INTAKE, day=DAY)
+    assert p.calls.count(TOKEN_PATH) == exchanges
+    assert db.scalar(select(DailyIntakeObservation.id)) is None
+
+
+def test_weight_replay_multiplicity_and_ambiguous_correction(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    existing = p.weights[0]
+    p.weights.append(existing | {"timestampGMT": existing["timestampGMT"] + 1})
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS) == {
+        "observed": 2,
+        "created": 2,
+    }
+    items = db.scalars(
+        select(BodyWeightObservation).order_by(BodyWeightObservation.measured_at)
+    ).all()
+    assert len(items) == 2 and items[1].measured_at - items[0].measured_at == timedelta(
+        milliseconds=1
+    )
+    first = items[0]
+    assert first.measured_at == datetime(2024, 11, 4, 3, 30, 0, 123000, tzinfo=UTC)
+    assert first.local_date == DAY and first.time_resolution_us == 1000
+    assert first.source_unit == "g" and first.source_value == 72125
+    assert first.documented_source_unit == "kg" and first.mass_kg == Decimal("72.125")
+    assert first.upstream_id is None and first.upstream_writer is None
+    assert PRIVATE not in repr(vars(first))
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS) == {
+        "observed": 2,
+        "unchanged": 2,
+    }
+    p.weights = [existing | {"weight": 80}]
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS) == {
+        "observed": 1,
+        "unresolved": 1,
+    }
+    p.weights = []
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS) == {"observed": 0}
+    db.expire_all()
+    assert db.get(BodyWeightObservation, first.id).mass_kg == Decimal("72.125")
+    assert set(db.scalars(select(BodyWeightObservation.id))) == {r.id for r in items}
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"timestampGMT": "1730691000123"},
+        {"timestampGMT": 1730691000},
+        {"weight": -1},
+        {"weight": True},
+        {"calendarDate": str(OTHER_DAY)},
+        {"userProfilePk": PROFILE + 1},
+    ],
+)
+def test_malformed_second_weight_rolls_back(
+    db: Session, setup: tuple[Importer, Provider], bad: dict
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    p.weights.append(p.weights[0] | bad)
+    with pytest.raises(MappingError):
+        importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS)
+    assert db.scalar(select(BodyWeightObservation.id)) is None
+
+
+def test_weight_time_collision_and_date_only(db: Session, setup: tuple[Importer, Provider]) -> None:
+    importer, p = setup
+    enroll(importer)
+    first = p.weights[0]
+    p.weights = [
+        first,
+        first.copy(),
+        first | {"weight": first["weight"] + 1},
+        first | {"timestampGMT": None},
+        first | {"timestampGMT": first["timestampGMT"] + 2},
+    ]
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS) == {
+        "observed": 5,
+        "created": 1,
+        "unresolved": 4,
+    }
+    assert len(db.scalars(select(BodyWeightObservation)).all()) == 1
+
+
+def test_nutrition_writes_preserve_other_workouts_and_recovery(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    importer.run(Mode.ACTIVITIES, day=DAY, steps=True)
+    importer.run(Mode.RECOVERY, day=DAY)
+    hevy = SourceAccount(
+        user_id=importer.evidence.source.owner_id,
+        provider="hevy",
+        status="active",
+        provider_account_id="invented",
+    )
+    w = Workout(
+        user_id=hevy.user_id, title="Synthetic strength session", started_at=datetime.now(UTC)
+    )
+    db.add_all([hevy, w])
+    db.flush()
+    db.add(
+        ExternalReference(
+            user_id=w.user_id,
+            source_account_id=hevy.id,
+            provider="hevy",
+            entity_type="workout",
+            external_id="synthetic",
+            workout_id=w.id,
+            raw_payload={},
+        )
+    )
+    db.commit()
+
+    def snapshot() -> list:
+        return [
+            db.execute(select(model.__table__).order_by(*model.__table__.primary_key)).all()
+            for model in (
+                Workout,
+                ExternalReference,
+                EnduranceActivity,
+                ActivitySplit,
+                ActivityStep,
+                DailyRecoveryObservation,
+                SourceAccount,
+                GarminEnrollment,
+            )
+        ]
+
+    original = snapshot()
+    importer.run(Mode.INTAKE, day=DAY)
+    importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS)
+    assert snapshot() == original
+
+
+def test_weight_unit_must_be_chosen_and_matches_replay(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    with pytest.raises(GarminError, match="verified source unit"):
+        importer.run(Mode.WEIGHT, day=DAY)
+    p.weights[0]["weight"] = 81.125
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.KILOGRAMS)["created"] == 1
+    assert importer.run(Mode.WEIGHT, day=DAY, weight_unit=WeightUnit.GRAMS)["unresolved"] == 1
+    item = db.scalars(select(BodyWeightObservation)).one()
+    assert item.mass_kg == item.source_value == Decimal("81.125") and item.source_unit == "kg"
+
+
+def test_witnessed_nutrition_outside_anchor_without_extending_enrollment(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    original, p = setup
+    evidence = replace(
+        original.evidence,
+        kind=EvidenceType.WITNESSED,
+        profile_id=None,
+        durability_confirmed=False,
+        feeds=(),
+    )
+    receipt = evidence.receipt(GarminBinding(evidence.source, PROFILE))
+    importer = Importer(db.bind, replace(evidence, approved_pin=receipt), original.client)
+    enroll(importer)
+    p.daily.update(calendarDate=str(OTHER_DAY), consumedKilocalories=432)
+    p.food["mealDate"] = str(OTHER_DAY)
+    assert importer.run(Mode.INTAKE, day=OTHER_DAY)["created"] == 2
+    p.weights[0]["calendarDate"] = str(OTHER_DAY)
+    assert importer.run(Mode.WEIGHT, day=OTHER_DAY, weight_unit=WeightUnit.GRAMS)["created"] == 1
+    assert db.scalars(select(GarminEnrollment)).one().approved_pin == receipt
+    assert importer.evidence.feeds == ()
+    p.daily["userProfileId"] = PROFILE + 1
+    with pytest.raises(ComparisonError):
+        importer.run(Mode.INTAKE, day=OTHER_DAY)
+
+
+def test_intake_commit_failure_rolls_back_staged_rows(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    p.daily.update(consumedKilocalories=1500, includesCalorieConsumedData=True)
+    # Synthetic DB failure on the food source, after the earlier summary has been flushed.
+    db.execute(
+        text(
+            "ALTER TABLE daily_intake_observations "
+            "ADD CHECK (source_field NOT LIKE 'DailyNutrition%')"
+        )
+    )
+    db.commit()
+    with pytest.raises(IntegrityError):
+        importer.run(Mode.INTAKE, day=DAY)
+    assert db.scalar(select(DailyIntakeObservation.id)) is None
+
+
+def test_sparse_calorie_provenance_and_unavailable_feed(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, p = setup
+    enroll(importer)
+    p.daily.update(consumedKilocalories=1750, includesCalorieConsumedData=True)
+    p.errors[Endpoint.FOOD.format(day=DAY)] = 204
+    assert importer.run(Mode.INTAKE, day=DAY)["created"] == 1
+    row = db.scalars(select(DailyIntakeObservation)).one()
+    p.daily.pop("includesCalorieConsumedData")
+    assert importer.run(Mode.INTAKE, day=DAY)["unchanged"] == 1
+    db.refresh(row)
+    assert row.source_data_present is True
+    p.daily["consumedKilocalories"] = 1700
+    assert importer.run(Mode.INTAKE, day=DAY)["updated"] == 1
+    db.refresh(row)
+    assert row.source_data_present is None and row.reported_kcal == 1700
+    previous = row.retrieved_at
+    p.daily["consumedKilocalories"] = None
+    assert importer.run(Mode.INTAKE, day=DAY)["observed"] == 0
+    db.refresh(row)
+    assert row.retrieved_at == previous and row.reported_kcal == 1700

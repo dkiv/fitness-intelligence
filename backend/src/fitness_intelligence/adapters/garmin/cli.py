@@ -17,6 +17,7 @@ from .binding import Evidence
 from .client import GarminClient, GarminError
 from .importer import Importer, Mode
 from .mapping import MappingError
+from .nutrition import WeightUnit
 from .verify import keychain_key
 
 
@@ -26,8 +27,16 @@ def main() -> int:
     commands = parser.add_subparsers(dest="mode", required=True)
     for mode in Mode:
         command = commands.add_parser(mode.value)
-        if mode in (Mode.ACTIVITIES, Mode.RECOVERY):
+        if mode.takes_day:
             command.add_argument("--day", required=True, type=date.fromisoformat)
+        if mode == Mode.WEIGHT:
+            command.add_argument(
+                "--weight-unit",
+                required=True,
+                type=WeightUnit,
+                choices=list(WeightUnit),
+                help="Source unit checked against the displayed weigh-in",
+            )
         if mode == Mode.ACTIVITIES:
             command.add_argument("--steps", action="store_true")
     args = parser.parse_args()
@@ -43,7 +52,10 @@ def main() -> int:
             client = GarminClient(keychain_key())
             stack.callback(client.close)
             counts = Importer(engine, evidence, client).run(
-                Mode(args.mode), day=getattr(args, "day", None), steps=getattr(args, "steps", False)
+                Mode(args.mode),
+                day=getattr(args, "day", None),
+                steps=getattr(args, "steps", False),
+                weight_unit=getattr(args, "weight_unit", None),
             )
     except (GarminError, MappingError, LocalAccountError) as exc:
         # These adapter errors carry fixed categories or comparison labels only.

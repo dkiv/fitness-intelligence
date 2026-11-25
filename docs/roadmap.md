@@ -52,7 +52,7 @@ B1 delivers a [local verification command](garmin-verification.md) and a
 The operator verified the two-window probe and default macOS Keychain lookup.
 [B2](endurance-recovery.md) adds canonical endurance and recovery storage and pure Garmin
 mapping. [B3.1](garmin-importer.md) adds private enrollment and bounded activity and recovery
-ingestion, tested with synthetic data. Personal enrollment supports independent profile evidence or a locally witnessed,
+ingestion. The controlled local rehearsal verified one activity with children and one day of recovery, including replay and preservation of existing Hevy history. Personal enrollment supports independent profile evidence or a locally witnessed,
 explicitly approved profile pin. B3.2 covers nutrition and body weight. B3.3 covers historical and incremental sync.
 
 Validate Garmin eligibility, permissions and terms separately for personal use and commercial
@@ -64,13 +64,20 @@ fields so planning can proceed with partial coverage.
 
 ### C · Nutrition and body-weight ingestion
 
-Validate what the upstream apps actually write and what Android Health Connect permissions and
-history access allow. Accept the Kotlin bridge when permitted RENPHO-origin weight and
-MyFitnessPal-origin daily calorie totals, where available, retain their dates, units and origin
-across repeated syncs without double counting. Report days with missing intake as unknown.
-The MVP reads existing records. Macronutrients are a later option conditional on availability.
+The nutrition MVP uses the Garmin Personal API through B3.2. Its inputs are reported daily
+calories and individual weigh-ins. Preserve source and local date, distinguish unknown intake
+from explicit zero, and reconcile overlapping totals once per day. Original writer and scale
+attribution require evidence. Health Connect is an optional future source if Garmin coverage
+or observation semantics prove insufficient. Meal records and macronutrients are optional
+extensions. B3.3 historical and incremental ingestion depends on review and a bounded live
+rehearsal of B3.2.
 
 ### D · Unified athlete analytics
+
+D1 first provides read-only longitudinal intake and weight summaries with coverage. Wearable
+energy expenditure is an estimate. Reported total expenditure already includes its documented
+components. Logged maintenance intake and physiological TDEE are distinct estimands. Packet 007
+Model B and any calorie-target adjustment require separate scientific and engineering review.
 
 Start with A and extend the same reproducible analysis as B and C deliver normalized records.
 Acceptance requires an athlete-scoped report showing strength and endurance progression,
