@@ -101,6 +101,12 @@ class HistoricalProvider(Provider):
             row.pop("beginTimestamp")
             self.activity_rows.append(row)
 
+    def append_tied_activity(self) -> None:
+        last = self.activity_rows[-1]
+        ident = last["activityId"] + 1
+        self.activity_rows.append(last | {"activityId": ident})
+        self.details[ident] = deepcopy(self.details[last["activityId"]]) | {"activityId": ident}
+
 
 @pytest.fixture
 def bound(db: Session) -> tuple[Evidence, HistoricalProvider]:
@@ -366,6 +372,83 @@ def test_unstable_pagination_retains_verified_details(
     assert result["stopped"] == "activity listing did not converge"
     assert len(list(db.scalars(select(Workout)))) == 10
     assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["acquisition"] == "partial"
+
+
+def test_tied_starts_resume_with_scoped_receipts(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, provider = bound
+    provider.append_tied_activity()
+    cats = (Category.ACTIVITIES, Category.STEPS)
+    interrupted = run(db, bound, cats, limit=9)
+    assert interrupted["stopped"] == "budget_exhausted"
+    assert interrupted["observations"]["created"] == 1
+    original = db.scalars(select(ExternalReference)).one()
+    original_ids = (original.id, original.workout_id)
+    for cat in cats:
+        state = day_status(db, ev.source, cat, DAY)
+        assert state["acquisition"] == "partial" and state["last_success"] is None
+
+    provider.activity_rows.reverse()
+    resumed = run(db, bound, cats)
+    assert resumed["stopped"] is None and resumed["observations"]["created"] == 1
+    assert resumed["requests"]["detail"] == 2  # Anchor and one previously unprocessed activity.
+    assert resumed["requests"]["workouts"] == 1
+    assert provider.pages == [0, 0, 0]
+    refs = db.scalars(select(ExternalReference)).all()
+    assert {r.external_id for r in refs} == {str(IDENT), str(IDENT + 1)}
+    assert len({r.workout_id for r in refs}) == len(refs) == 2
+    assert original_ids in {(r.id, r.workout_id) for r in refs}
+    assert (
+        len(db.scalars(select(Workout)).all()) == len(db.scalars(select(ActivityStep)).all()) == 2
+    )
+    for cat in cats:
+        state = day_status(db, ev.source, cat, DAY)
+        assert state["acquisition"] == "observed" and state["last_eligible_count"] == 2
+
+
+def test_tied_starts_cross_page_boundary_in_different_orders(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, provider = bound
+    provider.page_of_ten()
+    provider.append_tied_activity()
+    second_scan = provider.activity_rows.copy()
+    second_scan[-2:] = reversed(second_scan[-2:])
+
+    def reorder(offset: int, page: list[dict]) -> list[dict]:
+        if provider.pages.count(0) == 2:
+            return second_scan[offset : offset + len(page)]
+        return page
+
+    provider.mutation = reorder
+    result = run(db, bound, (Category.ACTIVITIES,))
+    assert result["stopped"] is None and result["observations"]["created"] == 11
+    assert provider.pages == [0, 10, 0, 10]
+    assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["last_eligible_count"] == 11
+    assert len(db.scalars(select(Workout)).all()) == 11
+
+
+@pytest.mark.parametrize("change", ["duplicate", "missing", "additional", "edited"])
+def test_tied_starts_do_not_hide_listing_changes(
+    db: Session, bound: tuple[Evidence, HistoricalProvider], change: str
+) -> None:
+    ev, provider = bound
+    provider.append_tied_activity()
+    first, second = provider.activity_rows
+    changed = {
+        "duplicate": [first, first],
+        "missing": [second],
+        "additional": [second, first, first | {"activityId": IDENT + 2}],
+        "edited": [second | {"duration": 123}, first],
+    }[change]
+    provider.mutation = lambda offset, page: changed if len(provider.pages) == 2 else page
+    result = run(db, bound, (Category.ACTIVITIES, Category.STEPS))
+    assert result["stopped"] == "activity listing did not converge"
+    assert result["observations"]["created"] == 2
+    for cat in (Category.ACTIVITIES, Category.STEPS):
+        state = day_status(db, ev.source, cat, DAY)
+        assert state["acquisition"] == "partial" and state["last_success"] is None
 
 
 def test_running_steps_sparse_revision_cleanup(
