@@ -16,6 +16,7 @@ from fitness_intelligence.analytics.strength import (
     StrengthReport,
     analyze_strength,
 )
+from fitness_intelligence.db.endurance_models import EnduranceActivity
 from fitness_intelligence.db.models import ExerciseSet, ExternalReference, Workout, WorkoutExercise
 
 
@@ -57,6 +58,12 @@ def active_strength_statement(owner_id: UUID, period: Period) -> Select:
         .where(
             Workout.user_id == owner_id,
             Workout.deleted_at.is_(None),
+            WorkoutExercise.id.is_not(None)
+            | ~select(EnduranceActivity.workout_id)
+            .where(
+                EnduranceActivity.user_id == owner_id, EnduranceActivity.workout_id == Workout.id
+            )
+            .exists(),
             Workout.started_at >= lower,
             Workout.started_at < upper,
             ~refs.exists() | refs.where(ExternalReference.source_deleted_at.is_(None)).exists(),

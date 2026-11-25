@@ -3,8 +3,9 @@
 **Status, 2026-11-24.** The contract below comes from Garmin's published Personal API
 documentation, OpenAPI 3.0.1 specification (API version 1.0.0) and official Python client.
 The operator completed the [two-date probe](garmin-verification.md) with the full key
-supplied in memory. Token exchange and the bounded read sequence succeeded. The default
-Keychain lookup returned a shortened value, so that credential path still needs confirmation.
+supplied in memory and subsequently confirmed the default macOS Keychain lookup.
+[B2 models, mapping and identity verification](endurance-recovery.md) specify the next
+boundary before personal ingestion.
 
 ## Credentials, permissions and transport
 

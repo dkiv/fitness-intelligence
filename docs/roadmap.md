@@ -49,8 +49,9 @@ from zero and exclude another owner's records. The MVP is an internal query and 
 
 B1 delivers a [local verification command](garmin-verification.md) and a
 [documented Personal API contract and B2/B3 proposal](garmin-integration-design.md).
-The operator completed one bounded live run with the full key supplied in memory.
-Repeatability through the default Keychain lookup still needs local confirmation.
+The operator verified the two-window probe and default macOS Keychain lookup.
+[B2](endurance-recovery.md) adds canonical endurance and recovery storage and pure Garmin
+mapping. B3 ingestion awaits independent account binding.
 
 Validate Garmin eligibility, permissions and terms separately for personal use and commercial
 deployment. Record which activities, running metrics, sleep, HRV and resting heart rate each
