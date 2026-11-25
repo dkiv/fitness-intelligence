@@ -7,6 +7,9 @@ No health-data endpoints, authentication, AI or web UI. See [Hevy setup and sync
 
 M3A adds internal [strength progression, weekly volume and activity metrics](docs/strength-analytics.md).
 
+E1 adds an offline, deterministic strength and running planner for the first two weeks of
+the [synthetic press block](docs/training-plan-design.md#using-the-e1-domain-planner).
+
 ## Repository
 
 - `backend/src/fitness_intelligence/`: API, settings and persistence

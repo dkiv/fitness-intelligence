@@ -3,8 +3,8 @@
 **Proposed design for workstreams E and F, with J supplying evidence.** The first deliverable is a
 seven-day prescription an athlete can enter manually, review and revise within a multiweek block.
 Strength history and athlete feedback are sufficient inputs. PR #6 established this product
-direction. M3A supplies internal strength reports. Planning, approval and endurance ingestion
-remain future implementation. See the [vision](product-vision.md) and [roadmap](roadmap.md).
+direction. M3A supplies internal strength reports. E1 implements the pure planner for cycle A weeks 1 and 2. Approval and endurance
+ingestion remain future work. See the [vision](product-vision.md) and [roadmap](roadmap.md).
 
 ## What the athlete reviews
 
@@ -183,6 +183,65 @@ January 17, 09:00, 25 minutes easy” with the three run steps intact. The diff 
 the block. Declining keeps Saturday scheduled and flags the availability conflict. If both weekend windows disappear, the only
 remaining running slot has a 30-minute cap. Return a conflict between two required run days
 and one available day. Reducing the maintenance commitment requires a block proposal.
+
+## Using the E1 domain planner
+
+From the backend environment, pass frozen values to the internal Python API. Select week 1
+as the predecessor and pass a normalized review of its two logical press slots. For each slot,
+`completed` records the explicit whole-slot outcome (complete, incomplete or unknown).
+The caller supplies one `confirmed_rpes` entry per distinct prescribed working set with
+independent completion evidence. Use `None` for a confirmed set with unknown effort.
+`inferred_sets` counts prescribed working sets attributed by inference. A positive count
+holds volume even with a complete slot outcome and full RPE coverage, because the summary
+cannot resolve overlapping set attribution. Progression requires both slots to be explicitly
+complete, every prescribed working set independently confirmed with measured effort within
+the cap, zero inferred sets in either slot, and positive feedback. The review records its
+as-of instant, predecessor block version and local week start.
+
+```python
+from datetime import UTC, datetime
+from decimal import Decimal
+
+from fitness_intelligence.planning.planner import (
+    Exposure, WeekInputs, WeekPlan, WeekReview, generate_week,
+)
+from fitness_intelligence.planning.press_block import Availability, PressBlock
+
+block, calendar = PressBlock(), Availability()
+first = generate_week(WeekInputs(block, calendar, 1))
+assert isinstance(first, WeekPlan)
+review = WeekReview(
+    block.version, block.start, datetime(2027, 1, 10, 18, tzinfo=UTC),
+    Exposure(completed=True, confirmed_rpes=(Decimal(7),) * 3),
+    Exposure(completed=True, confirmed_rpes=(Decimal(7),) * 2),
+    both_manageable=True,
+)
+second = generate_week(WeekInputs(block, calendar, 2, previous=first, review=review))
+assert isinstance(second, WeekPlan)
+assert (second.press_sets, second.running_seconds) == (6, 2700)
+```
+
+Each result is a candidate or a set of named conflicts. Day entries carry the local date and
+ordered sessions, with an empty tuple for rest. Run steps use seconds and perceived effort.
+Every step in an interval group repeats, including a final recovery if listed. Strength
+sessions reserve the full fixture allowance including warm-up, rests and transitions.
+Prescriptions use absolute external kilograms. The fixture assumes a barbell press and uses
+America/Toronto as its default IANA zone. Each permitted day has one local start and a
+duration budget. A dated override takes precedence over the recurring window.
+
+The generator tries Saturday for the longer run and uses Sunday when Saturday is
+unavailable for running. `propose_move` reviews one slot against the updated calendar and
+returns its old and new date/time in the rationale. The neighboring Monday uses its local
+strength window, or the template's 09:00 reservation. Supply `fixed_next_monday_start` to
+pin an already scheduled neighbor. Week 2 rechecks the actual week 1 run dates against
+its first press. `change_run_commitment` identifies the affected block intents and detailed
+weeks for review. Pass any generated later weeks with `later_weeks`.
+
+All progression bounds belong to this synthetic fixture. The standard generator only adds
+the conditional Thursday set. An explicit week 2 Thursday dose is checked against the same
+evidence, the predecessor and the entire approved rep/load range. Structured rationale
+pins the synthetic rule version and reports the observations and bounds used. Weeks 3–8
+carry intents only. Approvals, ingestion and evidence-backed programming remain later work.
 
 ## Worked cycle B — event and taper
 
