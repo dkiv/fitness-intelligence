@@ -12,6 +12,9 @@ the [synthetic press block](docs/training-plan-design.md#using-the-e1-domain-pla
 E2 adds owner-scoped proposal review, approval and historical prescriptions in PostgreSQL.
 See the [internal command example and storage guarantees](docs/training-plan-design.md#e2-persistence-and-owner-review).
 
+E3 connects approved prescriptions, manual outcomes and the first adaptive weekly review.
+[Run the synthetic cycle locally](docs/adaptive-coaching-cycle.md)
+
 J1 provides a versioned scientific evidence catalog and deterministic local retrieval.
 The initial five claims await independent review. [Corpus and retrieval contract](docs/scientific-evidence-catalog.md)
 

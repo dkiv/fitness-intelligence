@@ -4,7 +4,16 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import JSON, CheckConstraint, DateTime, ForeignKeyConstraint, UniqueConstraint, func
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    DateTime,
+    ForeignKeyConstraint,
+    Index,
+    UniqueConstraint,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -72,6 +81,7 @@ class PlanRevision(OwnedRecord, Base):
     plan_id: Mapped[UUID]
     context_id: Mapped[UUID]
     base_id: Mapped[UUID | None]
+    rationale: Mapped[dict[str, Any] | None] = mapped_column(snapshot_type, nullable=True)
     snapshot: Mapped[dict[str, Any]] = mapped_column(snapshot_type)
 
 
@@ -99,3 +109,65 @@ class PlanDecision(OwnedRecord, Base):
     decided_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.clock_timestamp()
     )
+
+
+class SessionOutcome(OwnedRecord, Base):
+    """One immutable athlete attestation or correction for a logical calendar slot."""
+
+    __tablename__ = "session_outcomes"
+    __table_args__ = (
+        UniqueConstraint("user_id", "command_id", name="uq_outcome_command"),
+        UniqueConstraint("supersedes_id", name="uq_outcome_successor"),
+        UniqueConstraint("user_id", "plan_id", "week", "slot", "id", name="uq_outcome_slot_id"),
+        Index(
+            "uq_outcome_root",
+            "user_id",
+            "plan_id",
+            "week",
+            "slot",
+            unique=True,
+            postgresql_where=text("supersedes_id IS NULL"),
+            sqlite_where=text("supersedes_id IS NULL"),
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "plan_id", "revision_id", "choice"],
+            [
+                "plan_decisions.user_id",
+                "plan_decisions.plan_id",
+                "plan_decisions.revision_id",
+                "plan_decisions.choice",
+            ],
+            name="fk_outcome_approval",
+        ),
+        ForeignKeyConstraint(["user_id", "workout_id"], ["workouts.user_id", "workouts.id"]),
+        ForeignKeyConstraint(
+            ["user_id", "plan_id", "week", "slot", "supersedes_id"],
+            [
+                "session_outcomes.user_id",
+                "session_outcomes.plan_id",
+                "session_outcomes.week",
+                "session_outcomes.slot",
+                "session_outcomes.id",
+            ],
+            name="fk_outcome_supersedes",
+        ),
+        CheckConstraint("choice = 'approve'", name="approved"),
+        CheckConstraint("week IN (1, 2)", name="week"),
+        CheckConstraint(
+            "slot IN ('first-press','second-press','short-run','long-run')", name="slot"
+        ),
+        CheckConstraint("occurred_at <= recorded_at", name="elapsed"),
+        CheckConstraint("id <> supersedes_id", name="distinct_correction"),
+    )
+
+    plan_id: Mapped[UUID]
+    revision_id: Mapped[UUID]
+    choice: Mapped[str] = mapped_column(server_default="approve")
+    week: Mapped[int]
+    slot: Mapped[str]
+    command_id: Mapped[UUID]
+    supersedes_id: Mapped[UUID | None]
+    workout_id: Mapped[UUID | None]
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    actual: Mapped[dict[str, Any]] = mapped_column(snapshot_type)

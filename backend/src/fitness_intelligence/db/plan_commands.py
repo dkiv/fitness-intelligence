@@ -3,8 +3,9 @@
 Call within a short Session.begin() transaction. The caller owns commit and rollback.
 """
 
+import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
 from typing import Literal
 from uuid import UUID
@@ -12,6 +13,8 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from fitness_intelligence.planning import rationale
+from fitness_intelligence.planning.outcomes import Actual, WeeklyOutcomes
 from fitness_intelligence.planning.planner import (
     RULES,
     Conflicts,
@@ -23,9 +26,11 @@ from fitness_intelligence.planning.planner import (
 )
 from fitness_intelligence.planning.planner import Session as PlannedSession
 from fitness_intelligence.planning.press_block import PressBlock
+from fitness_intelligence.planning.rationale import Rationale
 
+from . import execution
 from .models import User
-from .plan_models import AthleteContext, PlanDecision, PlanRevision, TrainingPlan
+from .plan_models import AthleteContext, PlanDecision, PlanRevision, SessionOutcome, TrainingPlan
 from .plan_snapshot import (
     BLOCK,
     CANDIDATE,
@@ -54,7 +59,11 @@ class DecisionConflict(ValueError):
 class InfeasiblePlan(ValueError):
     def __init__(self, result: Conflicts) -> None:
         self.conflicts = result
-        super().__init__("proposal violates planner constraints")
+        details = []
+        for f in result.findings:
+            facts = ", ".join(f"{key}={value}" for key, value in f.facts)
+            details.append(f"{f.rule} ({', '.join(f.slots)}) · {facts}")
+        super().__init__("\n".join(details))
 
 
 type Choice = Literal["approve", "decline"]
@@ -88,6 +97,8 @@ class Preview:
     candidate: Candidate
     changes: tuple[SlotChange, ...]
     decision: Receipt | None
+    rationale: Rationale | None
+    evidence_alerts: tuple[str, ...]
 
 
 def _changes(before: WeekPlan | None, after: WeekPlan) -> tuple[SlotChange, ...]:
@@ -107,8 +118,16 @@ def _generate(
     if isinstance(request, Move):
         if base is None:
             raise ValueError("a move requires an approved week")
-        if base.inputs.number == 2 and context.review != base.inputs.review:
-            raise StalePlan("regenerate with the updated feedback before moving this slot")
+        if base.inputs.number == 2:
+            original = base.inputs.review
+            review = context.review
+            if (
+                review is None
+                or original is None
+                or replace(review, as_of=original.as_of) != original
+            ):
+                raise StalePlan("regenerate with the updated feedback before moving this slot")
+            base = replace(base, inputs=replace(base.inputs, review=review))
         result = propose_move(base, context.availability, request.slot, request.day, request.start)
     else:
         if base and request.number < base.inputs.number:
@@ -219,9 +238,100 @@ class PlanCommands:
             return None
         return read(CANDIDATE, self._revision(plan_id, base_id).snapshot).week
 
+    def _now(self) -> datetime:
+        return self._db.execute(select(func.clock_timestamp())).scalar_one().astimezone(UTC)
+
     def _today(self, context: PlanningContext) -> date:
-        now = self._db.execute(select(func.clock_timestamp())).scalar_one()
-        return now.astimezone(context.availability.zone).date()
+        return self._now().astimezone(context.availability.zone).date()
+
+    def record_outcome(
+        self,
+        plan_id: UUID,
+        revision_id: UUID,
+        week: int,
+        slot: Slot,
+        actual: Actual,
+        *,
+        occurred_at: datetime,
+        command_id: UUID,
+        supersedes_id: UUID | None = None,
+        workout_id: UUID | None = None,
+    ) -> UUID:
+        self._lock_owner()
+        self._plan(plan_id, lock=True)
+        return execution.record(
+            self._db,
+            self._owner,
+            plan_id,
+            revision_id,
+            week,
+            slot,
+            actual,
+            occurred_at,
+            self._now(),
+            command_id,
+            supersedes_id,
+            workout_id,
+        )
+
+    def weekly_review(self, plan_id: UUID, week: int) -> WeeklyOutcomes:
+        """Current observations across revisions, against the approved logical week."""
+        self._lock_owner()
+        plan = self._plan(plan_id, lock=True)
+        current = self._base(plan_id, plan.head_id)
+        if current and current.inputs.number != week:
+            current = current.inputs.previous
+        if current is None or current.inputs.number != week:
+            raise ValueError("week has no approved prescription")
+        return execution.week_outcomes(self._db, self._owner, plan_id, current, self._now())
+
+    def _outcomes(
+        self, plan_id: UUID, request: Generate | Move, base: WeekPlan | None, as_of: datetime
+    ) -> WeeklyOutcomes | None:
+        number = (
+            request.number if isinstance(request, Generate) else (base.inputs.number if base else 1)
+        )
+        if number != 2 or base is None:
+            return None
+        prior = base if base.inputs.number == 1 else base.inputs.previous
+        assert prior is not None
+        return execution.week_outcomes(self._db, self._owner, plan_id, prior, as_of)
+
+    def _review_context(
+        self, context: PlanningContext, outcomes: WeeklyOutcomes | None, base: WeekPlan | None
+    ) -> PlanningContext:
+        review = None
+        if outcomes and base:
+            prior = base if base.inputs.number == 1 else base.inputs.previous
+            assert prior is not None
+            review = outcomes.review(prior)
+        return replace(context, review=review)
+
+    def _check_recorded_slots(self, plan_id: UUID, base: WeekPlan | None, week: WeekPlan) -> None:
+        # An athlete may explicitly perform a future slot early within the week.
+        recorded = set(
+            self._db.execute(
+                select(SessionOutcome.week, SessionOutcome.slot).where(
+                    SessionOutcome.user_id == self._owner, SessionOutcome.plan_id == plan_id
+                )
+            )
+        )
+        if any((c.week, c.slot) in recorded for c in _changes(base, week)):
+            raise StalePlan("a changed slot already has execution history")
+
+    def citing(self, claim_revision: str) -> tuple[UUID, ...]:
+        """Owner-scoped historical and pending E3 proposals citing an exact claim revision."""
+        self._lock_owner()
+        rows = self._db.execute(
+            select(PlanRevision.id, PlanRevision.rationale)
+            .where(PlanRevision.user_id == self._owner, PlanRevision.rationale.is_not(None))
+            .order_by(PlanRevision.id)
+        )
+        return tuple(
+            key
+            for key, raw in rows
+            if raw and claim_revision in Rationale.model_validate_json(json.dumps(raw)).claim_keys
+        )
 
     def submit(
         self,
@@ -240,7 +350,16 @@ class PlanCommands:
             raise ValueError("capture the planning context first")
         context = read(CONTEXT, ctx.snapshot)
         base = self._base(plan.id, expected_head)
+        if evidence:
+            raise ValueError("scientific references must come from catalog retrieval")
+        as_of = self._now()
+        outcomes = self._outcomes(plan_id, request, base, as_of)
+        context = self._review_context(context, outcomes, base)
+        explanation = Rationale.retrieve(outcomes, rationale.current_catalog())
+        selection = explanation.selection
+        evidence = tuple(EvidenceRef(selection.release_id, key) for key in explanation.claim_keys)
         week = _generate(request, context, read(BLOCK, plan.block), base)
+        self._check_recorded_slots(plan_id, base, week)
         _effective_dates(base, week, self._today(context))
         payload = snapshot(Candidate(request, week, evidence))
         read(CANDIDATE, payload)
@@ -250,6 +369,7 @@ class PlanCommands:
             base_id=expected_head,
             context_id=ctx.id,
             snapshot=payload,
+            rationale=explanation.model_dump(mode="json"),
         )
         self._db.add(revision)
         self._db.flush()
@@ -280,6 +400,7 @@ class PlanCommands:
         ctx = self._context()
         assert ctx is not None
         decision = self._decision(plan.id, revision_id)
+        why = self._rationale(revision)
         return Preview(
             revision_id,
             revision.base_id,
@@ -290,7 +411,15 @@ class PlanCommands:
             candidate,
             _changes(self._base(plan.id, revision.base_id), candidate.week),
             self._receipt(decision) if decision else None,
+            why,
+            why.eligibility() if why else (),
         )
+
+    @staticmethod
+    def _rationale(revision: PlanRevision) -> Rationale | None:
+        if revision.rationale is None:
+            return None
+        return Rationale.model_validate_json(json.dumps(revision.rationale))
 
     def current(self, plan_id: UUID) -> Preview | None:
         self._lock_owner()
@@ -340,7 +469,25 @@ class PlanCommands:
             candidate = read(CANDIDATE, revision.snapshot)
             if candidate.week.rule_version != RULES:
                 raise StalePlan("planner rule version changed")
+            why = self._rationale(revision)
+            if why is None:
+                if candidate.week.inputs.number == 2 or candidate.evidence:
+                    raise StalePlan(
+                        "legacy proposal requires a fresh execution and evidence review"
+                    )
+            else:
+                if not why.verify_selection():
+                    raise StalePlan("pinned scientific selection cannot be reproduced")
+                refs = tuple(EvidenceRef(why.selection.release_id, key) for key in why.claim_keys)
+                if refs != candidate.evidence or why.eligibility():
+                    raise StalePlan("scientific reference is ineligible or differs from retrieval")
+                as_of = why.outcomes.as_of if why.outcomes else self._now()
+                outcomes = self._outcomes(plan_id, candidate.request, base, as_of)
+                if outcomes != why.outcomes:
+                    raise StalePlan("execution review changed; submit a fresh proposal")
+                context = self._review_context(context, outcomes, base)
             week = _generate(candidate.request, context, read(BLOCK, plan.block), base)
+            self._check_recorded_slots(plan_id, base, week)
             if canonical(
                 snapshot(Candidate(candidate.request, week, candidate.evidence))
             ) != canonical(revision.snapshot):
@@ -353,6 +500,7 @@ class PlanCommands:
             choice=choice,
             command_id=command_id,
             reason=reason,
+            decided_at=self._now(),
         )
         self._db.add(row)
         self._db.flush()  # PostgreSQL advances the approved head in this statement.
