@@ -200,7 +200,11 @@ J3A.2 appraises evidence for choosing a block and protecting a named secondary o
 
 ## Running prescription curation
 
-J3A.3 appraises six publications and stages a revised Nuuttila source and two endpoint claims. J3B.3 archives proposed J3-M03 revision 0.1 for selecting running references, prescribing and adjusting sessions, protecting concurrent work and reviewing outcomes. M02’s familiar-running-hold default continues to govern until separate method review and explicit block authorization. The next step is a joint review of M01, M02 and M03 before generalized planner design. [Curation index](curation/README.md#running-prescription-and-progression) · [Decision priorities](research-backlog.md#running-prescription-curation)
+J3A.3 appraises six publications and stages a revised Nuuttila source and two endpoint claims. J3B.3 archives proposed J3-M03 revision 0.1 for selecting running references, prescribing and adjusting sessions, protecting concurrent work and reviewing outcomes. M02’s familiar-running-hold default continues to govern until separate method review and explicit block authorization. J3I.1 consolidates these choices with M01 and M02 for independent review. [Curation index](curation/README.md#running-prescription-and-progression) · [Decision priorities](research-backlog.md#running-prescription-curation)
+
+## Integrated methodology and E4.0 handoff
+
+J3I.1 revision 0.1 archives the candidate profile `J3I-HYBRID-0.1`. It links the original strength, block and running methods through shared observation and approval contracts, traces all 55 predecessor parameters, and specifies 26 integrated conformance cases. Its 37 cited claim revisions already exist in the combined candidate below. J3I.1 adds no evidence fragment or operational rule. Independent scientific and practical reviews remain open. E4.0 generalized planner design is the next training-planner activity. [Curation index and E4.0 decisions](curation/README.md#integrated-hybrid-methodology) · [Engineering roadmap](../roadmap.md#e--canonical-training-plan-and-scheduling)
 
 ## Numbering and revisions
 

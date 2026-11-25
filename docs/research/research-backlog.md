@@ -293,7 +293,7 @@ The hybrid block tranche extends this work to the block objectives and exposure 
 | --- | --- |
 | J3A.3 | AI-assisted appraisal complete. Independent scientific review of six publications, the Nuuttila full-text revision and two endpoints is outstanding. [Scientific obligations](curation/README.md#running-evidence-awaiting-independent-review) |
 | J3B.3 | Candidate J3-M03 revision 0.1 complete. Independent method review of M03a–M03c, R01–R20, worked programs and conformance cases is outstanding. [Method bundles](curation/README.md#j3-m03-review-bundles) |
-| J3C.3 | Approval and operational release preparation pending. The next activity is a consolidated M01/M02/M03 integration review before generalized planner design. [Integration-review considerations](curation/README.md#running-integration-review-considerations) |
+| J3C.3 | Approval and operational release preparation pending. J3I.1 consolidates these proposals for independent review in E4.0. [Integration-review considerations](curation/README.md#running-integration-review-considerations) |
 
 | J3-M03 review bundle | Existing priorities addressed in part |
 | --- | --- |
@@ -302,6 +302,12 @@ The hybrid block tranche extends this work to the block objectives and exposure 
 | M03c · Concurrent protection and outcome review | A4/A7/A15 for feasible scheduling and protected secondary outcomes. A9/A16/A25 for comparable outcomes, conflicts and block authority. |
 
 All 38 decision-oriented priorities remain open. Scheduled preliminary research closed with Packet 010.
+
+### Integrated methodology handoff
+
+J3I.1 candidate integration is complete. All 38 J3 decision priorities retain their dispositions. The M01/M02/M03 source and method reviews remain open, including the revised claims and their exact dependencies. Scheduled preliminary research closed with Packet 010.
+
+**E4.0 generalized planner design is next.** Review the consolidated profile, define the evidence and authorization contract, and freeze the synthetic fixtures and versioned inputs needed for a design decision. Nutrition/fueling and further recovery methodology may proceed separately. Synthetic strength-and-running work can proceed on its own track. [Integrated archive and review decisions](curation/README.md#integrated-hybrid-methodology) · [Engineering handoff](../roadmap.md#e--canonical-training-plan-and-scheduling)
 
 ## Earlier strength-focused priorities
 
