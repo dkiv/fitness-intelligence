@@ -32,6 +32,22 @@ The [Packet 002 fragment](drafts/002-evidence-additions.json) proposes `full-tex
 
 Aube was also appraised from indexed passages and has no proposed Packet 002 source revision. All access descriptions are attributed to the research session. Independent reviewers still need to check versions, publication notices, rights and locators.
 
+## Packet 003
+
+[Concurrent strength and running programming for experienced recreational hybrid athletes](003-concurrent-strength-running.md) is packet revision 0.1, dated 2026-11-24. The archive preserves the supplied bytes (SHA-256 `d7b5e97ab4048a38b5903df60ed4eb12f7c722da7980fcfef33451018b2d9f1f`). Its 28 evidence entries (C01–C27 and nutrition context N01) retain the research session’s access notes, estimates, uncertainty and screening decisions. The [draft JSON](drafts/003-evidence-additions.json) reproduces the narrower selection in section 5. All proposed methods and claims await independent human review.
+
+[Seven candidate policies](003-concurrent-strength-running.md#3-candidate-coaching-policies) address how a change in either discipline affects both sets of objectives. **CT-P01 revision 0.2** (protect secondary performance in either direction) and **CT-P02 revision 0.2** (schedule around priority-session quality) are the latest candidates for discussion. CT-P03 reviews running dose and modality. CT-P04 asks what strength stimulus the athlete already receives. **CT-P05 extends Packet 002’s RT-P02 revision 0.2**, which remains the working-set volume candidate. It applies the option of holding a productive dose to both lifting and running, compares actual exposures with both sets of outcomes, and considers redistribution, a change to either dose, or more information when the evidence is incomplete. CT-P06 adds nutrition and fueling context to feasibility review. HP-P01 covers selection and explicit revision of block priorities.
+
+The [block archetypes](003-concurrent-strength-running.md#42-candidate-block-archetypes) are strength emphasis, endurance emphasis and balanced development, with assessment/event-preparation and recovery/interruption variants. The [24 synthetic cases](003-concurrent-strength-running.md#6-evaluation-cases) record acceptable alternatives and forbidden rationales. They test decisions such as whether to retain a productive dose or revisit a priority when the athlete cannot protect both key sessions. Coaching efficacy requires prospective evaluation. The [integrated research sequence](research-backlog.md#proposed-integrated-sequence) brings fueling and energy availability forward as dependencies of joint strength and endurance planning.
+
+### Scientific review blockers
+
+- Map overlapping primary studies in Schumann, Petré and Huiberts and across the running reviews. Verify interaction estimates for timing, training status, sex and modality. A significant result in one subgroup and an uncertain result in another cannot establish a difference between them.
+- Keep maximal strength, explosive strength, biopsy-measured fiber hypertrophy and whole-muscle hypertrophy distinct. Verify the contributing populations, muscle groups, measures and intervals for each contrast.
+- Separate running economy at a specified speed or fatigue state, time to exhaustion and race or time-trial performance. Determine habitual lifting exposure before inferring an incremental benefit for runners who already strength train.
+- Check the duration of each contributing comparison against its draft scope. For example, C11 reports 6–14 weeks for the high-load running-economy comparison, while `high-load-running-economy@1` uses the overall 6–24-week horizon. Check the Petré timing strata and Llanos-Lagos performance contrasts separately. Leave the proposed records intact for adjudication.
+- Obtain the primary reports for abstract-based results, including Gomes, Støren, Trowell and Zanini. Verify direct between-group contrasts, intervals, realized training and baseline experience. Confirm versions of record, correction notices, cohort overlap and reuse rights. The packet’s [human review checklist](003-concurrent-strength-running.md#8-human-review-checklist) records source-specific checks and the outstanding programming and evaluation decisions.
+
 ## Numbering and revisions
 
 Assign the next unused three-digit number to each new research question or packet of related questions. Keep its number and filename stable across revisions. Cite the packet number, revision, section and Git commit when reviewing an extraction or proposing a rule. Evidence IDs such as E02 are local to their packet. J1 references use exact revision keys such as `moesgaard@1`.
@@ -41,16 +57,24 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 ## From packet to reviewed evidence
 
 1. Extract proposed records into a fragment under `drafts/` and keep their source locators, access depth, uncertainty and screening dispositions. Validate the fragment in the context of its full target manifest, including existing relations and withdrawals.
-2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist) and [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
+2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist) and [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
 3. Record the designated reviewer's identity, role, date and explicit decision on each accepted revision in version control. A claim requires reviewed supporting sources. Operational eligibility also requires a reviewed release. A separately authorized release receives a new immutable manifest, registry entry and digest under the [J1 release procedure](../scientific-evidence-catalog.md#review-and-release-procedure).
 
-### Checking both drafts against J1
+### Checking the three drafts against J1
 
-Packet 002 adds the `volume-burden` question, five source revisions, five pending claim revisions and one pending programming method. The combined candidate contains **5 questions, 18 source revisions, 15 claim revisions, 1 qualification relation, 3 programming methods and 0 withdrawals**. The 18 source revisions cover 15 distinct publication DOIs. The male Enes, female Enes and Pelland papers each appear at `@1` and `@2`. The Enes perceptual follow-up also reports on the male strength cohort, so distinct publications need not represent independent participants.
+| Input | Questions | Source revisions | Claim revisions | Relations | Methods | Withdrawals |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Registered `j1-screening-1` | 4 | 6 | 5 | 1 | 1 | 0 |
+| Packet 001 additions | 0 | 7 | 5 | 0 | 1 | 0 |
+| Packet 002 additions | 1 | 5 | 5 | 0 | 1 | 0 |
+| Packet 003 additions | 6 | 6 | 15 | 3 | 3 | 0 |
+| **In-memory candidate** | **11** | **24** | **30** | **4** | **6** | **0** |
 
-Both Enes strength claims retain their pending `@1` and `@2` revisions with their respective source references. Earlier screening dispositions remain recorded. The combined graph preserves the existing qualification and has no supersession edges. Reviewers still need to assess scope semantics, transfer and method support.
+Counts refer to exact revisions. Through Packet 002, the 18 source revisions cover 15 distinct publication DOIs. The male Enes, female Enes and Pelland papers each appear at `@1` and `@2`. The Enes perceptual follow-up shares the male strength cohort. Both Enes strength claims retain their pending revisions and original source links. The candidate retains the earlier screening dispositions.
 
-Run the following from `backend/` in the project Python environment. It verifies the registered base digest, validates the complete candidate in memory with J1 schema version 1, and exercises J1 retrieval for each exact claim scope and catalog question.
+All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
+
+Run this check from `backend/` in the project Python environment. The registered loader verifies the J1 digest. Strict schema validation checks exact keys, supporting sources, question membership, relation endpoints and method references across the full graph.
 
 ```python
 import json
@@ -63,21 +87,25 @@ from fitness_intelligence.evidence.retrieval import Catalog
 
 base = load_release("j1-screening-1").release
 manifest = base.model_dump(mode="json")
-manifest["release_id"] = "j2a-packets-001-002-candidate"
-for packet in ("001", "002"):
+manifest["release_id"] = "j2b-packets-001-003-candidate"
+for packet in ("001", "002", "003"):
     path = Path(f"../docs/research/drafts/{packet}-evidence-additions.json")
     for group, records in json.loads(path.read_bytes()).items():
         manifest[group].extend(records)
 
 data = json.dumps(manifest).encode()
-candidate = CorpusRelease.model_validate_json(data)
+candidate = CorpusRelease.model_validate_json(data, strict=True)
+groups = ("questions", "sources", "claims", "relations", "methods", "withdrawals")
+assert tuple(len(getattr(candidate, group)) for group in groups) == (11, 24, 30, 4, 6, 0)
 assert candidate.approval is None
-assert candidate.relations == base.relations and candidate.withdrawals == base.withdrawals
+assert all(r.kind == "qualifies" for r in candidate.relations)
 catalog = Catalog(candidate, sha256(data).hexdigest())
 for claim in candidate.claims:
     assert catalog.ineligibility(claim.key) == "pending"
     result = catalog.retrieve(claim.scope)
+    assert result == catalog.retrieve(claim.scope)
     assert result.gaps and not result.matches
+assert all(m.status == "pending" and m.approval is None for m in candidate.methods)
 assert all(not catalog.methods(q.id) for q in candidate.questions)
 ```
 
@@ -85,4 +113,4 @@ assert all(not catalog.methods(q.id) for q in candidate.questions)
 
 Review each method separately from the empirical claims it cites. Identify which choices reflect evidence, athlete preferences or engineering safeguards. Define eligible observations, alternatives (including holding the dose), parameters, authority to change a plan and conditions for deferring a decision. A reviewer must justify any proposed numeric threshold or transfer to an experienced hybrid athlete.
 
-Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. Both packets and their drafts remain research inputs. E1 continues to use its existing synthetic progression rules.
+Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. All three packets and their drafts remain research inputs. E1 continues to use its existing synthetic progression rules.
