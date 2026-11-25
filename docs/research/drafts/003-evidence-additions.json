@@ -1,0 +1,685 @@
+{
+  "questions": [
+    {
+      "id": "concurrent-hypertrophy",
+      "description": "How does adding endurance training affect muscle hypertrophy?",
+      "gap": "Whole-muscle and fiber outcomes differ; trained runner dose and region-specific effects remain unresolved."
+    },
+    {
+      "id": "concurrent-timing",
+      "description": "How does the scheduling of resistance and endurance sessions affect outcomes?",
+      "gap": "No validated individual spacing interval or optimal weekly layout."
+    },
+    {
+      "id": "concurrent-sequence",
+      "description": "How does same-session ordering affect concurrent adaptations?",
+      "gap": "Run-priority and dual-trained comparisons remain limited."
+    },
+    {
+      "id": "strength-running-economy",
+      "description": "How does supplemental strength training affect running economy?",
+      "gap": "Incremental benefit of additional work in already strong runners remains unknown."
+    },
+    {
+      "id": "strength-running-performance",
+      "description": "How does supplemental strength training affect running performance?",
+      "gap": "Race-specific effects and optimal strength dose in dual-trained runners remain unknown."
+    },
+    {
+      "id": "concurrent-aerobic-capacity",
+      "description": "How does adding resistance training affect aerobic capacity during endurance training?",
+      "gap": "VO2max retention is not equivalent to running performance retention."
+    }
+  ],
+  "sources": [
+    {
+      "key": "huiberts@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Huiberts RO, Wüst RCI, van der Zwaard S. Concurrent Strength and Endurance Training: A Systematic Review and Meta-Analysis on the Impact of Sex and Training Status. Sports Med. 2024;54:485–503.",
+      "doi": "10.1007/s40279-023-01943-9",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37847373/",
+      "published_on": "2023-10-17",
+      "design": "Systematic review and random-effects meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic and accessible article record examined on 2026-11-24; complete correction/retraction and version audit pending.",
+      "rights": "Reuse permissions not independently reviewed; retain only bibliographic metadata, links and original factual summaries pending rights review.",
+      "appraisal": "Publisher HTML Results §§3.3–3.5 inspected. Fifty-nine studies overall; unclear allocation concealment and detection bias, sparse highly trained data; study-level moderation. Overlap with prior concurrent-training syntheses requires audit.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "lundberg-fibers@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Lundberg TR, Feuerbacher JF, Sünkeler M, Schumann M. The Effects of Concurrent Aerobic and Strength Training on Muscle Fiber Hypertrophy: A Systematic Review and Meta-Analysis. Sports Med. 2022;52:2391–2403.",
+      "doi": "10.1007/s40279-022-01688-x",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/35476184/",
+      "published_on": "2022-04-27",
+      "design": "Systematic review and random-effects meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic and accessible article record examined on 2026-11-24; complete correction/retraction and version audit pending.",
+      "rights": "Reuse permissions not independently reviewed; retain only bibliographic metadata, links and original factual summaries pending rights review.",
+      "appraisal": "Publisher HTML §§3.1–3.4; 15 studies, 300 participants, only three running studies. Mean PEDro 4.3; tissue endpoint and heterogeneity limit inference; same registered protocol as Schumann adapted for fiber outcomes.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "eddens-sequence@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Eddens L, van Someren K, Howatson G. The Role of Intra-Session Exercise Sequence in the Interference Effect: A Systematic Review with Meta-Analysis. Sports Med. 2018;48:177–188.",
+      "doi": "10.1007/s40279-017-0784-1",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/28917030/",
+      "published_on": "2017-09-15",
+      "design": "Systematic review and meta-analysis of intra-session ordering",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic and accessible article record examined on 2026-11-24; complete correction/retraction and version audit pending.",
+      "rights": "Reuse permissions not independently reviewed; retain only bibliographic metadata, links and original factual summaries pending rights review.",
+      "appraisal": "Publisher article and indexed full result text; ten studies overall; mixed modalities and largely recreational/untrained populations; individual spacing and chronic run-performance outcomes unresolved.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "llanos-lagos-economy@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Llanos-Lagos C, Ramirez-Campillo R, Moran J, Sáez de Villarreal E. Effect of Strength Training Programs in Middle- and Long-Distance Runners’ Economy at Different Running Speeds: A Systematic Review with Meta-analysis. Sports Med. 2024;54:895–932.",
+      "doi": "10.1007/s40279-023-01978-y",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/38165636/",
+      "published_on": "2024-01-02",
+      "design": "Systematic review and multilevel meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic and accessible article record examined on 2026-11-24; complete correction/retraction and version audit pending.",
+      "rights": "Reuse permissions not independently reviewed; retain only bibliographic metadata, links and original factual summaries pending rights review.",
+      "appraisal": "Publisher HTML §3.4, Figs. 2–3, certainty appraisal and discussion inspected. Multiple measured speeds, small effects, sensitivity to outliers, varied training backgrounds. No validated marginal dose for experienced lifters.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "llanos-lagos-performance@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Llanos-Lagos C, Ramirez-Campillo R, Moran J, Sáez de Villarreal E. The Effect of Strength Training Methods on Middle-Distance and Long-Distance Runners’ Athletic Performance: A Systematic Review with Meta-analysis. Sports Med. 2024;54:1801–1833.",
+      "doi": "10.1007/s40279-024-02018-z",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/38627351/",
+      "published_on": "2024-04-17",
+      "design": "Systematic review and random-effects meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic and accessible article record examined on 2026-11-24; complete correction/retraction and version audit pending.",
+      "rights": "Reuse permissions not independently reviewed; retain only bibliographic metadata, links and original factual summaries pending rights review.",
+      "appraisal": "Publisher HTML Running Performance results and discussion inspected; Fig. 6. Mixed time trials and TTE; combined method heterogeneity; certainty very low to moderate. Overlap with economy review to audit.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "zanini-durability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Zanini M, Folland JP, Wu H, Blagrove RC. Strength Training Improves Running Economy Durability and Fatigued High-Intensity Performance in Well-Trained Male Runners: A Randomized Control Trial. Med Sci Sports Exerc. 2025;57:1546–1558.",
+      "doi": "10.1249/MSS.0000000000003685",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/40016936/",
+      "published_on": "2025-02-28",
+      "design": "Randomized parallel-group trial",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Bibliographic and accessible article record examined on 2026-11-24; complete correction/retraction and version audit pending.",
+      "rights": "Reuse permissions not independently reviewed; retain only bibliographic metadata, links and original factual summaries pending rights review.",
+      "appraisal": "Publisher/PubMed abstract inspected; performance-matched randomized groups. Full dose, baseline strength history, attrition, direct intervals and figures require extraction. Combined strength/plyometric intervention; male runners.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "key": "pooled-concurrent-explosive-strength@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-strength",
+        "objective": "power-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "supervised-aerobic-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "explosive-strength",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Pooled explosive-strength gains were smaller with concurrent training than with resistance training alone.",
+      "limitations": "Mixed modalities and experience; influential study and sensitivity of subgroup estimates; not maximal strength.",
+      "quality": "moderate",
+      "assessment": "18 studies; moderate methodological limitations; running-specific and individual transfer unresolved.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "schumann@1",
+          "locator": "Results §3.3, Fig. 3",
+          "result": "SMD −0.28 (95% CI −0.48 to −0.08), I²=35.81%.",
+          "restriction": "Explosive strength only; no individual spacing threshold."
+        }
+      ]
+    },
+    {
+      "key": "pooled-concurrent-whole-muscle-hypertrophy@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-hypertrophy",
+        "objective": "hypertrophy-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "supervised-aerobic-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "whole-muscle-hypertrophy",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The average whole-muscle hypertrophy difference between concurrent training and matched resistance-only training was close to zero.",
+      "limitations": "15 studies; heterogeneous protocols, mixed experience, no equivalence test; fiber-level outcome differs.",
+      "quality": "moderate",
+      "assessment": "Pooled contrast moderately precise; running dose and dual-trained transfer unestablished.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "schumann@1",
+          "locator": "Results §3.4, Fig. 4",
+          "result": "SMD −0.01 (95% CI −0.16 to 0.18), I²=0%.",
+          "restriction": "Whole-muscle outcome only."
+        }
+      ]
+    },
+    {
+      "key": "concurrent-lower-body-sex-moderation@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-strength",
+        "objective": "strength-development",
+        "population": "healthy-adults-aged-18-50",
+        "experience": "mixed",
+        "intervention": "concurrent-versus-strength-only-male-subgroup",
+        "comparator": "concurrent-versus-strength-only-female-subgroup",
+        "outcome": "lower-body-maximal-strength",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The estimated concurrent-versus-strength-only contrast for lower-body strength differed between male and female subgroups.",
+      "limitations": "Sparse female data, wide female interval and study-level moderation; no causal individual sex-specific policy.",
+      "quality": "low",
+      "assessment": "20 lower-body studies; unclear concealment/detection bias; directness limited.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "huiberts@1",
+          "locator": "Results §3.4, Figs. 3–4",
+          "result": "Male SMD −0.43 (95% CI −0.64 to −0.22); female 0.08 (−0.34 to 0.49); subgroup difference p=0.03.",
+          "restriction": "Comparison of program effects across sex strata; not a sex-based progression rule."
+        }
+      ]
+    },
+    {
+      "key": "concurrent-strength-experience-moderation@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-strength",
+        "objective": "strength-development",
+        "population": "healthy-adults-aged-18-50",
+        "experience": "mixed",
+        "intervention": "concurrent-versus-strength-only-trained-strength-subgroup",
+        "comparator": "concurrent-versus-strength-only-untrained-strength-subgroup",
+        "outcome": "lower-body-maximal-strength",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The synthesis did not detect a difference in the concurrent-training lower-body strength effect between strength-trained and untrained subgroups.",
+      "limitations": "Study-level classification; insufficient highly trained data; no equivalence or evidence of absence.",
+      "quality": "low",
+      "assessment": "16 studies in this moderation contrast; related Petré subgroup result uses different classifications and inclusion.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "huiberts@1",
+          "locator": "Results §3.5, Fig. 5B",
+          "result": "Between-strength-experience subgroup p=1.00; subgroup estimate intervals not extracted in this record.",
+          "restriction": "Interaction result only; not a within-trained comparison."
+        }
+      ]
+    },
+    {
+      "key": "pooled-concurrent-fiber-hypertrophy@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-hypertrophy",
+        "objective": "hypertrophy-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "supervised-aerobic-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "muscle-fiber-hypertrophy",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The pooled fiber-level hypertrophy estimate modestly favored resistance-only training, with uncertainty reaching zero at reported precision.",
+      "limitations": "Only three running studies; biopsy variation, mixed populations and substantial heterogeneity; not whole-muscle hypertrophy.",
+      "quality": "low",
+      "assessment": "15 studies, mean PEDro 4.3; related source protocol and potential overlap with Schumann.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "lundberg-fibers@1",
+          "locator": "Results §3.2, Fig. 2",
+          "result": "SMD −0.23 (95% CI −0.46 to −0.00), p=0.050, I²=58.6%.",
+          "restriction": "Overall fiber-level outcome; not a body-composition prediction."
+        }
+      ]
+    },
+    {
+      "key": "running-type-one-fiber-hypertrophy@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-hypertrophy",
+        "objective": "hypertrophy-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "supervised-running-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "type-one-muscle-fiber-hypertrophy",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "In the running subgroup, type I fiber hypertrophy was smaller with concurrent training than with resistance-only training.",
+      "limitations": "Only three running studies overall; §3.3 reports no statistically significant subgroup differences; no proof of running-versus-cycling effect modification.",
+      "quality": "low",
+      "assessment": "Small subgroup, heterogeneity, study-level modality assignment; no approved transfer.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "lundberg-fibers@1",
+          "locator": "Abstract Results, running subgroup; §3.3, Fig. 4",
+          "result": "SMD −0.81 (95% CI −1.26 to −0.36).",
+          "restriction": "Type I fibers, not whole-muscle hypertrophy or a mandate to replace running."
+        }
+      ]
+    },
+    {
+      "key": "same-session-trained-lower-body-strength@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-timing",
+        "objective": "strength-development",
+        "population": "healthy-adults-aged-18-40",
+        "experience": "structured-training",
+        "intervention": "same-session-running-or-cycling-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "squat-or-leg-press-one-rm",
+        "horizon": "six-to-twenty-one-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "In the trained same-session subgroup, the estimate favored resistance-only training for lower-body 1RM.",
+      "limitations": "Study-level subgroup; same-session definition under 20 min; overall review duration range; not direct randomized comparison of timing.",
+      "quality": "low",
+      "assessment": "Small studies and mixed running/cycling; differences in dose and training status.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "petre@1",
+          "locator": "Results §3.5, Fig. 3, trained subgroup",
+          "result": "ES −0.66 (95% CI −1.08 to −0.25).",
+          "restriction": "Not evidence of a minimum safe gap."
+        }
+      ]
+    },
+    {
+      "key": "separate-session-trained-lower-body-strength@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-timing",
+        "objective": "strength-development",
+        "population": "healthy-adults-aged-18-40",
+        "experience": "structured-training",
+        "intervention": "different-session-running-or-cycling-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "squat-or-leg-press-one-rm",
+        "horizon": "six-to-twenty-one-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "In the trained different-session subgroup, the lower-body 1RM contrast was uncertain and close to zero.",
+      "limitations": "Study-level subgroup; separate defined as over two hours; overall review duration range; interval allows meaningful impairment.",
+      "quality": "low",
+      "assessment": "No equivalence test or direct timing contrast.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "petre@1",
+          "locator": "Results §3.5, Fig. 4, trained subgroup",
+          "result": "ES −0.10 (95% CI −0.43 to 0.23), p=0.55.",
+          "restriction": "No inference about intermediate spacing or individual recovery time."
+        }
+      ]
+    },
+    {
+      "key": "resistance-first-dynamic-strength@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-sequence",
+        "objective": "strength-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "same-session-strength-then-endurance",
+        "comparator": "same-session-endurance-then-strength",
+        "outcome": "lower-body-dynamic-strength",
+        "horizon": "at-least-five-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Resistance-first ordering yielded greater lower-body dynamic strength improvement in the pooled same-session comparisons.",
+      "limitations": "Mostly recreational/untrained samples, varied modalities; not a race-specific performance or separate-day ordering result.",
+      "quality": "low",
+      "assessment": "Direct sequence contrast but limited dual-trained running applicability.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "eddens-sequence@1",
+          "locator": "Results, Fig. 2, lower-body dynamic strength",
+          "result": "Weighted mean difference in percent change 6.91 percentage points (95% CI 1.96 to 11.87).",
+          "restriction": "Only this outcome; no universal order."
+        }
+      ]
+    },
+    {
+      "key": "high-load-running-economy@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-running-economy",
+        "objective": "running-economy-development",
+        "population": "middle-and-long-distance-runners",
+        "experience": "moderate-to-high-endurance-experience",
+        "intervention": "high-load-strength-plus-running",
+        "comparator": "running-with-no-or-low-dose-strength-control",
+        "outcome": "measured-running-economy",
+        "horizon": "six-to-twenty-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The pooled running-economy contrast favored the studied supplemental strength method over control.",
+      "limitations": "Varied control conditions and lifting experience; speed-dependent tests; no individual conversion to race time.",
+      "quality": "moderate",
+      "assessment": "Publisher results and review certainty assessment; dual-trained marginal effect unknown. Horizon is review overall.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "llanos-lagos-economy@1",
+          "locator": "Results §3.4, Fig. 2",
+          "result": "ES −0.266 (95% CI −0.516 to −0.015), p=0.039.",
+          "restriction": "Negative effect favors lower measured running cost. Study prescriptions are not defaults."
+        }
+      ]
+    },
+    {
+      "key": "combined-strength-running-economy@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-running-economy",
+        "objective": "running-economy-development",
+        "population": "middle-and-long-distance-runners",
+        "experience": "moderate-to-high-endurance-experience",
+        "intervention": "combined-strength-methods-plus-running",
+        "comparator": "running-with-no-or-low-dose-strength-control",
+        "outcome": "measured-running-economy",
+        "horizon": "six-to-twenty-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The pooled running-economy contrast favored the studied supplemental strength method over control.",
+      "limitations": "Heterogeneity and outlier sensitivity, distinct method combinations; no head-to-head superiority.",
+      "quality": "low",
+      "assessment": "Publisher results and review certainty assessment; dual-trained marginal effect unknown. Horizon is review overall.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "llanos-lagos-economy@1",
+          "locator": "Results §3.4, Fig. 3",
+          "result": "ES −0.647 (95% CI −1.140 to −0.154); outlier-excluded ES −0.426 (−0.768 to −0.083).",
+          "restriction": "Negative effect favors lower measured running cost. Study prescriptions are not defaults."
+        }
+      ]
+    },
+    {
+      "key": "high-load-running-performance@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-running-performance",
+        "objective": "running-performance-development",
+        "population": "middle-and-long-distance-runners",
+        "experience": "moderate-to-high-endurance-experience",
+        "intervention": "high-load-strength-plus-running",
+        "comparator": "running-with-no-or-low-dose-strength-control",
+        "outcome": "time-trial-or-time-to-exhaustion",
+        "horizon": "six-to-forty-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The pooled running-performance contrast favored the studied supplemental strength method over control.",
+      "limitations": "Combines time trials and TTE; no individual race-time percentage or optimal additional strength dose.",
+      "quality": "moderate",
+      "assessment": "Mixed laboratory/field outcomes and overlapping primary studies; hybrid transfer not approved. Horizon is review overall.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "llanos-lagos-performance@1",
+          "locator": "Results, Running Performance, Fig. 6",
+          "result": "ES −0.469 (95% CI −0.872 to −0.066), p=0.029.",
+          "restriction": "Negative effects favor supplemental strength; no predicted individual race-time change."
+        }
+      ]
+    },
+    {
+      "key": "combined-strength-running-performance@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-running-performance",
+        "objective": "running-performance-development",
+        "population": "middle-and-long-distance-runners",
+        "experience": "moderate-to-high-endurance-experience",
+        "intervention": "combined-strength-methods-plus-running",
+        "comparator": "running-with-no-or-low-dose-strength-control",
+        "outcome": "time-trial-or-time-to-exhaustion",
+        "horizon": "six-to-forty-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The pooled running-performance contrast favored the studied supplemental strength method over control.",
+      "limitations": "Heterogeneous combined methods; no direct proof of superiority to high-load-only training.",
+      "quality": "low",
+      "assessment": "Mixed laboratory/field outcomes and overlapping primary studies; hybrid transfer not approved. Horizon is review overall.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "llanos-lagos-performance@1",
+          "locator": "Results, Running Performance, Fig. 6",
+          "result": "ES −1.035 (95% CI −1.967 to −0.103), I²=67.475%.",
+          "restriction": "Negative effects favor supplemental strength; no predicted individual race-time change."
+        }
+      ]
+    },
+    {
+      "key": "strength-running-economy-durability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-running-economy",
+        "objective": "running-economy-development",
+        "population": "well-trained-male-runners",
+        "experience": "trained-endurance",
+        "intervention": "maximal-strength-and-plyometrics-plus-habitual-running",
+        "comparator": "habitual-running-only",
+        "outcome": "running-economy-at-ninety-minutes",
+        "horizon": "ten-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "In the trial, the supplemented group improved oxygen cost at the end of the prolonged run relative to running-only control.",
+      "limitations": "Male runners, 14 per group; abstract-level extraction; combined stimulus; baseline strength training and CIs require full-text confirmation.",
+      "quality": "low",
+      "assessment": "Randomized comparison and explicit time-specific outcome; no independent full-text or rights review.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "zanini-durability@1",
+          "locator": "Abstract Results, 90-min running-economy comparison",
+          "result": "Change −2.1% vs +0.6%, p=0.04; group×training×run-time p=0.003, partial eta-squared 0.13.",
+          "restriction": "Measured laboratory oxygen cost at 90 minutes; not race performance or a universal training dose."
+        }
+      ]
+    },
+    {
+      "key": "concurrent-trained-endurance-vo2max@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-aerobic-capacity",
+        "objective": "aerobic-capacity-development",
+        "population": "healthy-adults-aged-18-50",
+        "experience": "trained-endurance",
+        "intervention": "concurrent-strength-and-endurance",
+        "comparator": "endurance-only",
+        "outcome": "vo2max",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The trained endurance subgroup did not show detectably smaller VO2max gains with concurrent versus endurance-only training.",
+      "limitations": "Mixed aerobic modes and sparse high-level evidence; no equivalence test; not running economy, race time or retention.",
+      "quality": "low",
+      "assessment": "Outcome-specific comparison with moderate imprecision; study-level training-status classification.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "huiberts@1",
+          "locator": "Results §3.5, Fig. 6, trained endurance subgroup",
+          "result": "SMD 0.18 (95% CI −0.02 to 0.38); p=0.08.",
+          "restriction": "Trained endurance subgroup only; no inference about all performance qualities."
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "key": "timing-trained-separate-context@1",
+      "kind": "qualifies",
+      "subject": "separate-session-trained-lower-body-strength@1",
+      "object": "same-session-trained-lower-body-strength@1",
+      "reason": "Same review, distinct timing strata and common comparator type. Separate-session estimate is uncertain; this does not estimate a randomized direct timing contrast or establish a minimum gap."
+    },
+    {
+      "key": "training-status-moderation-context@1",
+      "kind": "qualifies",
+      "subject": "concurrent-strength-experience-moderation@1",
+      "object": "trained-lower-body-strength@1",
+      "reason": "Huiberts did not detect a strength-status interaction; Petré reports a within-trained program comparison. Different estimands and classification, overlapping literature; neither logically refutes the other."
+    },
+    {
+      "key": "fiber-vs-whole-muscle-context@1",
+      "kind": "qualifies",
+      "subject": "pooled-concurrent-fiber-hypertrophy@1",
+      "object": "pooled-concurrent-whole-muscle-hypertrophy@1",
+      "reason": "Different tissue measurement levels and partially overlapping research; do not transfer whole-muscle estimate to fibers or vice versa."
+    }
+  ],
+  "methods": [
+    {
+      "key": "priority-aware-concurrent-calendar@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "question": "concurrent-timing",
+      "description": "Compare feasible weekly schedules with explicit key-session priorities and actual athlete responses; consider separation or ordering changes before altering protected dose.",
+      "provenance": "Research Packet 003 CT-P02 v0.2; original candidate programming method, not empirical finding.",
+      "tradeoffs": "Spacing, adherence and other priorities can conflict; no universal interval; direct timing evidence limited.",
+      "claims": [
+        "same-session-trained-lower-body-strength@1",
+        "separate-session-trained-lower-body-strength@1",
+        "resistance-first-dynamic-strength@1"
+      ]
+    },
+    {
+      "key": "existing-strength-stimulus-for-running@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "question": "strength-running-economy",
+      "description": "Map existing resistance training to running and strength objectives before adding supplemental work; consider retaining suitable strength exposure or replacing less important work.",
+      "provenance": "Research Packet 003 CT-P04; original candidate programming method, not empirical finding.",
+      "tradeoffs": "Additional work may not improve running in already strong athletes and may compromise session quality; exact doses unvalidated.",
+      "claims": [
+        "high-load-running-economy@1",
+        "high-load-running-performance@1",
+        "combined-strength-running-performance@1"
+      ]
+    },
+    {
+      "key": "joint-priority-block-review@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 003)",
+      "status": "pending",
+      "approval": null,
+      "question": "concurrent-strength",
+      "description": "Review both disciplines and secondary commitments within a shared block; compare feasible alternatives, disclose uncertainty and require athlete approval for objective changes.",
+      "provenance": "Research Packet 003 HP-P01 and CT-P05; original candidate programming method, not empirical finding.",
+      "tradeoffs": "No demonstrated optimal priority trajectory or adaptation algorithm; needs athlete preferences, nutrition context and explicit secondary protection.",
+      "claims": [
+        "pooled-concurrent-strength@1",
+        "trained-lower-body-strength@1",
+        "concurrent-trained-endurance-vo2max@1",
+        "high-load-running-performance@1"
+      ]
+    }
+  ]
+}

@@ -1,8 +1,42 @@
 # Research backlog
 
-The original 14 priorities and E-series evidence IDs come from [packet 001, revision 0.1](001-strength-progression-periodization.md#7-research-backlog).
+## Proposed integrated sequence
 
-P0 = first credible strength-focused coach; P1 = longitudinal extension; P2 = additional domains. Ordering is a proposed engineering/scientific dependency priority, not a ranking of health importance. No research beyond the initial scope has been performed for queued questions.
+[Packet 003, section 7](003-concurrent-strength-running.md#7-research-backlog) sets the current proposed research order for integrated strength, endurance and nutrition optimization. P0 questions support early joint planning, P1 extends adaptation and evaluation, and P2 addresses later complexity. Priorities describe research dependencies. Each packet still needs independent scientific review.
+
+| Packet | Priority | Research focus and dependency |
+| --- | --- | --- |
+| 001–002 | Retained | Strength progression and periodization, then working-set volume. The original questions, Enes protocol checks and feedback-adjustment gap remain open below. |
+| 003 | P0, staged | Concurrent adaptations in both directions, scheduling, dose and modality. Review transfer to athletes experienced in both disciplines and the proposed joint block decisions. |
+| **004** | **P0, next** | **Integrated nutrition, energy availability and fueling.** Start with safe energy availability and fueling different sessions, including double sessions. Appraise body-composition goals and protein as distinct comparisons (NU-01–03). |
+| **005** | **P0** | **Running development and progression.** Study baseline-relative volume, intensity distribution, long runs, quality sessions and adherence alongside lifting (EN-01/02). |
+| **006** | **P0** | **Integrated hybrid periodization, maintenance and tapering.** Compare balanced and emphasis blocks, retention in both directions, coordinated deloads and event assessments (HP-01–03). Draw on Packets 001–005. |
+| **007** | **P1** | **Individual energy expenditure estimation and nutritional adaptation.** Evaluate what intake and weight observations can identify, wearable validity, missing data, uncertainty and simple baselines (NU-04/05). Packet 004 handles the immediate fueling questions. |
+| 008 | P1 | Integrated recovery interpretation and autoregulation (RE-01/02 and EV-01). Assess measurement comparability and whether acting on effort, sleep, heart rate, HRV or nutrition observations improves decisions. Use RT-P02 and Packets 004–007. |
+| 009 | P1 | Individualized adaptation and prospective multi-objective evaluation (EV-02/03). Compare policies within athletes, account for noise and carryover, and test against fixed programs and simple progression. |
+| 010 | P2, conditional | HP/EV extensions for interruptions, complex event conflicts, adherence and changing preferences when evidence or observed failures warrant them. |
+
+### Identifier reconciliation
+
+Packet numbers identify research deliverables. The question IDs below identify lines of inquiry, and policy IDs such as CT-P01 identify candidate decisions. Use the originating packet alongside an ID whose scope has broadened.
+
+| Earlier question | Relationship to the integrated roadmap |
+| --- | --- |
+| **CT-01** (001), endurance dose needed to retain defined qualities | **CT-01** (003) broadens to bidirectional adaptations. The original endurance-maintenance question remains open under CT-03 dose/modality and HP-01a / Packet 006 outcome-specific maintenance. CT-04a–c asks specifically what strength adds to running. |
+| **CT-02** (001), sequence and spacing | CT-02 retains that scope. CT-02a seeks direct comparisons in runners and checks priority-session quality. CT-03 is a separate dose/modality question. |
+| **RT-01, RT-02, RT-03** | Load/repetition progression and the ten RT-02 volume questions retain their identities. CT-P05 extends the candidate RT-P02 volume review to both domains. RT-03’s effort-based autoregulation question contributes to Packet 008. |
+| **LP-01–05** | Strength specialization (LP-01), non-priority strength maintenance (LP-02), deload (LP-03) and taper/assessment (LP-04) feed Packet 006’s HP questions. LP-05 on resumption feeds Packet 010. The original strength-specific comparisons stay open. |
+| **NU-01** (001), energy availability and nutrition constraints | Elevated from P2 to P0. Packet 003 uses NU-01 for nutrition context and unmeasured moderators. Packet 004 retains energy availability/balance and safe body-composition goals under NU-01 and adds separate fueling/protein questions (NU-02/03). Packet 007 adds expenditure estimation and adaptation (NU-04/05). |
+| **EN-01** (001), running progression | Elevated from P2 to P0. Packet 005 carries the earlier progression question into EN-01/02 with event-specific running outcomes, adherence and lifting interactions. |
+| **RE-01, EV-01** | Packet 008 retains recovery-guided versus performance-guided adjustment and detection of real individual progress within a broader integrated recovery review. RE-02 extends that work. EV-02/03 in Packet 009 adds prospective joint-policy evaluation, including the feedback-policy question EV-02a. |
+
+### Packet 003 appraisal queue
+
+The [complete queue](003-concurrent-strength-running.md#72-packet-003-outstanding-questions-and-appraisal-queue) gives priorities and source-specific actions. CT-01a–c cover review overlap, subgroup interactions, primary protocols and fiber outcomes. CT-02a covers sequencing and spacing. CT-03a covers realistic running doses and modality transfer. CT-04a–c cover running economy, performance, durability and incremental benefit in experienced lifters. HP-01a seeks direct block and maintenance comparisons. NU-01 carries nutrition constraints to Packet 004. EV-02a asks whether feedback-driven changes improve joint outcomes. REVIEW-03 covers exact scopes, publication versions, rights and relation meanings. Technical staging leaves the [scientific review checklist](003-concurrent-strength-running.md#8-human-review-checklist) open.
+
+## Earlier strength-focused priorities
+
+The original 14 priorities and E-series evidence IDs come from [Packet 001, revision 0.1](001-strength-progression-periodization.md#7-research-backlog). The ranks, P0–P2 labels and statuses in this table record the earlier strength-focused sequence through Packet 002. The integrated sequence above governs the next packets. The [Packet 002 source-access checks](README.md#source-access-requiring-review) and all ten RT-02 follow-ups below remain outstanding.
 
 | Rank | ID / question | Priority / status | Starting evidence | Remaining question / implementation implication |
 |---|---|---|---|---|
