@@ -1,0 +1,59 @@
+{
+  "questions": [],
+  "sources": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted J3A.1 appraisal)",
+      "status": "pending",
+      "approval": null,
+      "key": "barsuhn@2",
+      "citation": "Barsuhn A et al. Training volume increases or maintenance based on previous volume: the effects on muscular adaptations in trained males. J Appl Physiol. 2025;138(1):259–269.",
+      "doi": "10.1152/japplphysiol.00476.2024",
+      "record_url": "https://openrepository.aut.ac.nz/items/87b4d27e-50d0-4dd4-b652-1cf456281ded",
+      "published_on": "2024-12-12",
+      "design": "Counterbalanced randomized parallel-group trial",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Institutional copy of paginated journal article and publisher abstract checked. Direct publisher full text returned 403. No correction surfaced in targeted search; comprehensive notice check remains outstanding.",
+      "rights": "Institutional metadata reports CC BY 4.0. Confirm version-specific and deployment rights; retain metadata, links and original summaries.",
+      "appraisal": "Methods, Fig. 1, Tables 1 and 3, Results and Discussion inspected. 55 allocated, 29 completed; available-data mixed models included 55. Group main effect is not difference in change. Unusually narrow reported intervals and discordant pairwise p-values require clarification.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted J3A.1 appraisal)",
+      "status": "pending",
+      "approval": null,
+      "key": "habitual-set-maintenance-strength@2",
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "trained-adult-males",
+        "experience": "trained",
+        "intervention": "maintain-habitual-weekly-sets",
+        "comparator": "increase-habitual-weekly-sets",
+        "outcome": "back-squat-one-rm",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "In the trial of trained men, reported squat strength increased during the intervention including the habitual-set maintenance arm; a differential change between maintenance and volume increases was not established.",
+      "limitations": "55 allocated and 29 completed; differing pre/post denominators; baseline imbalance; no significant group-by-time interaction reported; uncertainty reporting requires clarification; not equivalence, optimal dose or hybrid transfer.",
+      "quality": "low",
+      "assessment": "Full journal copy inspected. Retain qualitative interpretation provisionally; verify mixed-model uncertainty, missingness and pairwise contrasts before approval.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "barsuhn@2",
+          "locator": "Results, Maximum Strength and Strength Endurance, p. 265; Table 3 p. 266; Discussion pp. 266–267; Fig. 1 p. 261",
+          "result": "Reported model time effect +21.47 kg (95% CI 21.27 to 21.66, as printed; requires clarification). Control descriptive means 161.90 to 193.70 kg with n=21 and n=10 respectively. No significant group-by-time interaction reported. Direct difference-in-change interval not verified.",
+          "restriction": "Descriptive means with unequal denominators are not paired individual changes. Do not infer superiority or equivalence, individual set threshold or quantitative prescription."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [],
+  "withdrawals": []
+}
