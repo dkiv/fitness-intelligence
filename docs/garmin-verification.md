@@ -10,9 +10,41 @@ The [design and availability matrix](garmin-integration-design.md) describe what
 2. Enter **fitness-intelligence.garmin** as the keychain item name, **personal** as the
    account name and your Garmin Personal API key as the password. Select **Add**. Keep the
    key out of shell commands, environment files, chat and the repository.
-3. When replacing an expired or revoked key, update the password of that same item.
+3. To update an existing item, open it in Keychain Access, select **Show password**,
+   authenticate if prompted, replace the entire password, and select **Save Changes**.
    The command uses the system Keychain helper with captured output. A locked keychain
    may ask you to allow access. Keychain access has a 30-second timeout.
+
+Use the graphical password field for long API keys. The interactive
+`security add-generic-password … -w` prompt uses macOS `getpass(3)`, which accepts only
+the first 128 bytes on the tested system. Both confirmation prompts can agree on the same
+truncated value. Both curl and Python will then read that value from Keychain.
+[Apple's password prompt implementation](https://github.com/apple-oss-distributions/Security/blob/main/SecurityTool/macOS/keychain_add.c)
+
+If a key entered through that prompt gets a 401, keep the current Garmin key and replace
+the password in **Keychain Access** with the original saved at issuance. To check the repair
+offline from `backend/`, run this block first. At the prompt, copy the original key from
+your password manager and press Return in Terminal. The check prints only a comparison result.
+
+```sh
+uv run --no-sync python -c '
+from secrets import compare_digest
+from subprocess import run
+from fitness_intelligence.adapters.garmin.verify import keychain_key
+
+input("Copy the original Garmin key now, then press Return here: ")
+original = run(["/usr/bin/pbpaste"], capture_output=True, check=True).stdout
+stored = keychain_key().encode("ascii")
+if not original:
+    print("Clipboard empty.")
+elif compare_digest(original, stored):
+    print("Exact match.")
+elif len(stored) == 128 and original.startswith(stored):
+    print("Confirmed: Keychain contains only the first 128 bytes.")
+else:
+    print("Different values.")
+'
+```
 
 ## Run
 
