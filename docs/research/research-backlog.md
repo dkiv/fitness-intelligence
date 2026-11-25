@@ -2,7 +2,7 @@
 
 ## Proposed integrated sequence
 
-[Packet 003, section 7](003-concurrent-strength-running.md#7-research-backlog) established the integrated research order. [Packet 004, section 7](004-integrated-nutrition-fueling.md#7-research-backlog) carried running development forward. [Packet 005, section 7](005-running-development-measurement.md#7-research-backlog) now sends the joint block questions to Packet 006. P0 questions support early joint planning, P1 extends adaptation and evaluation, and P2 addresses later complexity. Priorities describe research dependencies. Each packet still needs independent scientific review.
+[Packet 003, section 7](003-concurrent-strength-running.md#7-research-backlog) established the integrated research order. [Packet 004, section 7](004-integrated-nutrition-fueling.md#7-research-backlog) carried running development forward. Packet 005 passed its joint block questions to Packet 006. The next research packet covers individual energy expenditure estimation and nutritional adaptation. J3 can curate the staged evidence in parallel with Packets 007–010. [Packet 005 handoff](005-running-development-measurement.md#7-research-backlog) · [Packet 006 continuing roadmap](006-integrated-hybrid-periodization.md#73-continuing-roadmap) P0 questions support early joint planning, P1 extends adaptation and evaluation, and P2 addresses later complexity. Priorities describe research dependencies. Each packet still needs independent scientific review.
 
 | Packet | Priority | Research focus and dependency |
 | --- | --- | --- |
@@ -10,8 +10,8 @@
 | 003 | P0, staged | Concurrent adaptations in both directions, scheduling, dose and modality. Review transfer to athletes experienced in both disciplines and the proposed joint block decisions. |
 | 004 | P0, staged for independent review | Integrated nutrition, energy availability and fueling. Review the clinical boundaries, session fueling (including double sessions), protein evidence, dietary tradeoffs and the eight candidate policies. |
 | 005 | P0, staged for independent review | Running development, progression and measurement validity (EN-01/02). Review actual exposure, comparable performance, adherence and workload alongside lifting. Running-specific fueling and tolerance from Packet 004 remain open. |
-| **006** | **P0, next** | **Integrated hybrid periodization, bidirectional maintenance and coordinated tapering.** Compare balanced and emphasis blocks, retention in both directions, coordinated deloads and event assessments (HP-01–03). Draw on Packets 001–005. |
-| **007** | **P1** | **Individual energy expenditure estimation and nutritional adaptation.** Evaluate what intake and weight observations can identify, wearable validity, missing data, uncertainty and simple baselines. See the packet-qualified nutrition IDs below. |
+| **006** | **P0, staged for independent review** | **Integrated hybrid periodization, bidirectional maintenance and coordinated tapering.** Review balanced and emphasis blocks, retention in both directions, and coordinated recovery and event assessments. The nine Packet 006 questions refine the earlier HP-01–03 remit. |
+| **007** | **P1, next** | **Individual energy expenditure estimation and nutritional adaptation.** Evaluate what intake and weight observations can identify, wearable validity, missing data, uncertainty and simple baselines. See the packet-qualified nutrition IDs below. |
 | 008 | P1 | Integrated recovery interpretation and autoregulation (RE-01/02 and EV-01). Assess measurement comparability and whether acting on effort, sleep, heart rate, HRV or nutrition observations improves decisions. Use RT-P02 and Packets 004–007. |
 | 009 | P1 | Individualized adaptation and prospective multi-objective evaluation (EV-02/03). Compare policies within athletes, account for noise and carryover, and test against fixed programs and simple progression. |
 | 010 | P2, conditional | HP/EV extensions for interruptions, complex event conflicts, adherence and changing preferences when evidence or observed failures warrant them. |
@@ -61,6 +61,54 @@ The eight children of legacy EN-01 are research questions. The ten question term
 | P005/EN-08 · Coordination | Coordinate running with priority lifts, other sport and fueling. Carry outcome-specific maintenance and competing session demands to Packet 006 and prospective policy comparisons to Packet 009. |
 
 For all selected sources, verify full-text access, versions of record, correction and retraction notices, reuse rights, result locators and overlap among cohorts and reviews. Universal mileage caps, intensity ratios, decoupling thresholds, injury-risk scores and readiness rules lack authorization. The independent reviewer must assess scientific support and the proposed decision separately. [Human review checklist](005-running-development-measurement.md#8-human-review-checklist)
+
+### Packet 006 question crosswalk
+
+Packet 003 used HP-01–03 for joint priorities, bidirectional maintenance and coordinated recovery/taper and assessment. Packet 005 carried that work forward. P003/HP-01a still seeks direct comparisons of blocks and maintenance in athletes trained in both disciplines. Cite the packet number for each research question. HP-P01 identifies a candidate policy. The nine question terms in the JSON are catalog vocabulary and have their own identifiers. [Original joint remit](003-concurrent-strength-running.md#7-research-backlog) · [Packet 006 reconciliation and open questions](006-integrated-hybrid-periodization.md#71-identifier-reconciliation-and-remaining-questions)
+
+| Packet 006 question | Earlier question and outstanding decision |
+| --- | --- |
+| P006/HP-01 · Archetype | P003/HP-01 and HP-01a, LP-01. Compare balanced and emphasis blocks with matched exposure and assess transfer to runners who lift. |
+| P006/HP-02 · Initialization and duration | LP-01, RT-01/02, P005/EN-01/03. Establish comparable baseline exposure and review the duration, phase intent and bounds of a feasible block. |
+| P006/HP-03 · Strength retention | Earlier HP maintenance and LP-02. Determine which reduced exposures preserve a specified established strength outcome during endurance emphasis. |
+| P006/HP-04 · Endurance retention | P001/CT-01, P003/CT-03 and HP-01a. Review running-specific performance and long endurance during strength emphasis. P003/CT-01 retains the broader bidirectional adaptation question. |
+| P006/HP-05 · Joint progression | RT-02, CT-02 scheduling and CT-03 dose/modality, P005/EN-08. Compare holding, increasing or redistributing work. Carry prospective tests to Packet 009. |
+| P006/HP-06 · Deload | LP-03 and earlier HP recovery. Compare scheduled and reactive changes, local and general reductions. Packet 008 retains the recovery-signal question. |
+| P006/HP-07 · Taper | LP-04 and earlier HP coordinated taper/assessment. Review event-specific comparisons and competing strength and running demands. |
+| P006/HP-08 · Nutrition | P004/NU-01–06 and CT-P06. Review fueling feasibility and referral boundaries. Packet 007 retains expenditure estimation and nutritional adaptation. |
+| P006/HP-09 · Review and transition | LP-01/04/05, EV-01/02. Define review and revision authority. Prospective comparison remains with Packet 009 and resumption with Packet 010. |
+
+### Packet 006 scientific review blockers
+
+- **Block organization.** Separate direct concurrent-training comparisons from indirect team-sport and high-intensity functional training (HIFT) evidence. Verify small samples, overlapping trials in the block-periodization reviews, realized dose and outcome definitions. In Micke et al., check crossover order, carryover and unmonitored strength exposure. Colquhoun tested constrained session-order flexibility. Broader adaptive prescription requires separate evidence.
+- **Maintenance.** Separate retention of newly acquired adaptations from maintenance of long-standing performance. Verify baseline training, realized exposure and the specific outcome tested. Exposure alone cannot establish retention. Failure to detect deterioration leaves equivalence unresolved. Check possible population overlap across the Hickson studies and evaluate aerobic capacity, running-specific performance and long-duration endurance separately.
+- **Recovery and taper.** Distinguish complete cessation from reduced-volume deloading, local from systemic exposure, and planned from reactive recovery. For endurance tapering, extract controlled comparisons, pre/post changes and subgroup analyses separately and map shared trials. Appraise strength taper evidence at the level of the lift and comparator. The packet identifies no validated coordinated hybrid taper protocol.
+- **Publication dates.** Resolve issue-date placeholders for `colquhoun-flexible-dup@1`, `bickel-retention@1`, `ronnestad-soccer-maintenance@1`, `hickson-frequency-retention@1` and `hickson-intensity-retention@1` before approval. Record the verified publication date and its precision in subsequent curation. Preserve the supplied archive and draft.
+- **Coleman access.** `midblock-cessation-dynamic-strength@1` cites indexed Table 3 results while `coleman@1` is abstract-only and screening. Inspect the full text, map each estimate and posterior interval to its model column, and prepare an appropriate new source revision before claim approval. Preserve the original claim-to-source link in the archive and draft.
+
+The checklist also retains source-by-source checks for publication notices, versions, rights, risk of bias, locators and applicability, as well as all earlier packet obligations. [Independent human review checklist](006-integrated-hybrid-periodization.md#8-human-review-checklist)
+
+## J3 scientific curation
+
+Start with Packet 006 section 7.2. Its thirteen entries give the exact source, claim and method revisions, transfer questions, numerical needs, data requirements and consequence of deferral for each decision. Start with one narrow end-to-end capability drawn from A1–A10. For example, review what would support arranging a familiar lift and run around an athlete’s priority, checking execution and proposing a hold or calendar change. Select only the premises and methods that decision requires. The other claims can remain pending while review proceeds. [Full cross-packet shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count)
+
+| Priority | Coaching decision | First review action |
+| --- | --- | --- |
+| A1 | Choose balanced or emphasis work and initialize the block | Verify matched exposure, carryover and population transfer. Review candidate duration, envelope and hierarchy. |
+| A2 | Prescribe load and reps and retain familiar movement exposure | Check the progression contrast, effort ranges and feasible equipment increments. |
+| A3 | Hold or change working sets | Reconstruct assigned and realized Enes doses, verify Barsuhn and the Pelland model, and appraise the hold/change method. |
+| A4 | Coordinate the calendar and protect key sessions | Check shared trials, sequence and subgroup interactions. Review scheduling against actual availability. |
+| A5 | Initialize and progress habitual running | Verify the adaptive trial, distinguish session and weekly exposure, and review tolerable progression choices. |
+| A6 | Prescribe run purpose and intensity | Verify intensity-distribution denominators, overlapping trials and reliability of the athlete’s available anchors. |
+| A7 | Protect secondary strength and running outcomes | Check baseline dose, direct retention comparisons and assessment comparability. Review exposure floors and outcome tolerances separately for `outcome-specific-strength-maintenance@1` and `outcome-specific-running-maintenance@1`. |
+| A8 | Offer practical nutrition and fueling guidance | Verify dose denominators, consensus guidance and referral scope. Distinguish inputs for recommending a target from observations of intake and adequacy. |
+| A9 | Observe adherence and evaluate comparable progress | Review test protocols, measurement error, agreement and timing. Determine when the outcome must remain unknown. |
+| A10 | Hold, review or reduce work and protect health | Resolve the Coleman source issue, check the Pancar comparison and review safe fallback and referral decisions. |
+| B1 | Coordinate an event-specific taper and assessment | Verify controlled endurance trials, overlapping reviews and lift-specific evidence before reviewing event parameters. |
+| B2 | Add strength work for a running benefit | Verify study-level comparators and habitual lifting, and separate economy from race performance. |
+| C1 | Refine adaptive recovery, expenditure, durability and response estimates | Defer to Packets 007–009 for signal validity, coverage and prospective incremental benefit. |
+
+For each decision, **source verification** establishes access, version, locator and study identity. **Claim appraisal** evaluates the measured contrast, uncertainty and limitations. **Population transfer** requires a rationale for applying that result to the intended athlete. **Candidate method review** assesses the action, alternatives and revision authority. **Numerical parameter review** examines provenance, units, bounds and validation. **Data readiness** identifies which observations support prescription, adherence and outcome evaluation. **Operational authorization** is a separate decision for a specific reviewed release and planner rule. Staging grants none of these approvals. [Parameter appraisal](006-integrated-hybrid-periodization.md#45-quantitative-parameter-appraisal) · [Review and release procedure](../scientific-evidence-catalog.md#review-and-release-procedure)
 
 ## Earlier strength-focused priorities
 
