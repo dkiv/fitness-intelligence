@@ -210,7 +210,7 @@ The eight research questions extend earlier planning and history questions. The 
 
 ## J3 scientific curation
 
-Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). Packet 007 adds A17–A19, B5–B8 and C4–C5. Packet 009 adds A20–A22. Packet 010 retains those 35 priorities and adds A23–A25, giving **38 open review entries** (25 essential, eight early extensions, five deferred). J3A.1 and J3B.1 cover selected parts of these decisions. Overlapping entries share evidence, method review and planning infrastructure. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist) · [Packet 007 source and claim keys, review requirements and data feasibility for each decision](007-individual-energy-expenditure-estimation.md#72-j3-curation-extension-decision-oriented-additions-to-packet-006008-shortlist) · [Packet 009 decision references and fallbacks](009-individual-training-history.md#72-narrow-extension-of-j3-curation-shortlist) · [Packet 010 decision references and fallbacks](010-long-term-planning-and-resumption.md#72-focused-j3-extension)
+Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). Packet 007 adds A17–A19, B5–B8 and C4–C5. Packet 009 adds A20–A22. Packet 010 retains those 35 priorities and adds A23–A25, giving **38 open review entries** (25 essential, eight early extensions, five deferred). The strength progression and hybrid block tranches cover selected parts of these decisions. Overlapping entries share evidence, method review and planning infrastructure. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist) · [Packet 007 source and claim keys, review requirements and data feasibility for each decision](007-individual-energy-expenditure-estimation.md#72-j3-curation-extension-decision-oriented-additions-to-packet-006008-shortlist) · [Packet 009 decision references and fallbacks](009-individual-training-history.md#72-narrow-extension-of-j3-curation-shortlist) · [Packet 010 decision references and fallbacks](010-long-term-planning-and-resumption.md#72-focused-j3-extension)
 
 | Priority | Coaching decision | First review action |
 | --- | --- | --- |
@@ -264,15 +264,29 @@ For each decision, **source verification** establishes access, version, locator 
 | J3A.1 | AI-assisted appraisal complete. Independent scientific review of six papers, transfer and the two pending Barsuhn revisions is outstanding. [Source findings and dependencies](curation/README.md#scientific-decisions-awaiting-independent-review) |
 | J3B.1 | Candidate J3-M01 revision 0.1 complete. Independent review of the three bundles, parameters and conformance cases is outstanding. [Methodology and review questions](curation/README.md#candidate-methodology-for-review) |
 | J3C.1 | Approval and operational release preparation pending. Each accepted evidence revision, method and operational rule needs its own applicable review and authorization. |
-| J3A.2 | Next scientific appraisal tranche covers multiweek block construction and protected secondary strength and running outcomes (A1/A7). Follow with practical block methodology in J3B.2. |
 
-Continue alternating focused scientific appraisal and practical method development by capability. J3A.2 and J3B.2 belong in a separate curation PR.
+The hybrid block tranche extends this work to the block objectives and exposure bounds within which M01 operates.
 
 | J3-M01 review bundle | Existing priorities addressed in part |
 | --- | --- |
 | M01a · Movement prescription and progression | A2/A11 for bounded load or rep changes. A9/A13/A20 for comparable historical references and confirmed work. A14 for interpretable effort feedback. |
 | M01b · Working-set exposure | A3/A12 for holding, trialing or reducing set counts. A9/A13/A21 for representative exposure and changes in context. A10/A16 for burden and escalation. |
 | M01c · Concurrent scheduling and constraints | A4/A15 for feasible moves around priority sessions. A7 for protection of secondary outcomes. A10/A14/A16 for local burden, conflicts and authority. A22 for tentative contextual patterns. |
+
+### Hybrid block curation
+
+| Tranche | Status and handoff |
+| --- | --- |
+| J3A.2 | AI-assisted appraisal complete. Independent scientific review of the six papers, reused Petré appraisal, scope changes and method dependencies is outstanding. [Appraisal obligations](curation/README.md#block-evidence-awaiting-independent-review) |
+| J3B.2 | Candidate J3-M02 revision 0.1 complete. Independent review of the three bundles, B01–B18, worked programs and conformance cases is outstanding. [Method bundles](curation/README.md#j3-m02-review-bundles) · [Implementation-review considerations](curation/README.md#block-implementation-review-considerations) |
+| J3C.2 | Approval and operational release preparation pending. Evidence revisions, method choices and planner authorization require separate decisions. |
+| J3A.3 | Next focused appraisal covers running prescription and progression (A5/A6), followed by practical running methodology. Scheduled preliminary research closed with Packet 010. No new broad packet is scheduled. |
+
+| J3-M02 review bundle | Existing priorities addressed in part |
+| --- | --- |
+| M02a · Goals, archetype and historical reference | A1/A7 for ranked development and protected outcomes. A20/A21 for choosing comparable performance and familiar exposure after a context change. |
+| M02b · Weekly structure, exposure bounds and protected outcomes | A2/A3/A5 for a familiar first week, A4/A7/A15 for feasible scheduling and specific protection, and A11/A12 for keeping local changes within approved block bounds. |
+| M02c · Review, continuation and transition | A9/A13 for exposure versus observed outcome. A16/A23 for weekly authority and block continuation. A21/A24/A25 for interruption, feasible re-entry and changed priorities. |
 
 ## Earlier strength-focused priorities
 

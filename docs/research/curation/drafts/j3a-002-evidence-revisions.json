@@ -1,0 +1,157 @@
+{
+  "questions": [],
+  "sources": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.2)",
+      "status": "pending",
+      "approval": null,
+      "key": "micke-hift-block@2",
+      "citation": "Micke F, Huelle J, D’Hulst G, Isenmann E, Geisler S, Held S. Block periodization vs. traditional periodization in high-intensity functional training: a randomized crossover study. Front Physiol. 2026;17:1810477.",
+      "doi": "10.3389/fphys.2026.1810477",
+      "record_url": "https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2026.1810477/full",
+      "published_on": "2026-05-20",
+      "design": "Randomized crossover conditioning trial",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publisher article and PubMed date inspected; DOI resolver header date discrepancy, comprehensive correction/retraction and version checks outstanding.",
+      "rights": "CC BY reported by publisher; factual summaries only pending rights review.",
+      "appraisal": "Methods 2.1–2.3, Results 3.1 and Table 1 checked; assigned conditioning pool matched, external lifting unmonitored, potential carryover and multiplicity; achieved exposure and supplement checks remain.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.2)",
+      "status": "pending",
+      "approval": null,
+      "key": "ronnestad-soccer-maintenance@2",
+      "citation": "Rønnestad BR, Nymark BS, Raastad T. Effects of in-season strength maintenance training frequency in professional soccer players. J Strength Cond Res. 2011;25:2653–2660.",
+      "doi": "10.1519/JSC.0b013e31822dcd96",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/21873897/",
+      "published_on": "2011-10-01",
+      "design": "Randomized comparative in-season strength maintenance trial",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "PubMed issue month and early journal-layout article-text copy checked; inherited first-day placeholder is not verified. Final version, exact publication day and correction/retraction checks outstanding.",
+      "rights": "Third-party copy inspected for factual verification; redistribution and reuse rights not verified.",
+      "appraisal": "Article text on ResearchGate: Subjects, Table 1, Statistical Analyses, In-season Adaptations. 14 in-season participants; prescribed frequency and cumulative dose differ; direct strength contrast interval and actual dose unverified.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.2)",
+      "status": "pending",
+      "approval": null,
+      "key": "bickel-retention@2",
+      "citation": "Bickel CS, Cross JM, Bamman MM. Exercise dosing to retain resistance training adaptations in young and older adults. Med Sci Sports Exerc. 2011;43:1177–1187.",
+      "doi": "10.1249/MSS.0b013e318207c15d",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/21131862/",
+      "published_on": "2011-07-01",
+      "design": "Two-phase randomized reduced-dose trial",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "PubMed and journal-layout copy inspected; inherited first-day issue-month placeholder is not verified. Final publisher version, exact date and correction/retraction checks outstanding.",
+      "rights": "Copyright notice on third-party journal copy; no redistribution rights verified; factual summaries only.",
+      "appraisal": "Methods pp.1178–1179, Fig. 1, p.1182 Fig. 2 and discussion checked. Phase 2 n=56, biopsy n=55; recently trained, small age-by-dose cells, imputation; repeated strength testing even during detraining.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.2)",
+      "status": "pending",
+      "approval": null,
+      "key": "hift-conditioning-block-deadlift@2",
+      "scope": {
+        "question": "hybrid-periodization-comparison",
+        "objective": "performance-development",
+        "population": "hift-athletes",
+        "experience": "experienced",
+        "intervention": "concentrated-conditioning-intensity",
+        "comparator": "evenly-distributed-conditioning-intensity",
+        "outcome": "deadlift-one-rm",
+        "horizon": "six-weeks-per-condition",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The adjusted deadlift 1RM change contrast favored concentrated versus distributed conditioning in the six-week-per-condition crossover.",
+      "limitations": "Unmonitored background lifting; carryover, multiple outcomes, achieved dose uncertainty; not a controlled strength-versus-running emphasis comparison.",
+      "quality": "low",
+      "assessment": "Original model coefficient and SE extracted; exact interval and independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "micke-hift-block@2",
+          "locator": "Results 3.1, Table 1 deadlift; Methods 2.2–2.3",
+          "result": "Adjusted intervention beta +5.53 kg, SE 2.11 kg, p=0.018, d=0.85; exact model CI not extracted.",
+          "restriction": "Study-specific conditioning allocation; no inference of maintenance equivalence, optimal phase order or approved hybrid transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.2)",
+      "status": "pending",
+      "approval": null,
+      "key": "soccer-weekly-strength-retention@2",
+      "scope": {
+        "question": "strength-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "professional-soccer-players",
+        "experience": "trained",
+        "intervention": "weekly-strength-maintenance",
+        "comparator": "alternate-week-strength-maintenance",
+        "outcome": "half-squat-one-rm",
+        "horizon": "twelve-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The weekly and alternate-week groups showed different descriptive patterns of measured half-squat 1RM retention after preparatory training.",
+      "limitations": "Seven per arm; participant turnover/attrition; cumulative set dose differs; within-group significance pattern does not establish between-group effect or equivalence.",
+      "quality": "low",
+      "assessment": "Article-text copy checked; final version, adherence, direct contrast and independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ronnestad-soccer-maintenance@2",
+          "locator": "Table 1; Results In-season Adaptations; Fig. 1",
+          "result": "Weekly group no detected decline; alternate-week group half-squat 1RM declined 10 ± 4% (mean ± SE), p<0.05. Direct between-group change interval not extracted.",
+          "restriction": "Specific half-squat protocol; not a universal weekly maintenance floor; no approved hybrid transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.2)",
+      "status": "pending",
+      "approval": null,
+      "key": "young-reduced-dose-hypertrophy-retention@2",
+      "scope": {
+        "question": "strength-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "adults-aged-20-to-35",
+        "experience": "recently-trained",
+        "intervention": "one-third-or-one-ninth-development-dose",
+        "comparator": "pretraining-baseline",
+        "outcome": "mean-myofiber-area",
+        "horizon": "thirty-two-weeks",
+        "block_context": "strength-maintenance"
+      },
+      "assertion": "Mean myofiber area in the young reduced-dose groups remained above pretraining baseline through phase 2; the one-third group showed additional enlargement at the first phase-2 sampling. Exact retention of the entire acquired gain relative to end of development was not established by an equivalence comparison.",
+      "limitations": "Recently trained adults; biopsy endpoint; small age-by-dose samples; attrition and mean substitution; age-dependent responses. Verified significance comparison is against pretraining baseline; narrower scope proposed, subject to catalog validation.",
+      "quality": "low",
+      "assessment": "Article-text copy and figure inspected; matched end-development to final contrast and interval not extracted.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "bickel-retention@2",
+          "locator": "Results p.1182; Fig. 2, mean myofiber area; Methods Fig. 1",
+          "result": "Time × age × group interaction p<0.05; young groups remained above baseline at phase-2 sampling, p<0.05; one-third group additional enlargement in first 16 weeks of phase 2, p<0.05. Exact retention contrast CI unavailable.",
+          "restriction": "Myofiber area, not measured whole-muscle retention or a universal one-ninth maintenance rule. No approved transfer."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [],
+  "withdrawals": []
+}
