@@ -44,7 +44,10 @@ def make_client() -> Iterator[Callable[..., GarminClient]]:
         client.close()
 
 
-def test_token_exchange_reuse_expiry_and_401(make_client: Callable[..., GarminClient]) -> None:
+@pytest.mark.parametrize("success_status", [200, 201])
+def test_token_exchange_reuse_expiry_and_401(
+    make_client: Callable[..., GarminClient], success_status: int
+) -> None:
     now = [100]
     tokens: list[str] = []
     reads = []
@@ -56,7 +59,7 @@ def test_token_exchange_reuse_expiry_and_401(make_client: Callable[..., GarminCl
             assert req.headers["authorization"] == f"ApiKey {KEY}"
             assert req.headers["accept"] == "*/*"
             tokens.append(jwt(now[0] + 100 + len(tokens)))
-            return httpx.Response(200, text=tokens[-1])
+            return httpx.Response(success_status, text=tokens[-1])
         assert req.method == "GET" and req.headers["authorization"] == "Bearer " + tokens[-1]
         reads.append(req.url.path)
         return httpx.Response(401 if len(reads) == 4 else 200, json=[])
@@ -75,6 +78,9 @@ def test_token_exchange_reuse_expiry_and_401(make_client: Callable[..., GarminCl
     ("code", "content", "expected"),
     [
         (401, PRIVATE, "token_exchange_failed"),
+        (403, PRIVATE, "token_exchange_failed"),
+        (503, PRIVATE, "token_exchange_failed"),
+        (204, "", "invalid_token_response"),
         (429, PRIVATE, "rate_limited"),
         (200, jwt(90), "invalid_token_response"),
         (200, '{"access_token":"private"}', "invalid_token_response"),
@@ -88,6 +94,8 @@ def test_exchange_errors(
     client = make_client(lambda _: httpx.Response(code, text=content))
     report = Probe(client).run(RECENT, OLDER)
     assert report["requests"] == 1
+    if code != 200:
+        assert report["token_http_status"] == code
     assert report["current"]["types"]["status"] == expected
     assert PRIVATE not in json.dumps(report) and KEY not in json.dumps(report)
 

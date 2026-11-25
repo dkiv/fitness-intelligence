@@ -70,7 +70,12 @@ availability. The command suppresses HTTP logging and needs no database configur
 | `myfitnesspal_markers` / `undocumented_source_fields` | Exact allowlisted marker counts only. Inspect the logged-event marker separately from food catalog source. The weight DTO does not promise a source label. An unmatched alias leaves attribution open. |
 
 For `keychain_unavailable`, check the item name, account, unlocked login keychain and permission
-prompt. For `token_exchange_failed` or `unauthorized`, review key status in Garmin Connect.
+prompt. If the token exchange fails, inspect the sanitized `token_http_status`:
+401 indicates authentication was rejected; check the key's active status in Garmin Connect
+and the password stored in the Keychain item. A 403 indicates access was refused; confirm the
+account is enabled for the global Personal API server. For 5xx, wait and retry later.
+A 2xx with `invalid_token_response` means the reply did not provide a usable token.
+For other statuses, the integer and the `stopped` category are sufficient for troubleshooting.
 For `rate_limited`, stop and wait for Garmin access to resume. A 403, 404, 5xx,
 unrecognized shape or size cap leaves that check unresolved. Avoid repeated probing to
 determine a limit.

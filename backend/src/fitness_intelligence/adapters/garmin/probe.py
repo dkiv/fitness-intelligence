@@ -6,7 +6,7 @@ from collections.abc import Iterator
 from datetime import date, timedelta
 from typing import Any
 
-from .client import Endpoint, GarminClient, GarminError
+from .client import Endpoint, GarminClient, GarminError, TokenExchangeError
 
 # Paths cross arrays of objects (e.g. meals and their foods) without retaining their contents.
 # The leaf type keeps a provider error object or string from passing as a measurement.
@@ -403,6 +403,8 @@ class Probe:
                 self.sample(out, Endpoint.WEIGHT, day=day)
         except GarminError as exc:
             report["stopped"] = str(exc)
+            if isinstance(exc, TokenExchangeError):
+                report["token_http_status"] = exc.http_status
             self.partial = True
         report["requests"] = self.client.requests
         report["status"] = "partial" if self.partial else "complete"

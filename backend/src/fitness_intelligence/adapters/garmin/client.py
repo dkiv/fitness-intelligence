@@ -35,6 +35,12 @@ class GarminError(Exception):
     """Only fixed diagnostic categories may cross the adapter boundary."""
 
 
+class TokenExchangeError(GarminError):
+    def __init__(self, category: str, http_status: int) -> None:
+        super().__init__(category)
+        self.http_status = http_status
+
+
 @dataclass
 class Reply:
     status: int
@@ -93,7 +99,8 @@ class GarminClient:
             with self._http.stream(
                 "POST" if exchange else "GET", path, params=params, headers=headers
             ) as response:
-                if response.status_code != 200:
+                success = response.is_success if exchange else response.status_code == 200
+                if not success:
                     return Reply(response.status_code, b"")
                 if response.headers.get("Content-Encoding", "identity").lower() != "identity":
                     raise GarminError("unsupported_encoding")
@@ -114,7 +121,7 @@ class GarminClient:
                     if len(data) + len(chunk) > limit:
                         raise GarminError("response_too_large")
                     data.extend(chunk)
-                return Reply(200, bytes(data))
+                return Reply(response.status_code, bytes(data))
         except httpx.HTTPError:
             raise GarminError("transport_error") from None
 
@@ -125,10 +132,9 @@ class GarminClient:
             if str(exc) in {"response_too_large", "unsupported_encoding"}:
                 raise GarminError("invalid_token_response") from None
             raise
-        if reply.status != 200:
-            if reply.status == 429:
-                raise GarminError("rate_limited")
-            raise GarminError("token_exchange_failed")
+        if not 200 <= reply.status < 300:
+            category = "rate_limited" if reply.status == 429 else "token_exchange_failed"
+            raise TokenExchangeError(category, reply.status)
         try:
             token = reply.body.decode("ascii").strip()
             if not re.fullmatch(r"[\w-]+\.[\w-]+\.[\w-]+", token, flags=re.ASCII):
@@ -138,7 +144,7 @@ class GarminClient:
             if type(exp) is not int or exp <= self._clock():
                 raise ValueError
         except (UnicodeError, ValueError, TypeError, KeyError, RecursionError):
-            raise GarminError("invalid_token_response") from None
+            raise TokenExchangeError("invalid_token_response", reply.status) from None
         self._token, self._expires = token, exp
 
     def read(
