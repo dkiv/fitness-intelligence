@@ -6,6 +6,7 @@ import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from typing import Any
 
@@ -33,6 +34,17 @@ class Endpoint(StrEnum):
 
 class GarminError(Exception):
     """Only fixed diagnostic categories may cross the adapter boundary."""
+
+
+def unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    row = dict(pairs)
+    if len(row) != len(pairs):
+        raise ValueError("duplicate key")
+    return row
+
+
+def invalid_constant(_: str) -> None:
+    raise ValueError("invalid number")
 
 
 class TokenExchangeError(GarminError):
@@ -182,9 +194,14 @@ class GarminClient:
         if archive:
             return None
         try:
-            result = json.loads(reply.body)
+            result = json.loads(
+                reply.body.decode("utf-8"),
+                parse_float=Decimal,
+                parse_constant=invalid_constant,
+                object_pairs_hook=unique_object,
+            )
             if not isinstance(result, (list, dict)):
                 raise ValueError
             return result
-        except (UnicodeError, ValueError, RecursionError):
+        except (UnicodeError, ValueError, InvalidOperation, RecursionError):
             raise GarminError("invalid_json") from None

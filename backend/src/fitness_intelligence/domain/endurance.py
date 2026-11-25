@@ -65,6 +65,7 @@ class Activity:
     splits: tuple[SplitSummary, ...] | None
     steps: tuple[PerformedStep, ...] | None
     measurement_sources: tuple[tuple[str, str], ...]
+    start_resolution_us: int = 1_000_000
 
     def running_pace(self) -> tuple[PaceState, Decimal | None]:
         """Seconds/km from reported average m/s, rounded half-even to milliseconds."""
@@ -103,3 +104,4 @@ class DailyObservation:
     method: str
     window_start: datetime | None
     window_end: datetime | None
+    source_field: str | None = None

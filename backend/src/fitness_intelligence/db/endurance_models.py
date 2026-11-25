@@ -171,3 +171,7 @@ class DailyRecoveryObservation(OwnedRecord, Base):
     method: Mapped[str]
     window_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     window_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Legacy B2/manual rows have unknown retrieval and mapping provenance.
+    retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    mapping_version: Mapped[str | None]
+    source_field: Mapped[str | None]

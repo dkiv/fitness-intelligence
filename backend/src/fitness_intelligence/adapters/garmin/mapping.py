@@ -32,7 +32,7 @@ def integer(value: object, *, minimum: int = 0, bits: int = 32) -> int:
     return value
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, repr=False)
 class GarminBinding:
     """Internal expected identity; construct from a previously verified active account."""
 
@@ -122,7 +122,7 @@ DETAIL_STAMP = DAY + "T" + CLOCK + r"\.\d{1,6}"
 GMT_STAMP = DAY + "T" + CLOCK + r"(?:\.\d{1,6})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)?"
 
 
-def start_times(summary: Row, detail: Row) -> tuple[datetime, date]:
+def start_times(summary: Row, detail: Row) -> tuple[datetime, date, int]:
     """Compare at the precision shared by the two representations (seconds or finer)."""
     candidates: list[tuple[int, datetime]] = []
     detail_time = detail.get("startTimeGMT")
@@ -145,7 +145,7 @@ def start_times(summary: Row, detail: Row) -> tuple[datetime, date]:
         candidates.append((1000000, stamp(coarse, LIST_STAMP).replace(tzinfo=UTC)))
     if not candidates:
         raise MappingError("missing UTC start")
-    _, precise = min(candidates)
+    precision, precise = min(candidates)
     for resolution, other in candidates:
         if precise.replace(microsecond=precise.microsecond // resolution * resolution) != other:
             raise MappingError("inconsistent activity start")
@@ -162,7 +162,7 @@ def start_times(summary: Row, detail: Row) -> tuple[datetime, date]:
         days=1
     ):
         raise MappingError("missing or incompatible local start")
-    return precise, local.date()
+    return precise, local.date(), precision
 
 
 def splits(value: object) -> tuple[SplitSummary, ...] | None:
@@ -186,7 +186,7 @@ def splits(value: object) -> tuple[SplitSummary, ...] | None:
     return tuple(result)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, repr=False)
 class WorkoutResponse:
     """Carry the account and activity from the GET request; this array has no echoed ID."""
 
@@ -317,7 +317,7 @@ def map_activity(
             kind = detail_kind or kind
         if detail.get("splitSummaries") is not None:
             split_data = detail["splitSummaries"]
-    when, local_date = start_times(summary, detail_summary)
+    when, local_date, precision = start_times(summary, detail_summary)
     sport = {
         "squash": "squash",
         "running": "running",
@@ -365,6 +365,7 @@ def map_activity(
         splits=splits(split_data),
         steps=None if workouts is None else performed_steps(workouts),
         measurement_sources=tuple(origins),
+        start_resolution_us=precision,
         **measurements,
     )
 
@@ -428,10 +429,13 @@ def map_day(
             measured = quantity(integer(value) if integral else value)
             assert measured is not None
             observations.append(
-                DailyObservation(binding.source, day, metric, measured, unit, method, *interval)
+                DailyObservation(
+                    binding.source, day, metric, measured, unit, method, *interval, f"{dto}.{key}"
+                )
             )
 
     if daily is not None:
+        dto = "UserDailySummaryDto"
         daily = obj(daily)
         binding.check(daily, "userProfileId")
         check_day(daily)
@@ -444,6 +448,7 @@ def map_day(
         ):
             add(daily, key, metric, "kcal", "wearable_estimate", interval, integral=False)
     if sleep is not None:
+        dto = "DailySleepDTO"
         sleep = obj(sleep)
         binding.check(sleep, "userProfilePK")
         check_day(sleep)
@@ -457,6 +462,7 @@ def map_day(
         ):
             add(sleep, key, metric, "s", "reported", interval)
     if hrv is not None:
+        dto = "HrvChartDTO.hrvSummary"
         hrv = obj(hrv)
         binding.check(hrv, "userProfilePk")
         if hrv.get("hrvSummary") is not None:

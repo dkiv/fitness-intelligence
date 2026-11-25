@@ -4,13 +4,13 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
-from hashlib import sha256
 from uuid import UUID
 
-from sqlalchemy import Engine, or_, select, text
+from sqlalchemy import Engine, or_, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import ColumnElement
 
+from fitness_intelligence.adapters.local_account import LocalAccountError, locked_account
 from fitness_intelligence.db.models import (
     AccountSyncState,
     ExerciseSet,
@@ -69,35 +69,11 @@ class Importer:
 
     @contextmanager
     def _locked(self) -> Iterator[Session]:
-        # Dedicated connection: session advisory lock survives per-snapshot commits.
-        # A crashed process releases it when PostgreSQL closes the connection.
-        key = int.from_bytes(
-            sha256(str(self.binding.source_account_id).encode()).digest()[:8], "big", signed=True
-        )
-        with self.engine.connect() as connection:
-            if connection.dialect.name != "postgresql":
-                raise HevyError("PostgreSQL required")
-            try:
-                locked = connection.scalar(text("SELECT pg_try_advisory_lock(:key)"), {"key": key})
-                connection.commit()
-            except BaseException:
-                # Acquisition may have succeeded before a commit/connection failure.
-                connection.invalidate()
-                raise
-            if not locked:
-                raise HevyError("account synchronization already running")
-            try:
-                with Session(connection, expire_on_commit=False) as session:
-                    yield session
-            finally:
-                try:
-                    connection.rollback()
-                    connection.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": key})
-                    connection.commit()
-                except BaseException:
-                    # Rollback/pool reset cannot release session advisory locks.
-                    connection.invalidate()
-                    raise
+        try:
+            with locked_account(self.engine, self.binding.source_account_id) as session:
+                yield session
+        except LocalAccountError as exc:
+            raise HevyError(str(exc)) from None
 
     def _reference(self, session: Session, identity: str) -> ExternalReference | None:
         return session.scalar(

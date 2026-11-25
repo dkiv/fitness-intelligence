@@ -51,7 +51,9 @@ B1 delivers a [local verification command](garmin-verification.md) and a
 [documented Personal API contract and B2/B3 proposal](garmin-integration-design.md).
 The operator verified the two-window probe and default macOS Keychain lookup.
 [B2](endurance-recovery.md) adds canonical endurance and recovery storage and pure Garmin
-mapping. B3 ingestion awaits independent account binding.
+mapping. [B3.1](garmin-importer.md) adds private enrollment and bounded activity and recovery
+ingestion, tested with synthetic data. Personal enrollment requires independent owner and
+profile evidence. B3.2 covers nutrition and body weight. B3.3 covers historical and incremental sync.
 
 Validate Garmin eligibility, permissions and terms separately for personal use and commercial
 deployment. Record which activities, running metrics, sleep, HRV and resting heart rate each
