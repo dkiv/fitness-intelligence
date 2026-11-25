@@ -104,7 +104,9 @@ The report explicitly identifies the evidence gap. Neither the one-set increment
 24-hour start-to-start rule has scientific validation here.
 
 Approval repeats retrieval using the pinned release, verifies the exact stored selection and
-checks every referenced claim revision against the current catalog's eligibility policy.
+checks the exact saved programming methods and their supporting claims against the current
+eligible catalog. Method support is recorded with its programming option. Empirical matches
+and related evidence retain their own retrieval and eligibility checks.
 Historical previews render the frozen selection and annotate later ineligibility.
 `commands.citing(claim_revision)` returns affected revisions for the bound owner.
 The local process uses a single packaged release policy. To switch releases, finish outstanding

@@ -330,7 +330,7 @@ class PlanCommands:
         return tuple(
             key
             for key, raw in rows
-            if raw and claim_revision in Rationale.model_validate_json(json.dumps(raw)).claim_keys
+            if raw and Rationale.model_validate_json(json.dumps(raw)).cites_claim(claim_revision)
         )
 
     def submit(
@@ -479,8 +479,10 @@ class PlanCommands:
                 if not why.verify_selection():
                     raise StalePlan("pinned scientific selection cannot be reproduced")
                 refs = tuple(EvidenceRef(why.selection.release_id, key) for key in why.claim_keys)
-                if refs != candidate.evidence or why.eligibility():
-                    raise StalePlan("scientific reference is ineligible or differs from retrieval")
+                if refs != candidate.evidence:
+                    raise StalePlan("scientific reference differs from retrieval")
+                if alerts := why.eligibility():
+                    raise StalePlan("Ineligible rationale reference · " + " / ".join(alerts))
                 as_of = why.outcomes.as_of if why.outcomes else self._now()
                 outcomes = self._outcomes(plan_id, candidate.request, base, as_of)
                 if outcomes != why.outcomes:

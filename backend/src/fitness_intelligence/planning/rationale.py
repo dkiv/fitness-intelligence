@@ -46,17 +46,31 @@ class Rationale(Frozen):
 
     @property
     def claim_keys(self) -> tuple[str, ...]:
+        """Primary and related empirical revisions in the pinned retrieval result."""
         keys = set()
         for match in self.selection.matches:
             keys.add(match.evidence.claim.key)
             keys.update(r.evidence.claim.key for r in match.related)
         return tuple(sorted(keys))
 
+    def cites_claim(self, key: str) -> bool:
+        return key in self.claim_keys or any(key in m.claims for m in self.programming_options)
+
     def eligibility(self) -> tuple[str, ...]:
         current = current_catalog()
-        return tuple(
+        alerts = [
             f"{key} {reason}" for key in self.claim_keys if (reason := current.ineligibility(key))
-        )
+        ]
+        eligible_methods = current.methods(self.selection.query.question)
+        for method in self.programming_options:
+            if method not in eligible_methods:
+                alerts.append(f"Programming method {method.key} is no longer eligible.")
+            for key in method.claims:
+                if reason := current.ineligibility(key):
+                    alerts.append(
+                        f"Programming method {method.key} supporting claim {key} {reason}"
+                    )
+        return tuple(alerts)
 
     def verify_selection(self) -> bool:
         return self.retrieve(self.outcomes, load_release(self.selection.release_id)) == self

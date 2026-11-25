@@ -432,7 +432,7 @@ def test_c2_c3_selection_approval_and_withdrawal(
     receipt = cycle.cmd.decide(cycle.plan, pending, **intent)
     outstanding = cycle.cmd.submit(cycle.plan, pending, Generate(2))
     monkeypatch.setattr(rationale, "CURRENT_RELEASE", current.release.release_id)
-    with pytest.raises(StalePlan, match="scientific reference"):
+    with pytest.raises(StalePlan, match="effect-a@1 withdrawn"):
         cycle.cmd.decide(
             cycle.plan, outstanding, expected_head=pending, choice="approve", command_id=uuid4()
         )
@@ -443,6 +443,67 @@ def test_c2_c3_selection_approval_and_withdrawal(
     assert cycle.cmd.decide(cycle.plan, pending, **intent) == receipt
     fresh = cycle.cmd.submit(cycle.plan, pending, Generate(2))
     assert cycle.cmd.preview(cycle.plan, fresh).rationale.claim_keys == ("effect-b@1",)
+
+
+@pytest.mark.parametrize("change", ["retained", "removed", "replaced", "support-withdrawn"])
+def test_programming_method_eligibility_across_releases(
+    cycle: Cycle, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    data = json.loads(FIXTURE.read_bytes())
+    data["release_id"] = "fixture-method-support"
+    method = data["methods"][0]
+    method["claims"] = ["effect-b@1"]
+    # B supports the method but neither matches the query nor qualifies as related evidence.
+    data["claims"][1]["scope"]["outcome"] = "other-fixture-outcome"
+    data["relations"] = []
+    old = load_modified(data)
+
+    data["release_id"] = f"fixture-method-{change}"
+    if change == "replaced":
+        method["key"] = "preferred-increase@2"
+    elif change in ("removed", "support-withdrawn"):
+        data["methods"] = []
+    if change == "support-withdrawn":
+        data["withdrawals"] = [
+            dict(claim="effect-b@1", reason="Fixture correction", withdrawn_on="2000-01-11")
+        ]
+    current = load_modified(data)
+    registry = {c.release.release_id: c for c in (old, current)}
+    monkeypatch.setattr(rationale, "load_release", registry.__getitem__)
+    monkeypatch.setattr(rationale, "DOSE_QUERY", old.release.claims[0].scope)
+    monkeypatch.setattr(rationale, "CURRENT_RELEASE", old.release.release_id)
+    approved = cycle.propose()
+    view = cycle.cmd.preview(cycle.plan, approved)
+    frozen = view.rationale
+    assert frozen.programming_options[0].claims == ("effect-b@1",)
+    assert frozen.claim_keys == ("effect-a@1",)
+    assert tuple(ref.claim_id for ref in view.candidate.evidence) == frozen.claim_keys
+    intent = dict(expected_head=cycle.first, choice="approve", command_id=uuid4())
+    receipt = cycle.cmd.decide(cycle.plan, approved, **intent)
+    pending = cycle.cmd.submit(cycle.plan, approved, Generate(2))
+    decision = dict(expected_head=approved, choice="approve", command_id=uuid4())
+
+    monkeypatch.setattr(rationale, "CURRENT_RELEASE", current.release.release_id)
+    if change == "retained":
+        assert cycle.cmd.preview(cycle.plan, pending).evidence_alerts == ()
+        cycle.cmd.decide(cycle.plan, pending, **decision)
+        return
+
+    with pytest.raises(StalePlan, match="preferred-increase@1"):
+        cycle.cmd.decide(cycle.plan, pending, **decision)
+    assert cycle.cmd.preview(cycle.plan, pending).decision is None
+    assert cycle.cmd.current(cycle.plan).revision_id == approved
+    history = cycle.cmd.preview(cycle.plan, approved)
+    assert history.rationale == frozen and history.rationale.verify_selection()
+    report = render_review(history)
+    assert "Programming option · preferred-increase@1" in report
+    assert "Current evidence alert · Programming method preferred-increase@1" in report
+    if change == "support-withdrawn":
+        assert any(
+            "effect-b@1 withdrawn: Fixture correction" in msg for msg in history.evidence_alerts
+        )
+    assert cycle.cmd.decide(cycle.plan, approved, **intent) == receipt
+    assert {approved, pending} <= set(cycle.cmd.citing("effect-b@1"))
 
 
 def test_proposal_failure_rolls_back_observation_and_revision(db: Session, cycle: Cycle) -> None:
