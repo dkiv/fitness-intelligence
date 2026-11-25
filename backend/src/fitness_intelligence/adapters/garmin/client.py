@@ -4,7 +4,8 @@ import base64
 import json
 import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from enum import StrEnum
@@ -74,6 +75,7 @@ class GarminClient:
         self._expires = 0
         self._clock = clock
         self._deadline = time.monotonic() + 180
+        self._fixed_token = False
         self.requests = 0
         self._http = httpx.Client(
             base_url="https://personal.connectapi.garmin.com",
@@ -159,6 +161,17 @@ class GarminClient:
             raise TokenExchangeError("invalid_token_response", reply.status) from None
         self._token, self._expires = token, exp
 
+    @contextmanager
+    def verified_session(self) -> Iterator[None]:
+        """Use a single bearer for the pin checks and subsequent account-scoped feeds."""
+        if self._expires <= self._clock() + 5:
+            self._exchange()
+        self._fixed_token = True
+        try:
+            yield
+        finally:
+            self._fixed_token = False
+
     def read(
         self,
         endpoint: Endpoint,
@@ -176,9 +189,11 @@ class GarminClient:
         path = endpoint.value.format(day=day, activity_id=activity_id)
         archive = endpoint is Endpoint.ORIGINAL
         if self._expires <= self._clock() + 5:
+            if self._fixed_token:
+                raise GarminError("verified session expired")
             self._exchange()
         reply = self._request(path, archive=archive, params=params)
-        if reply.status == 401:
+        if reply.status == 401 and not self._fixed_token:
             self._exchange()
             reply = self._request(path, archive=archive, params=params)
         if reply.status != 200:

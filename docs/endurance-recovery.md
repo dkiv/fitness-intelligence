@@ -151,18 +151,12 @@ D1 can project normalized rows by authenticated owner and preserve units, covera
 measurement method. The strength reader excludes endurance-only sessions from strength
 frequency while retaining workouts that actually contain strength exercises.
 
-## Deferred intake and body weight
+## Intake and body weight
 
-Future intake records need provider-local date, kcal, carbohydrate/protein/fat grams and
-coverage per quantity (unknown, partial or complete). Preserve observed zero, source logging
-flags and the distinction between daily totals and underlying meals. A future body-weight
-measurement needs kg, source value/unit, UTC measurement instant, local date and timing
-precision. A daily date alone cannot establish an exact weigh-in instant.
-
-Both categories need owner, supplying account, provider, stable upstream record ID or file
-provenance where available, and separately evidenced original writer/device. Preserve
-unknown origin. Health Connect, Garmin and historical files can carry copies of one event.
-Prefer a documented original ID or reviewed source precedence at the relevant grain. Where
-identity remains uncertain, keep source observations distinct and select one analytical input
-per event or day. Similar weights or calorie totals alone cannot establish identity.
-MyFitnessPal and RENPHO attribution and historical coverage remain unresolved.
+B3.2 adds owner-scoped daily reported kcal by source field and individual weight observations
+with source value and unit, canonical kg, provider-local date, timing precision and retrieval
+provenance. The day selector exposes missing intake, explicit zero, completeness and conflicts.
+Weight identity is limited to eligible source evidence. Similar values alone cannot establish
+a shared event. Original writer, scale and historical coverage remain unverified. Meal records
+and macronutrients are optional future extensions.
+[Verified field behavior, units and reconciliation](garmin-importer.md#intake-and-body-weight)

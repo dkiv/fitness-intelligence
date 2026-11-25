@@ -1,6 +1,7 @@
 """Bounded local operations. Stage all remote reads before the write transaction."""
 
 from collections import Counter
+from contextlib import nullcontext
 from datetime import UTC, date, datetime
 from enum import StrEnum
 
@@ -21,6 +22,7 @@ from .binding import (
 )
 from .client import Endpoint, GarminClient, GarminError
 from .mapping import DETAIL_STAMP, WorkoutResponse, map_activity, map_day, obj, stamp
+from .nutrition import WeightUnit, map_weights, read_intake, save_intake, save_weight
 from .persistence import Snapshot, save_activity, save_observation
 from .projection import activity_inputs
 
@@ -30,6 +32,12 @@ class Mode(StrEnum):
     ENROLL = "enroll"
     ACTIVITIES = "activities"
     RECOVERY = "recovery"
+    INTAKE = "intake"
+    WEIGHT = "weight"
+
+    @property
+    def takes_day(self) -> bool:
+        return self in (Mode.ACTIVITIES, Mode.RECOVERY, Mode.INTAKE, Mode.WEIGHT)
 
 
 class Importer:
@@ -73,14 +81,23 @@ class Importer:
         return result
 
     def run(
-        self, mode: Mode, *, day: date | None = None, steps: bool = False
+        self,
+        mode: Mode,
+        *,
+        day: date | None = None,
+        steps: bool = False,
+        weight_unit: WeightUnit | None = None,
     ) -> dict[str, int | str]:
         mode = Mode(mode)
         evidence = self.evidence
         source = evidence.source
-        writing_data = mode in (Mode.ACTIVITIES, Mode.RECOVERY)
+        writing_data = mode.takes_day
         if writing_data != (day is not None) or (steps and mode != Mode.ACTIVITIES):
             raise GarminError("invalid operation")
+        if (mode == Mode.WEIGHT) != (weight_unit is not None) or (
+            weight_unit is not None and not isinstance(weight_unit, WeightUnit)
+        ):
+            raise GarminError("weight operation requires a verified source unit")
         if mode == Mode.RECOVERY and not evidence.feeds:
             raise GarminError("no verified recovery feeds selected")
         if (
@@ -106,10 +123,28 @@ class Importer:
         with locked_account(self.engine, source.source_account_id) as session:
             with session.begin():
                 expected = evidence.resolve(session, allow_new=mode == Mode.ENROLL)
-            sample = verify(self.client, evidence, expected)
+            scoped_feeds = mode in (Mode.INTAKE, Mode.WEIGHT)
+            counts: Counter[str] = Counter()
+            intake = []
+            weights = []
+            with self.client.verified_session() if scoped_feeds else nullcontext():
+                sample = verify(self.client, evidence, expected)
+                if mode == Mode.INTAKE and day is not None:
+                    intake = read_intake(self.client, sample, day, evidence.day)
+                if mode == Mode.WEIGHT and day is not None and weight_unit is not None:
+                    try:
+                        payload = self.client.read(Endpoint.WEIGHT, day=day.isoformat())
+                    except GarminError as exc:
+                        if str(exc) not in ("no_content", "not_found"):
+                            raise
+                        counts["feeds_without_content"] += 1
+                    else:
+                        weights, unresolved = map_weights(day, payload, weight_unit)
+                        if unresolved:
+                            counts["unresolved"] += unresolved
+
             activities = []
             observations = ()
-            counts: Counter[str] = Counter()
             if mode == Mode.ACTIVITIES and day is not None:
                 activities = self.activities(day, sample, steps)
             if mode == Mode.RECOVERY and day is not None:
@@ -120,7 +155,7 @@ class Importer:
                         try:
                             feeds[feed] = feed_for(self.client, sample.binding, day, feed)
                         except GarminError as exc:
-                            # Garmin documents 204 for HRV. The anchor already verified this feed.
+                            # Garmin documents 204 for the verified HRV feed.
                             if feed != Feed.HRV or str(exc) != "no_content":
                                 raise
                             counts["feeds_without_content"] += 1
@@ -141,7 +176,15 @@ class Importer:
                     counts[save_activity(session, snapshot, retrieved)] += 1
                 for obs in observations:
                     counts[save_observation(session, obs, retrieved)] += 1
-            return {"observed": len(activities) + len(observations), **counts}
+                if day is not None:
+                    for total in intake:
+                        counts[save_intake(session, sample.binding, day, total, retrieved)] += 1
+                    for entry in weights:
+                        counts[save_weight(session, sample.binding, day, entry, retrieved)] += 1
+            return {
+                "observed": sum(v for k, v in counts.items() if k != "feeds_without_content"),
+                **counts,
+            }
 
     def comparisons(self) -> dict[str, int | str]:
         return dict.fromkeys(

@@ -1,10 +1,10 @@
-# B3.1 · Bounded local Garmin ingestion
+# B3 · Bounded local Garmin ingestion
 
 B3.1 verifies the account behind the macOS Keychain credential, enrolls an active source
 account, and imports one activity search page or one provider-local recovery day. Each command
 runs in a trusted, single-owner terminal and exits. Automated validation uses invented
 responses and disposable PostgreSQL. Live B1 availability checks and B3.1 enrollment
-establish different facts. A personal B3.1 rehearsal still requires operator review.
+establish different facts. The controlled B3.1 rehearsal verified the enrolled account, bounded activity and recovery writes, and identical replay. B3.2 adds a separate [intake and weight workflow](#intake-and-body-weight).
 
 ## Evidence required for enrollment
 
@@ -112,7 +112,7 @@ unknown owner, inactive account or mismatch stops the operation. Verify-only per
 zero database writes, including before first enrollment. Enrollment repeats verification
 and commits only source-account metadata. Disconnection requires a separate local decision.
 
-Both import commands repeat the anchor checks using the current credential. A rotated key
+All import commands repeat the anchor checks using the current credential. A rotated key
 uses the original binding file. For witnessed enrollment, issue the replacement in the
 intended signed-in session and repeat verify-only. Replacing the key still requires the
 original approved profile, anchor and selected feeds to match. If that anchor is deleted,
@@ -186,7 +186,101 @@ source values, IDs or dates.
 
 For erasure, disconnect and revoke the source, then follow the existing owner-scoped local
 procedure. Include performed steps and splits before endurance parents, references and
-workouts, and recovery rows before source accounts. Erasing a source account cascades to
+workouts. Erase daily recovery, intake and body-weight rows for the specified owner and source account before deleting that account. Erasing a source account cascades to
 its enrollment evidence. Include the private binding, temporary
 exports, backup expiry and reapplication of erasure after restore. Stop after the approved
-page and day. Nutrition, body weight and historical synchronization are later milestones.
+page and day.
+
+## Intake and body weight
+
+B3.2 imports an exact provider-local day per invocation. The active account, original anchor
+and selected recovery feeds must still verify. The Personal API key grants access to the
+individual's own Connect data. The daily summary echoes the pinned profile. Food logs and
+weight entries rely on the authenticated account scope and their own returned local dates.
+Neither DTO documents a profile field. The importer keeps the same bearer from the anchor
+checks through these target reads. Expiration or a 401 stops the operation so the next attempt
+starts with verification. Account locking, the 40-request/three-minute budget, 2 MB JSON
+limit, staging and commit-time active-account revalidation apply to both operations.
+[Garmin Personal API FAQ](https://developer.garmin.com/gc-developer-program/personal/personal-faq) ·
+[Official OpenAPI operations and DTOs](https://developer.garmin.com/gc-developer-program/personal/swagger-docs)
+
+### Bounded provider evidence
+
+| Source | Evidence from the approved samples | Interpretation |
+| --- | --- | --- |
+| Daily summary | One known food-logging day returned a positive decimal `consumedKilocalories`, a true `includesCalorieConsumedData`, and the expected profile and date. | Reported kcal. Garmin defines the flag as presence of intake data. Meal coverage and upstream writer remain unknown. |
+| Food logs | The same day returned an integer `dailyNutritionContent.calories`. Its `mealDate` and total agreed with the daily summary. No profile echo or positive MyFitnessPal event marker was observed. | This field also reports kcal. Agreement on one day does not establish equivalent sources across history. Meal and catalog metadata cannot establish the sole writer of a daily aggregate. |
+| Weight/all | One known weigh-in day returned one entry with a decimal `weight`, an integer 13-digit `timestampGMT` and the matching `calendarDate`. No stable record ID, profile echo or original scale/writer was identified. | The published DTO labels weight in kg and GMT time in epoch ms. A private comparison against the displayed weigh-in confirmed that **grams** reproduced the sampled weight. The wire value has no unit tag. |
+
+The diagnostic used one single-day request per target feed. The unit cross-check reused the
+approved weight day. Older history, multiple entries on a real day, empty/zero response conventions
+and provider edit behavior remain unverified beyond these samples. Historical summary v2
+was unnecessary for the approved scope. Local synthetic tests cover the corresponding
+reconciliation cases. Garmin's published terms describe individual personal access and require
+acceptance at key creation. The signed-in agreement governs use of that key. Its detailed
+retention and onward-transfer clauses have not been independently verified. Keep personal
+payloads in the local process. External AI processing and multi-user use require separate
+review. [Personal API setup](https://developer.garmin.com/gc-developer-program/personal/personal-api/) ·
+[Garmin Terms of Use](https://www.garmin.com/en-US/legal/terms-of-use/)
+
+### Canonical observations
+
+- **Daily intake.** The owner, provider, source account, local day and source field identify
+  each reported total. A positively supplied amount updates that field in serialized retrieval
+  order. Garmin supplies no comparable revision. Each row records kcal, UTC retrieval,
+  mapping version, available source presence flag and completeness. Missing feeds, omitted or
+  null amounts and empty food logs leave earlier evidence in place. With the same amount an
+  omitted flag can retain earlier supporting evidence. A correction takes its own available
+  flag. A false flag with a positive summary total is contradictory and stops the transaction.
+- **Zero and completeness.** A zero with a true summary presence flag, or a zero food total
+  with a logged food event, is an explicit zero. The importer skips an unsupported zero.
+  A day with no qualifying observation is missing. Partial-day logging requires affirmative
+  evidence of partial coverage. Both sampled DTOs leave completeness unknown. The canonical
+  model can distinguish partial and athlete-confirmed completeness. The existing planner
+  feedback does not attest to complete-intent food logging.
+- **Analytical selection.** `select_daily_intake` reads only one owner's requested day across
+  sources, returns the supporting observation IDs, and emits at most one reported value.
+  Equal totals count once. Disagreement preserves the individual rows and yields a conflict
+  with no selected value. This includes a corrected total that disagrees with an earlier
+  retained sparse source. Partial coverage remains labeled. Future analysis must expose
+  completeness alongside intake.
+- **Weigh-ins.** Each source entry with an eligible identity retains its canonical kg, original
+  numeric value, operator-verified interpretation (`g` or `kg`), documented provider unit
+  (`kg`), field, mapping version, UTC retrieval and local date. The UTC instant uses integer
+  epoch milliseconds with 1,000 µs resolution. The weight command requires an explicit
+  source unit checked against Connect or the originating app for the requested data. Verify
+  that the interpretation applies to the entries in the response. If units are mixed or
+  unresolved, defer the import. The local-calendar `date` number is never used as UTC.
+- **Weight identity.** Garmin's DTO has no established stable ID or original device. An exact,
+  unique GMT instant within the account provides a limited replay key. Distinct instants
+  remain distinct even if weight is identical. Same-instant entries within a response
+  (including identical entries), dated-only values and changed mass, unit or day at a
+  previously seen instant yield unresolved counts. Existing records survive. Moving an
+  upstream instant can appear as a new observation. No source deletion or timestamp
+  correction can be inferred. The canonical table also permits a source with an established
+  upstream ID to represent a measurement with unknown time.
+- **Privacy and retention.** The two tables contain typed measurements and provenance. Meal
+  details, food names, images, macros, body composition, device guesses, credentials and
+  raw DTOs are excluded. Upstream writer stays unknown for these Garmin fields. The local
+  retention policy and encrypted backup, expiry and restore/erasure procedures apply to
+  both tables. Scope deletion by trusted owner, provider and source account. Revision
+  `b320` adds the two tables and rejects a downgrade while either contains observations.
+
+### Operator rehearsal after review and merge
+
+1. Confirm the existing private backup and owner, apply the reviewed migration, and run
+   verify-only with the existing binding. Keep its approved anchor and selected feeds intact.
+2. Use one previously approved food-logging day and one weigh-in day with a confirmed wire
+   unit. Run from `backend/` with private local shell variables. For weights the verified
+   unit refers to the API number, independently of the user's display preference.
+
+   ```sh
+   uv run --frozen python -m fitness_intelligence.adapters.garmin.cli --binding "$binding" intake --day "$food_day"
+   uv run --frozen python -m fitness_intelligence.adapters.garmin.cli --binding "$binding" weight --day "$weight_day" --weight-unit "$wire_unit"
+   ```
+
+3. Repeat both commands with identical options. Compare stable row IDs, one analytical
+   intake value or a labeled conflict, exact mass conversion, local dates, unknown writers,
+   absence of duplicates/orphans, and the existing Hevy and Garmin fingerprints. Publish
+   only counts and outcomes. B3.3 needs separately reviewed historical coverage, correction,
+   ambiguous weight identity and incremental reconciliation policies.

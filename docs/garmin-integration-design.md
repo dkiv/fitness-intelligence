@@ -130,6 +130,12 @@ on one activity provides no guarantee that an ordered listing captures every edi
 
 ## B2, B3 and the Health Connect decision
 
+The sequence below records the original B1 proposal. The active roadmap now uses Garmin for
+the nutrition MVP and treats Health Connect as optional. The B3.2 weigh-in comparison found a
+unit discrepancy with the published schema. Use the sampled behavior and explicit unit
+workflow when interpreting the earlier inventory.
+[B3.2 operator runbook](garmin-importer.md#intake-and-body-weight) · [Active roadmap](roadmap.md)
+
 1. **B2 · Activity mapping and binding.** First establish a trusted owner-to-source-account
    binding. The settings DTO offers a display name and preferences. Activity and wellness DTOs
    expose candidate IDs in different contexts. Verify a durable identity independently and
