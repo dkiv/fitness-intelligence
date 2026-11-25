@@ -2,7 +2,9 @@
 
 ## Proposed integrated sequence
 
-[Packet 003, section 7](003-concurrent-strength-running.md#7-research-backlog) established the integrated research order. [Packet 004, section 7](004-integrated-nutrition-fueling.md#7-research-backlog) carried running development forward. Packet 005 passed its joint block questions to Packet 006. The next research packet covers individual energy expenditure estimation and nutritional adaptation. J3 can curate the staged evidence in parallel with Packets 007–010. [Packet 005 handoff](005-running-development-measurement.md#7-research-backlog) · [Packet 006 continuing roadmap](006-integrated-hybrid-periodization.md#73-continuing-roadmap) P0 questions support early joint planning, P1 extends adaptation and evaluation, and P2 addresses later complexity. Priorities describe research dependencies. Each packet still needs independent scientific review.
+[Packet 003, section 7](003-concurrent-strength-running.md#7-research-backlog) established the integrated research order. [Packet 004, section 7](004-integrated-nutrition-fueling.md#7-research-backlog) carried running development forward. Packet 005 passed its joint block questions to Packet 006. The execution order is **001–006 → 008 → 007 → 009 → 010**. Packet 008 brings recovery and autoregulation forward to inform the initial adaptive hybrid methodology. J3 can begin after Packet 008 and proceed alongside the remaining research. [Packet 005 handoff](005-running-development-measurement.md#7-research-backlog) · [Packet 006 continuing roadmap](006-integrated-hybrid-periodization.md#73-continuing-roadmap) · [Packet 008 continuing roadmap](008-integrated-recovery-autoregulation.md#73-continuing-roadmap)
+
+P0 questions support early joint planning, P1 extends adaptation and evaluation, and P2 addresses later complexity. Priorities describe research dependencies. Each packet still needs independent scientific review.
 
 | Packet | Priority | Research focus and dependency |
 | --- | --- | --- |
@@ -11,8 +13,8 @@
 | 004 | P0, staged for independent review | Integrated nutrition, energy availability and fueling. Review the clinical boundaries, session fueling (including double sessions), protein evidence, dietary tradeoffs and the eight candidate policies. |
 | 005 | P0, staged for independent review | Running development, progression and measurement validity (EN-01/02). Review actual exposure, comparable performance, adherence and workload alongside lifting. Running-specific fueling and tolerance from Packet 004 remain open. |
 | **006** | **P0, staged for independent review** | **Integrated hybrid periodization, bidirectional maintenance and coordinated tapering.** Review balanced and emphasis blocks, retention in both directions, and coordinated recovery and event assessments. The nine Packet 006 questions refine the earlier HP-01–03 remit. |
+| **008** | **P1, staged for independent review** | Integrated recovery, fatigue management and autoregulation. Appraise each observation against the task, its measurement protocol and the incremental value of acting on it. |
 | **007** | **P1, next** | **Individual energy expenditure estimation and nutritional adaptation.** Evaluate what intake and weight observations can identify, wearable validity, missing data, uncertainty and simple baselines. See the packet-qualified nutrition IDs below. |
-| 008 | P1 | Integrated recovery interpretation and autoregulation (RE-01/02 and EV-01). Assess measurement comparability and whether acting on effort, sleep, heart rate, HRV or nutrition observations improves decisions. Use RT-P02 and Packets 004–007. |
 | 009 | P1 | Individualized adaptation and prospective multi-objective evaluation (EV-02/03). Compare policies within athletes, account for noise and carryover, and test against fixed programs and simple progression. |
 | 010 | P2, conditional | HP/EV extensions for interruptions, complex event conflicts, adherence and changing preferences when evidence or observed failures warrant them. |
 
@@ -88,9 +90,37 @@ Packet 003 used HP-01–03 for joint priorities, bidirectional maintenance and c
 
 The checklist also retains source-by-source checks for publication notices, versions, rights, risk of bias, locators and applicability, as well as all earlier packet obligations. [Independent human review checklist](006-integrated-hybrid-periodization.md#8-human-review-checklist)
 
+### Packet 008 question crosswalk
+
+The earlier RE-01/02 monitoring remit asks whether acting on recovery observations adds value beyond observed performance. The eleven P008 questions divide that inquiry by construct, decision and comparison. The nine new JSON question IDs serve catalog retrieval. The existing `recovery-monitoring` vocabulary and its `load-and-wellbeing@1` and `nocturnal-heart-rate@1` claims retain their history. [Packet-qualified questions and priorities](008-integrated-recovery-autoregulation.md#71-identifier-reconciliation-and-remaining-scientific-questions)
+
+| Question | Earlier work and remaining review |
+| --- | --- |
+| P008/RE-01 · Task readiness | P006/HP-06/09. Define task-specific fatigue and distinguish athlete restrictions from retrospective classifications or clinical diagnoses. |
+| P008/RE-02 · Subjective feedback | Recovery monitoring and RT-02 burden. Examine scale anchors and responsiveness, then evaluate what asking adds beyond actual exposure and comparable performance. |
+| P008/RE-03 · Effort measurement | RT-03 and RT-P01/02. Signed mean RIR bias can hide large individual errors in opposite directions. Compare reported effort with repetitions actually remaining under a defined failure protocol. |
+| P008/RE-04 · Strength autoregulation | RT-03, P002/RT-02 and P006 flexible scheduling. Separate RPE-based load selection from changes to weekly sets. Inspect realized exposure and conditional adjustments in nominally fixed-loading comparators. |
+| P008/RE-05 · Autonomic measures | Earlier nocturnal HR and P005 measurement questions. Compare protocols, units and within-person responsiveness. Autonomic modulation alone cannot establish whole-body readiness. |
+| P008/RE-06 · Adaptive endurance | P005/EN-01. Verify the Nuuttila intervention, comparator and both endpoints. Assess the entire bundle, the incremental contribution of each marker and transfer to hybrid athletes separately. |
+| P008/RE-07 · Sleep | P004 fueling and P006 scheduling feasibility. Separate acute sleep-loss effects from efficacy of sleep-guided prescription. Device agreement with a reference leaves longitudinal responsiveness unresolved. |
+| P008/RE-08 · Performance and tolerance | P005 comparable performance, P006/HP-09 and EV-01. Verify actual exposure, task conditions, effort and repeatability before interpreting change. |
+| P008/RE-09 · Cross-discipline burden | P003 sequence/dose, LP-03 and P006/HP-06/07. Distinguish local task-specific fatigue from generalized burden and acute impairment from chronic adaptation. Evaluate local and coordinated changes separately. |
+| P008/RE-10 · Modeling | P006 review and EV-01. Retrospective fit can coexist with poorly identified parameters. Carry temporal validation against simple baselines to Packet 009. |
+| P008/RE-11 · Incremental decision value | EV-02/03, LP-03 and P006/HP-06/09. Separate prospective prediction from benefit when a coach acts. Packet 009 compares fixed programming (A), completion and performance (B), targeted feedback (C), sleep duration and resting HR (D), HRV (E) and richer measurements (F), including burden and false alarms. |
+
+### Nuuttila source revision required before approval
+
+Packet 008 reports full-text appraisal of Nuuttila et al. (2022), including Table 3 and the intervention details. The new `adaptive-running-max-treadmill-speed@1` and Packet 005’s `adaptive-running-ten-km-performance@1` both cite `nuuttila-adaptive-running@1`, which records abstract access. The treadmill and 10-km results are separate endpoints in the same trial. [Packet 005 draft](drafts/005-evidence-additions.json) · [Packet 008 protocol audit](008-integrated-recovery-autoregulation.md#detailed-protocol-audit-f1921-not-a-deployable-rule) · [Packet 008 draft](drafts/008-evidence-additions.json)
+
+1. Independently verify the original publication, rights and exact result locators for Table 3 and the 10-km contrast. Check allocation, dropouts, exclusions and endpoint-specific group sizes. Reconstruct prescribed and realized training in both arms, adherence, HRV measurement and reference windows, subjective measures and the Figure 1 decision branches. Check effect direction and uncertainty for each endpoint.
+2. Prepare a new source revision reflecting verified access and locators. Preserve the existing source, claim revisions and their historical links. Review both claim revisions, shared participants, limits of component attribution and transfer from recreational runners with little other training.
+3. The five methods requiring review are `baseline-relative-running-dose-review@1`, `hierarchical-hybrid-block-construction@1`, `bounded-hybrid-review-transition@1`, `recovery-aware-priority-session-review@1` and `bounded-recovery-review-and-approval@1`. Study-specific adjustment rules, measurement windows and thresholds remain descriptive pending separate parameter review.
+
+The Coleman source revision, publication-date placeholders, earlier source-access checks and population-transfer questions remain open. Packet 008 adds checks on duplicated cohorts and reviews, individual agreement, acute versus longitudinal outcomes, and safety/referral boundaries. [Packet 006 blockers](#packet-006-scientific-review-blockers) · [Source access requiring review](README.md#source-access-requiring-review) · [Packet 008 checklist](008-integrated-recovery-autoregulation.md#8-human-review-checklist)
+
 ## J3 scientific curation
 
-Start with Packet 006 section 7.2. Its thirteen entries give the exact source, claim and method revisions, transfer questions, numerical needs, data requirements and consequence of deferral for each decision. Start with one narrow end-to-end capability drawn from A1–A10. For example, review what would support arranging a familiar lift and run around an athlete’s priority, checking execution and proposing a hold or calendar change. Select only the premises and methods that decision requires. The other claims can remain pending while review proceeds. [Full cross-packet shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count)
+Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). The **16 A, 4 B and 3 C entries** prioritize decisions for review. Several can share a single coaching method, so the count of 23 carries no requirement for 23 implementation modules. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist)
 
 | Priority | Coaching decision | First review action |
 | --- | --- | --- |
@@ -104,9 +134,21 @@ Start with Packet 006 section 7.2. Its thirteen entries give the exact source, c
 | A8 | Offer practical nutrition and fueling guidance | Verify dose denominators, consensus guidance and referral scope. Distinguish inputs for recommending a target from observations of intake and adequacy. |
 | A9 | Observe adherence and evaluate comparable progress | Review test protocols, measurement error, agreement and timing. Determine when the outcome must remain unknown. |
 | A10 | Hold, review or reduce work and protect health | Resolve the Coleman source issue, check the Pancar comparison and review safe fallback and referral decisions. |
+| A11 | Adjust load or repetitions within bounds | With A2, review anchored RPE, individual agreement, conditional comparator progression and a missing-effort fallback. |
+| A12 | Hold or reduce working-set burden | With A3, review prior dose and realized work. Appraise acute recovery and chronic volume outcomes separately. |
+| A13 | Reconcile planned and actual exposure, then compare performance | With A5/A9, check completion, task comparability and uncertainty before interpreting change. |
+| A14 | Seek targeted feedback about local or general burden | With A9/A10, establish when a voluntary answer could change the action and how to handle missing feedback or restrictions. |
+| A15 | Coordinate recovery around priority sessions | With A4/A7, compare scheduling, redistribution and local dose changes against the calendar and protected outcomes. |
+| A16 | Hold, reduce or revise when observations conflict | With A1/A10, distinguish safe advice, allowed execution choices, weekly proposals and explicit block revision. Review current restrictions at approval. |
 | B1 | Coordinate an event-specific taper and assessment | Verify controlled endurance trials, overlapping reviews and lift-specific evidence before reviewing event parameters. |
 | B2 | Add strength work for a running benefit | Verify study-level comparators and habitual lifting, and separate economy from race performance. |
+| B3 | Consider adaptive endurance scheduling | With A5/A15, appraise the Nuuttila bundle and compare it with simpler performance-aware scheduling. |
+| B4 | Interpret sleep and resting HR as context | Verify duration, protocol and comparability. Review when the observation could justify clarification. |
 | C1 | Refine adaptive recovery, expenditure, durability and response estimates | Defer to Packets 007–009 for signal validity, coverage and prospective incremental benefit. |
+| C2 | Consider quantitative HRV guidance | Verify units, protocol, reference window, reliability and incremental decision benefit. |
+| C3 | Consider velocity prescriptions, composite readiness or fitness–fatigue estimation | Review measurement validity, parameter identifiability and prospective value before considering these extensions. |
+
+Consolidate overlapping candidate methods into a narrow policy set. For example, one review of completed work and comparable performance (A9/A13) can inform a bounded lift change (A2/A11), a calendar proposal (A4/A15) or a reduction (A3/A10/A12/A16). Each proposal needs its own authority check against the approved block. J3 can start with one such decision while other claims await review.
 
 For each decision, **source verification** establishes access, version, locator and study identity. **Claim appraisal** evaluates the measured contrast, uncertainty and limitations. **Population transfer** requires a rationale for applying that result to the intended athlete. **Candidate method review** assesses the action, alternatives and revision authority. **Numerical parameter review** examines provenance, units, bounds and validation. **Data readiness** identifies which observations support prescription, adherence and outcome evaluation. **Operational authorization** is a separate decision for a specific reviewed release and planner rule. Staging grants none of these approvals. [Parameter appraisal](006-integrated-hybrid-periodization.md#45-quantitative-parameter-appraisal) · [Review and release procedure](../scientific-evidence-catalog.md#review-and-release-procedure)
 
