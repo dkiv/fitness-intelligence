@@ -146,7 +146,7 @@ class BlockRevisionRequired:
 
 
 type Result = WeekPlan | Conflicts
-type Fact = str | int | Decimal | date | time | None
+type Fact = bool | str | int | Decimal | date | time | None
 
 
 def finding(rule: str, *slots: Slot, **facts: Fact) -> Finding:

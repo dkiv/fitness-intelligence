@@ -3,8 +3,8 @@
 **Proposed design for workstreams E and F, with J supplying evidence.** The first deliverable is a
 seven-day prescription an athlete can enter manually, review and revise within a multiweek block.
 Strength history and athlete feedback are sufficient inputs. PR #6 established this product
-direction. M3A supplies internal strength reports. E1 implements the pure planner for cycle A weeks 1 and 2. Approval and endurance
-ingestion remain future work. See the [vision](product-vision.md) and [roadmap](roadmap.md).
+direction. M3A supplies internal strength reports. E1 implements the pure planner for cycle A weeks 1 and 2.
+E2 persists and approves these prescriptions through trusted internal commands. See the [vision](product-vision.md) and [roadmap](roadmap.md).
 
 ## What the athlete reviews
 
@@ -241,7 +241,106 @@ All progression bounds belong to this synthetic fixture. The standard generator 
 the conditional Thursday set. An explicit week 2 Thursday dose is checked against the same
 evidence, the predecessor and the entire approved rep/load range. Structured rationale
 pins the synthetic rule version and reports the observations and bounds used. Weeks 3–8
-carry intents only. Approvals, ingestion and evidence-backed programming remain later work.
+carry intents only. E2 adds the internal review workflow below.
+
+## E2 persistence and owner review
+
+Migration `e201` follows `b702_hevy_pending`. It adds four PostgreSQL tables.
+
+| Table | Stored contract |
+| --- | --- |
+| `athlete_contexts` | An owner's monotonically numbered, immutable context revisions. Each contains the IANA zone, availability, dated exceptions, equipment, exclusions and optional normalized week review. |
+| `training_plans` | A cycle ID, one immutable E1 block snapshot and a nullable approved head. The cycle ID and block version identify its eight-week objective, ranked goals, intents and progression limits. |
+| `plan_revisions` | An insert seals a complete candidate. It pins the cycle, expected approved predecessor, context revision, request, E1 input and output, rule version, findings and optional release/claim identifiers. Week 2 embeds the exact approved first week. |
+| `plan_decisions` | One terminal decision per revision, including the command ID, choice, optional reason and database timestamp. The owner and command ID identify the receipt across all of that owner's cycles. |
+
+Seven local dates, explicit rest days and ordered run/strength prescriptions fit in a small
+versioned JSONB document. Embedding them makes sealing a single insert. It also repeats a
+bounded amount of data and makes session-level SQL queries less convenient. The v1 reader
+validates the E1 types and compares the canonical encoding to the stored document. Decimal
+quantities use bounded decimal strings, heterogeneous finding values carry type tags as
+needed, and unordered equipment/exclusion sets have stable order. External load is in kg,
+prescribed durations and rest are in seconds, and window budgets are in minutes. Historical
+reads decode the stored workouts and rationale without invoking the planner. Preserve the v1
+reader when changing the wire format or E1 types.
+
+### Internal entry points
+
+Use a locally controlled process with `FITNESS_PLANNING_OWNER_ID` bound by its operator to an
+existing owner. This binding is a trust assumption for an in-process tool. Keep control of the
+environment and database credentials with that operator. A future multi-user service needs an
+authenticated principal and its own authorization boundary.
+
+The example uses a migrated disposable database, an existing synthetic owner and a future
+Monday supplied as `block_start`. `engine` is its SQLAlchemy engine. Each transaction ends
+before the athlete reviews or answers.
+
+```python
+from uuid import uuid4
+
+from sqlalchemy.orm import Session
+
+from fitness_intelligence.db.plan_commands import PlanCommands
+from fitness_intelligence.db.plan_snapshot import Generate, Move, PlanningContext
+from fitness_intelligence.planning.press_block import Availability, PressBlock
+
+with Session(engine) as db, db.begin():
+    plans = PlanCommands(db)
+    context_id = plans.capture_context(PlanningContext(Availability()), expected_context=None)
+    cycle = plans.create_cycle(PressBlock(start=block_start))
+    candidate = plans.submit(cycle, None, Generate(1))
+
+with Session(engine) as db, db.begin():
+    review = PlanCommands(db).preview(cycle, candidate)
+    # Inspect review.candidate.week.days, .inputs, .explanation and review.changes.
+
+command_id = uuid4()  # Retain this ID and the complete intent across a retry.
+with Session(engine) as db, db.begin():
+    receipt = PlanCommands(db).decide(
+        cycle, candidate, expected_head=review.base_id, choice="approve", command_id=command_id
+    )
+```
+
+To add week 2, capture any updated feedback with `expected_context=context_id`, then call
+`submit(cycle, candidate, Generate(2))`. A missing review follows E1's hold rule. To revise
+the latest detailed week, submit a `Move(slot, local_date, local_time)` or generate that week
+again. The service loads the predecessor from the approved head. Compare by week and logical
+slot in `preview().changes` to see the before/after date, start and prescription. The preview
+also exposes the pinned and current context IDs and the current restrictions. Use
+`current(cycle)` for the active calendar or `preview(cycle, revision_id)` for history. The
+latter includes the base revision and terminal receipt where present.
+
+### Decision and storage invariants
+
+- The command locks the owner, then the cycle. Context capture uses the same owner lock.
+  Preview and current reads hold the owner lock for a consistent view. Keep transactions short.
+- Both decisions require the submitted base and current head to equal the caller's expectation,
+  including a null initial head. Approval requires the exact current context revision. It reruns
+  the request through E1 and compares the whole stored candidate before inserting the receipt.
+  It checks the athlete's current local date again. A change to a session whose day has started
+  requires keeping that prescription. E2 also conservatively blocks a changed constraint in a
+  retained, unelapsed first week and fixes the zone for the approved cycle.
+- PostgreSQL composite keys bind the revision, base, context, decision and head to the correct
+  ancestors. Every table has a non-null user FK. Row triggers reject updates and deletes of
+  sealed snapshots and receipts, check that a new candidate names the current approved base,
+  and protect block identity and forward head transitions. Statement triggers reject truncation.
+  Only an approving receipt in the
+  same cycle can be a head. Its insert trigger checks the base and current context under lock,
+  then advances the head in the same SQL statement. A decline creates only its receipt.
+- `StalePlan` requires a fresh review. `InfeasiblePlan.conflicts` carries E1's named constraint
+  failures. `InvalidSnapshot` rejects damaged or incompatible payloads. An identical decision
+  retry returns the original receipt even after the head moves. Reusing the command ID with
+  another cycle, candidate, base, choice or reason raises `DecisionConflict`. A second command
+  for a finalized candidate also conflicts. Missing or out-of-scope IDs use the same lookup error.
+
+E2 covers one fixed block per independent cycle and changes to its latest detailed week.
+Selection among active cycles, multi-block manifests, execution/outcome matching, catalog
+lookups and evidence withdrawal, and per-owner export/erasure remain deferred. Restrict direct
+SQL write privileges to trusted processes. E1 replay and payload validation are application
+checks. PostgreSQL enforces lineage, row immutability and atomic approval. A database
+administrator with DDL privileges controls those guards. Downgrade refuses any populated E2
+schema. Preserve such a database and use a separately reviewed migration for its data.
+The migration leaves existing workout tables untouched.
 
 ## Worked cycle B — event and taper
 
