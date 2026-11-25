@@ -15,6 +15,11 @@ must supply an ID. The database now supports fitness records, but no fitness API
 Compose runs PostgreSQL, a one-shot migration service, and the development API. Ports bind to
 localhost. Development data lives in a Docker volume. This configuration is not public hosting.
 
+Internal planning commands bind a local operator-selected owner, seal E1 prescriptions in
+versioned JSONB, and serialize context updates and decisions in PostgreSQL. The E2 migration
+adds the cycle, context, revision and decision tables. See the
+[planning storage contract](training-plan-design.md#e2-persistence-and-owner-review).
+
 ## Canonical strength schema (Milestone 1)
 
 - `workouts`: user, title, notes, start/end instants, local creation/update timestamps and an
@@ -107,7 +112,7 @@ with the rationale. The language model can capture preferences, call structured 
 explain the result. Analytics, progression checks and approval remain independently enforceable.
 See [coaching science and evaluation](coaching-science.md).
 
-The platform will store canonical plan versions, recommendations, approval decisions and links
+The platform will extend canonical plan versions and approval decisions with recommendations and links
 to completed sessions and outcomes. A proposed revision becomes scheduled only with athlete
 approval. Publishing adapters receive a specific approved version and destination, track remote
 identifiers and delivery outcomes, and reconcile ambiguous failures before retrying. Hevy routine

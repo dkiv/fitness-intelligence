@@ -12,6 +12,8 @@
 | M2B.3A · Live verification readiness | Merged. A bounded read-only check matched the bound account and mapped one live workout sample. That observation covers identity and sample shape. |
 | M2B.3B · Controlled contract probe | Merged. The tool and runbook cover synthetic create, edit, reorder and delete operations in a controlled account. The controlled live synthetic lifecycle rehearsal remains unverified. [Rehearsal and limits](hevy-sync-design.md#m2b3b-controlled-lifecycle-rehearsal) |
 | M3A · Strength analytics foundation | Merged through PR #5. The internal, owner-scoped Polars reports cover exercise progression, weekly volume and training consistency. [Metric definitions](strength-analytics.md) [PR #5](https://github.com/dkiv/fitness-intelligence/pull/5) |
+| E1 · Deterministic training planner | Merged through PR #8. Pure generation and move review for the first two weeks of synthetic cycle A. |
+| E2 · Persistence and approval | Internal PostgreSQL commands seal, preview, approve or decline E1 revisions and recover historical prescriptions. [Scope and invariants](training-plan-design.md#e2-persistence-and-owner-review) |
 
 On November 22, 2026, the personal historical Hevy import completed locally with 303 workouts,
 1,618 exercise entries and 4,818 sets. A repeat reconciliation and a read-only integrity audit
@@ -30,7 +32,7 @@ Research Garmin read eligibility (B) and Training API eligibility (G) alongside 
 on-device record availability (C) independently. D incorporates each validated source as it
 arrives. F can then use those additional observations. G adds delivery of approved plans and H
 evaluates their outcomes. Apply ownership and privacy controls throughout, with I as the gate
-for public access. A has a merged internal implementation. B–J describe planned capabilities.
+for public access. A and the E1/E2 slices have internal implementations. The remaining acceptance criteria describe planned capabilities.
 
 ## Workstreams and acceptance criteria
 

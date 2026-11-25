@@ -9,6 +9,8 @@ M3A adds internal [strength progression, weekly volume and activity metrics](doc
 
 E1 adds an offline, deterministic strength and running planner for the first two weeks of
 the [synthetic press block](docs/training-plan-design.md#using-the-e1-domain-planner).
+E2 adds owner-scoped proposal review, approval and historical prescriptions in PostgreSQL.
+See the [internal command example and storage guarantees](docs/training-plan-design.md#e2-persistence-and-owner-review).
 
 J1 provides a versioned scientific evidence catalog and deterministic local retrieval.
 The initial five claims await independent review. [Corpus and retrieval contract](docs/scientific-evidence-catalog.md)
