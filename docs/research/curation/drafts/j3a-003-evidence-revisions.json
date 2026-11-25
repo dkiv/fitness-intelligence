@@ -1,0 +1,90 @@
+{
+  "questions": [],
+  "sources": [
+    {
+      "key": "nuuttila-adaptive-running@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.3)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Nuuttila OP, Nummela A, Korhonen E, Häkkinen K, Kyröläinen H. Individualized Endurance Training Based on Recovery and Training Status in Recreational Runners. Med Sci Sports Exerc. 2022;54(10):1690–1701.",
+      "doi": "10.1249/MSS.0000000000002968",
+      "record_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9473708/",
+      "published_on": "2022-08-17",
+      "design": "Matched-pair randomized parallel endurance-training intervention after preparation",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic record and original article text independently inspected via indexed PMC and publisher passages; journal-layout PDF text consulted. Direct PMC/DOI re-open and figure screenshot failed. Complete Figure 1 graphical branches, supplemental materials, notices and correction/retraction audit remain outstanding.",
+      "rights": "CC BY 4.0 stated in original article; metadata, links and original factual summaries only pending intended-use rights review.",
+      "appraisal": "Forty recruited; seven dropouts and three excluded finishers. Final treadmill sample PD 14, IND 16; final 10-km sample PD 13, IND 16. Comparator baseline-scaled with scheduled volume/interval changes. Adaptive multivariable bundle; minimal concurrent other exercise. Verified key protocol and endpoint text, not complete algorithm or missing-data behavior. Results versus Discussion HIT count discrepancy requires review. No component effect or hybrid transfer established.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "key": "adaptive-running-ten-km-performance@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.3)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-adaptive-programming",
+        "objective": "running-performance",
+        "population": "recreational-runners",
+        "experience": "recreational",
+        "intervention": "multivariable-adaptive-endurance-program",
+        "comparator": "predefined-endurance-program",
+        "outcome": "ten-km-running-time",
+        "horizon": "twelve-weeks-after-preparation",
+        "block_context": "endurance-training"
+      },
+      "assertion": "In the analyzed recreational runners, the multivariable individualized program improved 10-km running time more than the baseline-scaled predefined program from T1 to T3.",
+      "limitations": "Forty recruited; seven dropouts and three excluded finishers, one additional PD endpoint unavailable. Endpoint n=13 PD and 16 IND. Small bundled intervention, possible post-randomization selection and test timing/freshness differences; very little other training. No isolated effect of a marker or adjustment rule.",
+      "quality": "moderate",
+      "assessment": "Original Results and Figure 3 caption verified in article text. Promising direct recreational running comparison with limited precision and hybrid applicability; independent review and complete protocol/notice checks outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "nuuttila-adaptive-running@2",
+          "locator": "Methods Participants and Study protocol; Results Performance and laboratory tests, Fig. 3 and accompanying text, T1 to T3",
+          "result": "IND −6.2 ± 2.8% (n=16), PD −2.9 ± 2.4% (n=13), mean ± SD; between-group ES 1.23 (95% CI 0.42–2.02), p=.002; group-time interaction p=.006.",
+          "restriction": "Six-week volume and six-week interval periods after preparation; analyzed endpoint only, not an intention-to-treat estimate established here. No individual marker attribution, dose rule, or approved hybrid transfer."
+        }
+      ]
+    },
+    {
+      "key": "adaptive-running-max-treadmill-speed@2",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted appraisal, J3A.3)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-adaptive-programming",
+        "objective": "running-performance",
+        "population": "recreational-runners",
+        "experience": "recreational",
+        "intervention": "multivariable-adaptive-endurance-program",
+        "comparator": "predefined-endurance-program",
+        "outcome": "maximal-treadmill-speed",
+        "horizon": "twelve-weeks-after-preparation",
+        "block_context": "endurance-training"
+      },
+      "assertion": "Both programs improved maximal treadmill speed from T1 to T3 in the analyzed recreational runners; the between-group contrast was uncertain.",
+      "limitations": "Same small trial as the 10-km endpoint, not an independent replication. Endpoint n=14 PD and 16 IND; post-randomization losses/exclusions; protocol-specific treadmill outcome and little concurrent other exercise. Interval permits a range of effects; no equivalence test.",
+      "quality": "low",
+      "assessment": "Original Results text and Table 3 context inspected. Between-group estimate is from Results prose rather than within-group Table 3 effect sizes. Independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "nuuttila-adaptive-running@2",
+          "locator": "Methods Participants; Results Performance and laboratory tests, T1 to T3 between-group contrast in prose and Table 3 context",
+          "result": "IND +4.0 ± 1.9% (n=16), PD +3.0 ± 2.4% (n=14), mean ± SD; between-group ES 0.46 (95% CI −0.27–1.18), p=.322.",
+          "restriction": "Maximal speed of incremental treadmill protocol, not race performance or VO2max; no component attribution or approved hybrid transfer."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [],
+  "withdrawals": []
+}

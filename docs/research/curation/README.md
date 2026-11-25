@@ -99,4 +99,51 @@ J3-M02 revision 0.1 preserves B01–B18, the deterministic candidate procedure, 
 5. The planner is fixture-specific. General block representations, arbitrary weeks, movement groups and explicit block transitions need separate engineering work. Reuse the existing persistence and approval infrastructure and preserve replay of the original fixture.
 6. Running time headroom reserves calendar space. Increasing prescribed running dose requires its own reviewed method and authority.
 
-J3C.2 approval and operational release preparation are pending. J3A.3 turns next to running prescription and progression. Scheduled preliminary collection closed with Packet 010. [Curation roadmap](../research-backlog.md#hybrid-block-curation)
+J3C.2 approval and operational release preparation are pending. Scheduled preliminary collection closed with Packet 010. [Curation roadmap](../research-backlog.md#hybrid-block-curation)
+
+## Running prescription and progression
+
+| Archive | SHA-256 of supplied bytes | Git blob |
+| --- | --- | --- |
+| [J3A.3 scientific appraisal](j3a-003-running-appraisal.md) | `7eab0edf10d90b08f3f75ef536ab621c3fa0098f9a2e926da51eda62af6e817a` | `204695d2a9d55538aaf6d7c7ced234be426c8d30` |
+| [J3B.3 proposed J3-M03, revision 0.1](j3b-003-running-methodology.md) | `45382b0df18ff2ea3ca857df42f86542c6f9dd44657765c5fbd275ca5b756915` | `11c37836cec5a639a5990cf4f50fbcb7d95232f2` |
+
+### Running evidence awaiting independent review
+
+J3A.3 records AI-assisted checks of six publications. Independent reviewers still need to verify versions, rights, publication notices, corrections and retractions, endpoint locators and transfer to athletes who also lift. The earlier strength and block appraisals retain their open scientific obligations. [Running appraisals](j3a-003-running-appraisal.md#3-original-source-verification-and-scientific-appraisal) · [Strength reviews](#scientific-decisions-awaiting-independent-review) · [Block reviews](#block-evidence-awaiting-independent-review)
+
+| Source | What the appraisal supports and what remains open |
+| --- | --- |
+| Nuuttila | Of 40 recreational runners recruited, seven dropped out and three additional finishers were excluded. One participant also missed the final 10-km test. The individualized and predefined groups contributed **16 and 13** runners to the 10-km endpoint, **16 and 14** to maximum treadmill speed. The field-test contrast favored the multivariable intervention over a baseline-scaled program. The treadmill contrast was uncertain. Review post-randomization selection, test freshness and transfer given the limited concurrent exercise. The design cannot isolate a component effect or establish a requirement for HRV. |
+| Fokkema | The race-performance associations describe runners who selected their own training. Confounding and selection limit individual causal dose recommendations. |
+| Frandsen | The exposure compared one session’s distance with the runner’s longest session in the preceding 30 days. Distinguish **1,311 overuse injury reports** from the broader total of **1,820 injuries**. The study establishes neither a universal safe cutoff nor a weekly 10% rule. |
+| Oliveira | Review VO₂peak and time-trial contrasts separately, including the trials contributing to each and their achieved exposure. The pooled results leave an individual’s optimal intensity distribution unresolved. |
+| Seiler and Kjerland | Session-purpose percentages count sessions. Heart-rate time percentages count minutes in zones. Keep those denominators, eligible observations and the skiing population explicit when interpreting a running week. |
+| Hurst and Board | Only the abstract was verified. Obtain the full outdoor 5-km protocol and statistical methods. The reported typical error describes repeatability under those conditions and supplies no individual change threshold. |
+
+The [exact Appendix A fragment](drafts/j3a-003-evidence-revisions.json) proposes `nuuttila-adaptive-running@2` with full-text access based on inspected article passages, tables, figure captions and results prose. Figure 1 branch order, missing observations, valid-day denominators, individual adherence and the supplement still need verification. Results report 15.8 individualized high-intensity sessions on average, while Discussion reports 15.6. Resolve that discrepancy against the source. The complete algorithm audit remains open. J3-M03 does not require HRV or replicate the trial algorithm. [Source-access review](../research-backlog.md#nuuttila-source-revision-required-before-approval)
+
+Each revised endpoint keeps its original scope, cites the proposed `@2` source and has an empty transfer list. All three proposed records are pending with null approvals. The abstract-access `@1` source and both original claims retain their links. Six methods cite `adaptive-running-ten-km-performance@1`. Only `recovery-aware-priority-session-review@1` also cites `adaptive-running-max-treadmill-speed@1`. The [dependency crosswalk](j3a-003-running-appraisal.md#42-dependency-crosswalk) identifies all six, and the [combined manifest check](../README.md#checking-the-packet-and-curation-drafts-against-j1) verifies each link. Any future replacement requires explicit revision and method review.
+
+### J3-M03 review bundles
+
+| Bundle | Practical decisions preserved for review |
+| --- | --- |
+| M03a · References, initialization and prescription | Choose a starting exposure for a consistent runner, a hybrid athlete with modest running, a lifter with sparse running history, a return after interruption or incomplete coverage. Check eligibility of effort, pace and HR references separately. The template library includes a distinct Q0 first-quality entry pathway. [Prescription templates and entry criteria](j3b-003-running-methodology.md#3-practical-prescription-methodology--references-initialization-and-templates-m03a) |
+| M03b · Progression and execution-aware adjustment | Use evidence appropriate to the proposed change in duration, frequency, long-run exposure, quality work or intensity. Athlete confirmation can establish completed repetitions, recoveries and effort. A measured pace claim requires attributable measurements for the relevant work. [Execution and change operators](j3b-003-running-methodology.md#4-running-progression-and-execution-review-m03b) |
+| M03c · Concurrent protection and outcome review | Review local lifting demands, protected purposes, calendar feasibility and comparable outcomes. M02 B11 retains its familiar-running-hold default. A positive running change requires a reviewed B11 extension and explicit block authorization. The proposed J-EASY-SMALL joint profile also needs a reviewed, expressly authorized B12 exception. [Joint proposals](j3b-003-running-methodology.md#5-concurrent-scheduling-recovery-and-joint-proposals-m03c) · [Running bounds and outcome review](j3b-003-running-methodology.md#6-m02-running-envelope-and-outcome-review-m03c) |
+
+The archive preserves proposed R01–R20, a deterministic candidate procedure, four worked programs and 30 conformance cases. The review package assigns decisions to scientific, coaching, athlete and engineering reviewers and records the implementation inspection and observation gaps. J3B.3 contributes the candidate method only. [Parameters](j3b-003-running-methodology.md#7-proposed-numerical-parameter-configuration) · [Procedure](j3b-003-running-methodology.md#8-deterministic-candidate-procedure) · [Programs and cases](j3b-003-running-methodology.md#9-detailed-synthetic-worked-programs-and-conformance-cases) · [Review and readiness](j3b-003-running-methodology.md#10-human-review-package-and-implementation-readiness)
+
+### Running integration-review considerations
+
+1. Resolve whether leaving Q0 requires two introductory exposures in total or the first exposure followed by two additional repeats.
+2. Define the permitted changes to running versus walking fraction, their units and their bounds before enabling that progression axis.
+3. Evaluate current restrictions before selecting any familiar-running-hold fallback, including when a reviewed method or approved running envelope is unavailable.
+4. Identify when the athlete is executing an existing approval. A newly generated future week needs approval even if it repeats identical nominal targets.
+5. Design low-burden athlete confirmation across several relevant observations. Preserve the attribution and scope of each confirmation and keep inferred provider records identifiable.
+6. Review cumulative ceilings, joint progression profiles and role-specific exceptions together across M01, M02 and M03. Check each proposal against its local bounds and the approved block.
+7. Preserve between-repetition recovery arithmetic. For three work bouts with recovery only between bouts, the prescription contains two recoveries. The existing `Intervals` type repeats every listed step, including recovery on the final repeat, so the final work bout needs distinct encoding in that example. [Current representation](../../../backend/src/fitness_intelligence/planning/prescriptions.py)
+8. Record intended effort ranges and explicitly approved execution caps separately. Exceeding a target alone does not establish a cap breach.
+
+J3C.3 approval and operational release preparation are pending. The next activity is a consolidated M01/M02/M03 integration review before generalized planner design. [Curation roadmap](../research-backlog.md#running-prescription-curation)
