@@ -20,6 +20,13 @@ versioned JSONB, and serialize context updates and decisions in PostgreSQL. The 
 adds the cycle, context, revision and decision tables. See the
 [planning storage contract](training-plan-design.md#e2-persistence-and-owner-review).
 
+## Endurance and daily recovery
+
+Endurance measurements extend the canonical workout through its existing owner-scoped source
+reference. Split summaries and performed steps belong to that same workout. Daily recovery
+observations use the source-account namespace and provider calendar date. The
+[B2 storage and mapping contract](endurance-recovery.md) describes units, coverage and ownership.
+
 ## Canonical strength schema (Milestone 1)
 
 - `workouts`: user, title, notes, start/end instants, local creation/update timestamps and an

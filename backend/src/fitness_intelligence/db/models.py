@@ -134,6 +134,7 @@ class ExternalReference(OwnedRecord, Base):
     __tablename__ = "external_references"
     __table_args__ = (
         UniqueConstraint("user_id", "provider", "source_account_id", "entity_type", "external_id"),
+        UniqueConstraint("user_id", "workout_id", "id", name="uq_reference_workout_identity"),
         ForeignKeyConstraint(
             ["user_id", "provider", "source_account_id"],
             ["source_accounts.user_id", "source_accounts.provider", "source_accounts.id"],

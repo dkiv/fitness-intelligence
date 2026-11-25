@@ -2,7 +2,9 @@
 
 This command reads a small sample of your own account and prints a JSON capability report
 to your terminal. The operator completed the two-window live probe using the full key
-supplied in memory. The default Keychain lookup returned a shorter value in that run.
+supplied in memory and subsequently verified the default macOS Keychain lookup.
+The [separate account-binding procedure](endurance-recovery.md#bounded-local-identity-verification-before-b3)
+checks the identity required for ingestion.
 The [design and availability matrix](garmin-integration-design.md) describe what Garmin documents.
 
 ## Set up the key on macOS
