@@ -46,6 +46,10 @@ from zero and exclude another owner's records. The MVP is an internal query and 
 
 ### B · Endurance and recovery ingestion
 
+B1 delivers a [local verification command](garmin-verification.md) and a
+[documented Personal API contract and B2/B3 proposal](garmin-integration-design.md).
+Account-specific availability awaits the operator's probe.
+
 Validate Garmin eligibility, permissions and terms separately for personal use and commercial
 deployment. Record which activities, running metrics, sleep, HRV and resting heart rate each
 authorized read path provides. Implementation depends on that access decision. Accept each

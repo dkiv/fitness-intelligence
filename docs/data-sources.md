@@ -1,18 +1,18 @@
 # Data sources
 
-Hevy has a private local read-only importer as of M2B.2; other integrations remain planned.
+Hevy has a private local read-only importer as of M2B.2. Garmin B1 adds a local verification command.
 Hevy's official contract is verified against documentation; live account behavior remains
 unverified. See [local synchronization setup and limitations](hevy-importer.md).
 
 | Source | Intended data | Planned boundary |
 | --- | --- | --- |
 | Hevy | Workouts, exercises, sets, reps, weights | Backend provider adapter |
-| Garmin Personal API | Running, sleep, HRV, resting heart rate | Backend provider adapter; verify access and terms before implementation |
+| Garmin Personal API | Activities, daily wellness, intake and body weight | [Read-only verification and coverage matrix](garmin-integration-design.md) |
 | Android Health Connect | RENPHO-origin body weight; MyFitnessPal-origin calorie intake | Later Kotlin bridge reads permitted on-device records and uploads normalized data |
 | Strava | None | Explicitly out of scope |
 
-Health Connect is the transport for weight and calorie intake, not a direct RENPHO or
-MyFitnessPal backend connection. Availability depends on upstream apps actually writing the
+Health Connect remains the proposed transport for weight and intake where Garmin cannot
+supply the required granularity or upstream provenance. Availability depends on upstream apps actually writing the
 required records, device support, history access and granted permissions; validate these before
 committing to ingestion behavior. Record original source attribution to prevent duplicate imports.
 

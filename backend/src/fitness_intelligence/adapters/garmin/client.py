@@ -1,0 +1,184 @@
+"""Bounded, in-memory transport for Garmin's global Personal API."""
+
+import base64
+import json
+import re
+import time
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from enum import StrEnum
+from typing import Any
+
+import httpx
+
+TOKEN_PATH = "/personalapitoken-service/personal-api/personal-api-key/token"
+MAX_JSON_BYTES = 2_000_000
+
+
+class Endpoint(StrEnum):
+    TYPES = "/activity-service/activity/activityTypes/simple"
+    ZONES = "/biometric-service/heartRateZones/v2"
+    ACTIVITIES = "/activitylist-service/activities/search/activities"
+    DETAIL = "/activity-service/activity/{activity_id}"
+    WORKOUTS = "/activity-service/activity/{activity_id}/workouts"
+    ORIGINAL = "/download-service/files/activity/{activity_id}"
+    DAILY = "/usersummary-service/usersummary/daily"
+    HEART = "/wellness-service/wellness/dailyHeartRate"
+    HRV = "/hrv-service/hrv/{day}"
+    SLEEP = "/sleep-service/sleep/dailySleep"
+    BATTERY = "/wellness-service/wellness/bodyBattery/reports/daily"
+    FOOD = "/nutrition-service/food/logs/{day}"
+    WEIGHT = "/weight-service/weight/all/{day}/{day}"
+
+
+class GarminError(Exception):
+    """Only fixed diagnostic categories may cross the adapter boundary."""
+
+
+@dataclass
+class Reply:
+    status: int
+    body: bytes = field(repr=False)
+
+
+class GarminClient:
+    def __init__(
+        self,
+        key: str,
+        *,
+        transport: httpx.BaseTransport | None = None,
+        clock: Callable[[], float] = time.time,
+    ) -> None:
+        if not re.fullmatch(r"[!-~]{1,8192}", key):
+            raise GarminError("invalid_key")
+        self._key = key
+        self._token = ""
+        self._expires = 0
+        self._clock = clock
+        self._deadline = time.monotonic() + 180
+        self.requests = 0
+        self._http = httpx.Client(
+            base_url="https://personal.connectapi.garmin.com",
+            transport=transport,
+            trust_env=False,
+            follow_redirects=False,
+            timeout=httpx.Timeout(10, connect=5),
+            headers={"Accept-Encoding": "identity"},
+        )
+
+    def close(self) -> None:
+        self._key = self._token = ""
+        self._http.close()
+
+    def _request(
+        self,
+        path: str,
+        *,
+        exchange: bool = False,
+        archive: bool = False,
+        params: dict[str, str | int] | None = None,
+    ) -> Reply:
+        if self.requests >= 40 or time.monotonic() >= self._deadline:
+            raise GarminError("budget_exhausted")
+        self.requests += 1
+        headers = {"Authorization": f"Bearer {self._token}", "Accept": "application/json"}
+        if exchange:
+            headers = {"Authorization": f"ApiKey {self._key}", "Accept": "*/*"}
+        if archive:
+            headers["Accept"] = (
+                "application/zip, application/x-zip-compressed, application/octet-stream"
+            )
+        limit = 16_384 if exchange else MAX_JSON_BYTES
+        try:
+            with self._http.stream(
+                "POST" if exchange else "GET", path, params=params, headers=headers
+            ) as response:
+                if response.status_code != 200:
+                    return Reply(response.status_code, b"")
+                if response.headers.get("Content-Encoding", "identity").lower() != "identity":
+                    raise GarminError("unsupported_encoding")
+                if archive:
+                    media = response.headers.get("Content-Type", "").split(";")[0].strip().lower()
+                    if media not in (
+                        "application/zip",
+                        "application/x-zip-compressed",
+                        "application/octet-stream",
+                    ):
+                        raise GarminError("unexpected_archive_type")
+                    # Never read the ZIP, its filenames, or its contents.
+                    return Reply(200, b"")
+                data = bytearray()
+                for chunk in response.iter_bytes():
+                    if time.monotonic() >= self._deadline:
+                        raise GarminError("budget_exhausted")
+                    if len(data) + len(chunk) > limit:
+                        raise GarminError("response_too_large")
+                    data.extend(chunk)
+                return Reply(200, bytes(data))
+        except httpx.HTTPError:
+            raise GarminError("transport_error") from None
+
+    def _exchange(self) -> None:
+        try:
+            reply = self._request(TOKEN_PATH, exchange=True)
+        except GarminError as exc:
+            if str(exc) in {"response_too_large", "unsupported_encoding"}:
+                raise GarminError("invalid_token_response") from None
+            raise
+        if reply.status != 200:
+            if reply.status == 429:
+                raise GarminError("rate_limited")
+            raise GarminError("token_exchange_failed")
+        try:
+            token = reply.body.decode("ascii").strip()
+            if not re.fullmatch(r"[\w-]+\.[\w-]+\.[\w-]+", token, flags=re.ASCII):
+                raise ValueError
+            payload = token.split(".")[1]
+            exp = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))["exp"]
+            if type(exp) is not int or exp <= self._clock():
+                raise ValueError
+        except (UnicodeError, ValueError, TypeError, KeyError, RecursionError):
+            raise GarminError("invalid_token_response") from None
+        self._token, self._expires = token, exp
+
+    def read(
+        self,
+        endpoint: Endpoint,
+        *,
+        day: str = "",
+        activity_id: int = 0,
+        params: dict[str, str | int] | None = None,
+    ) -> Any:
+        if "{day}" in endpoint.value and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day, re.ASCII):
+            raise GarminError("invalid_date")
+        if "{activity_id}" in endpoint.value and (
+            type(activity_id) is not int or not 0 < activity_id < 2**63
+        ):
+            raise GarminError("invalid_activity_id")
+        path = endpoint.value.format(day=day, activity_id=activity_id)
+        archive = endpoint is Endpoint.ORIGINAL
+        if self._expires <= self._clock() + 5:
+            self._exchange()
+        reply = self._request(path, archive=archive, params=params)
+        if reply.status == 401:
+            self._exchange()
+            reply = self._request(path, archive=archive, params=params)
+        if reply.status != 200:
+            raise GarminError(
+                {
+                    204: "no_content",
+                    401: "unauthorized",
+                    403: "forbidden",
+                    404: "not_found",
+                    429: "rate_limited",
+                }.get(reply.status, "http_error_" + str(reply.status))
+            )
+        if archive:
+            return None
+        try:
+            result = json.loads(reply.body)
+            if not isinstance(result, (list, dict)):
+                raise ValueError
+            return result
+        except (UnicodeError, ValueError, RecursionError):
+            raise GarminError("invalid_json") from None
