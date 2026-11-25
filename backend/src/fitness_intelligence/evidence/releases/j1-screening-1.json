@@ -1,0 +1,320 @@
+{
+  "schema_version": 1,
+  "release_id": "j1-screening-1",
+  "kind": "operational",
+  "assembled_on": "2026-11-24",
+  "approval": null,
+  "questions": [
+    {
+      "id": "strength-dose",
+      "description": "How does a supervised resistance dose affect strength?",
+      "gap": "Weekly progression and fatigue caps for an individual press block remain unreviewed."
+    },
+    {
+      "id": "periodization",
+      "description": "How do volume-equated programming patterns affect strength?",
+      "gap": "The periodization candidate is in screening. No reviewed block comparison."
+    },
+    {
+      "id": "concurrent-strength",
+      "description": "How does adding endurance work affect strength development?",
+      "gap": "Run-specific spacing and individual upper-body or explosive-strength effects need separate review."
+    },
+    {
+      "id": "recovery-monitoring",
+      "description": "Which measures change during a training-load increase?",
+      "gap": "No reviewed deload intervention or single-reading decision threshold."
+    }
+  ],
+  "sources": [
+    {
+      "key": "currier@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Currier BS, Mcleod JC, Banfield L, Beyene J, Welton NJ, D'Souza AC, Keogh JAJ, Lin L, Coletta G, Yang A, Colenso-Semple L, Lau KJ, Verboom A, Phillips SM. Resistance training prescription for muscle strength and hypertrophy in healthy adults: a systematic review and Bayesian network meta-analysis. Br J Sports Med. 2023, 57(18), 1211-1220.",
+      "doi": "10.1136/bjsports-2023-106807",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37414459/",
+      "published_on": "2023-07-06",
+      "design": "Network meta-analysis of randomized trials",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published journal article. PubMed XML publication types and linked notices checked. No indexed retraction or erratum found. PubMed links an accompanying commentary (DOI 10.1136/bjsports-2023-107234).",
+      "rights": "CC BY-NC 4.0. Catalog use limited to metadata, links and original factual summaries.",
+      "appraisal": "Supervised healthy nonathletes over at least six weeks. Most active-dose contrasts had intervals crossing zero. The network does not identify an individual progression step.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "moesgaard@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "screening",
+      "approval": null,
+      "citation": "Moesgaard L, Beck MM, Christiansen L, Aagaard P, Lundbye-Jensen J. Effects of Periodization on Strength and Muscle Hypertrophy in Volume-Equated Resistance Training Programs: A Systematic Review and Meta-analysis. Sports Med. 2022, 52(7), 1647-1666.",
+      "doi": "10.1007/s40279-021-01636-1",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/35044672/",
+      "published_on": "2022-01-19",
+      "design": "Meta-analysis of volume-equated resistance programs",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published journal article. PubMed XML publication types and linked notices checked. No indexed retraction or erratum found. Springer change history records a table-format update on 2022-02-04.",
+      "rights": "Publisher subscription preview. Reuse permission unverified.. Catalog use limited to metadata, links and original factual summaries.",
+      "appraisal": "Abstract, Results, first comparison: the pooled change in 1RM favored periodized over constant programs (ES 0.31, 95% CI 0.04 to 0.57). The trained undulating-versus-linear subgroup interval reached zero at reported precision. Trial durations, allocation bias and updated tables need full-text review. The authors favor undulation in trained lifters. A specific block sequence remains untested here.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "schumann@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Schumann M, Feuerbacher JF, Sünkeler M, Freitag N, Rønnestad BR, Doma K, Lundberg TR. Compatibility of Concurrent Aerobic and Strength Training for Skeletal Muscle Size and Function: An Updated Systematic Review and Meta-Analysis. Sports Med. 2022, 52(3), 601-612.",
+      "doi": "10.1007/s40279-021-01587-7",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/34757594/",
+      "published_on": "2021-11-10",
+      "design": "Random-effects meta-analysis of supervised concurrent training",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published journal article. PubMed XML publication types and linked notices checked. No indexed retraction or erratum found.",
+      "rights": "CC BY 4.0. Catalog use limited to metadata, links and original factual summaries.",
+      "appraisal": "Mixed training histories and endurance modes. Section 3.3 found smaller explosive-strength gains in the combined group. This endpoint differs from maximal strength. Timing subgroups cannot establish an individual's required run-to-lift interval.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "petre@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Petré H, Hemmingsson E, Rosdahl H, Psilander N. Development of Maximal Dynamic Strength During Concurrent Resistance and Endurance Training in Untrained, Moderately Trained, and Trained Individuals: A Systematic Review and Meta-analysis. Sports Med. 2021, 51(5), 991-1010.",
+      "doi": "10.1007/s40279-021-01426-9",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/33751469/",
+      "published_on": "2021-03-22",
+      "design": "Meta-analysis of controlled concurrent-training interventions",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published journal article. PubMed XML publication types and linked notices checked. No indexed retraction or erratum found.",
+      "rights": "CC BY 4.0. Catalog use limited to metadata, links and original factual summaries.",
+      "appraisal": "Athletes or at least three months of structured training qualified as trained. Short small studies and inconsistent endurance workloads limit transfer. The authors discuss spacing sessions. Their subgroup categories leave intermediate intervals untested.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "saw@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Saw AE, Main LC, Gastin PB. Monitoring the athlete training response: subjective self-reported measures trump commonly used objective measures: a systematic review. Br J Sports Med. 2016, 50(5), 281-291.",
+      "doi": "10.1136/bjsports-2015-094758",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/26423706/",
+      "published_on": "2015-09-09",
+      "design": "Systematic review of athlete monitoring studies",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published journal article. PubMed XML publication types and linked notices checked. No indexed retraction or erratum found.",
+      "rights": "CC BY-NC (Europe PMC license record). Catalog use limited to metadata, links and original factual summaries.",
+      "appraisal": "Both subjective and objective observations were required. Study-specific load changes, questionnaires and sports differed. The review weighted studies with its own bias instrument. Regular monitoring is an author recommendation.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "nuuttila@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Nuuttila OP, Uusitalo A, Kokkonen VP, Weerarathna N, Kyröläinen H. Monitoring fatigue state with heart rate-based and subjective methods during intensified training in recreational runners. Eur J Sport Sci. 2024, 24(7), 857-869.",
+      "doi": "10.1002/ejsc.12115",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/38956784/",
+      "published_on": "2024-04-26",
+      "design": "Prospective overload and recovery study with post hoc response groups",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published journal article. PubMed XML publication types and linked notices checked. No indexed retraction or erratum found.",
+      "rights": "CC BY (Europe PMC license record). Catalog use limited to metadata, links and original factual summaries.",
+      "appraisal": "Twenty-four recreational runners finished three baseline, two overload and one recovery week. Eight were classified as overreached and twelve as responders. Four unclassified finishers and eight dropouts limit generalization. Readiness contributed to classification.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "key": "heavy-multiset-strength@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-dose",
+        "objective": "strength-development",
+        "population": "healthy-nonathlete-adults",
+        "experience": "mixed",
+        "intervention": "supervised-heavy-multiset-three-plus-days",
+        "comparator": "no-exercise",
+        "outcome": "strength",
+        "horizon": "at-least-six-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The heavy multiset group training at least three days per week gained more strength than the inactive group in the network estimate.",
+      "limitations": "Load was at least 80% of 1RM. Athletes were excluded. This control contrast cannot choose a starting load or a weekly set increase.",
+      "quality": "moderate",
+      "assessment": "Moderate to high within-study bias and indirect comparisons limit confidence. Few active prescriptions were clearly distinguishable.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "currier@1",
+          "locator": "Results, Figure 3A, HM3 versus CTRL",
+          "result": "Posterior standardized mean difference 1.60 (95% credible interval 1.38 to 1.82).",
+          "restriction": "Network estimate for strength at trial end."
+        }
+      ]
+    },
+    {
+      "key": "pooled-concurrent-strength@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-strength",
+        "objective": "strength-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "supervised-aerobic-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "maximal-strength",
+        "horizon": "at-least-four-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Across the pooled adult samples, the average maximal-strength change under concurrent training was close to that under strength training alone.",
+      "limitations": "The maximal-strength analysis included 37 studies. Endurance mode and training status vary. A trained lower-body subgroup warrants separate consideration.",
+      "quality": "moderate",
+      "assessment": "Mean PEDro score 4.3/10 across included studies. The pooled interval accommodates a small reduction. Equivalence was not tested.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "schumann@1",
+          "locator": "Results §3.2, Figure 2, pooled random-effects estimate",
+          "result": "Standardized mean difference −0.06 (95% CI −0.20 to 0.09).",
+          "restriction": "Maximal strength only. Explosive strength is a separate endpoint."
+        }
+      ]
+    },
+    {
+      "key": "trained-lower-body-strength@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "concurrent-strength",
+        "objective": "strength-development",
+        "population": "healthy-adults-aged-18-40",
+        "experience": "structured-training",
+        "intervention": "running-or-cycling-plus-strength",
+        "comparator": "identical-strength-only",
+        "outcome": "squat-or-leg-press-one-rm",
+        "horizon": "six-to-twenty-one-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "In the trained subgroup, adding endurance training was associated with smaller gains on squat or leg-press 1RM.",
+      "limitations": "Running or cycling at greater than 70% of maximum heart rate at least twice weekly. Transfer to easy running, elite athletes and presses is uncertain.",
+      "quality": "low",
+      "assessment": "Small samples, short studies and nonrandomized comparisons weaken the subgroup inference. Training status was classified across studies.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "petre@1",
+          "locator": "Results §3.4, Figure 2, trained subgroup diamond",
+          "result": "Standardized effect −0.35 (95% CI −0.59 to −0.11) for concurrent versus resistance alone.",
+          "restriction": "Six to 21 weeks is the range for included studies overall."
+        }
+      ]
+    },
+    {
+      "key": "load-and-wellbeing@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "recovery-monitoring",
+        "objective": "monitor-recovery",
+        "population": "athletes",
+        "experience": "mixed",
+        "intervention": "acute-load-increase",
+        "comparator": "prior-load",
+        "outcome": "subjective-wellbeing",
+        "horizon": "acute-load-change",
+        "block_context": "training-monitoring"
+      },
+      "assertion": "Several athlete-reported well-being measures worsened during an acute increase in training load.",
+      "limitations": "Acute periods varied by study. Subjective reports can reflect other stressors. The review did not compare deload decisions.",
+      "quality": "low",
+      "assessment": "Heterogeneous protocols and instruments. Review-specific bias weights and categorical synthesis limit precision.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "saw@1",
+          "locator": "Results, Table 7, acute increase in training load column and accompanying first result sentence",
+          "result": "Review rated evidence for impairment moderate to strong on 13 subjective measures.",
+          "restriction": "Count of measures, not independent trials. No common effect estimate."
+        }
+      ]
+    },
+    {
+      "key": "nocturnal-heart-rate@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "recovery-monitoring",
+        "objective": "monitor-recovery",
+        "population": "recreational-runners",
+        "experience": "recreational",
+        "intervention": "running-overload",
+        "comparator": "response-subgroups",
+        "outcome": "nocturnal-heart-rate",
+        "horizon": "two-week-overload",
+        "block_context": "running-training"
+      },
+      "assertion": "Change in nocturnal heart rate from baseline to the second overload week differed between the overreached and responder groups.",
+      "limitations": "The weekly summary does not establish how to interpret one night's reading or whether changing a session improves recovery.",
+      "quality": "low",
+      "assessment": "Small subgroup comparison with classification based on performance and subjective readiness. No prospective validation of an individual decision threshold.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "nuuttila@1",
+          "locator": "Results §3.3, Figure 3C, baseline to OL2 between-group contrast",
+          "result": "Nocturnal HR rose in the overreached group and fell in responders (between-group change p = 0.002).",
+          "restriction": "Direction describes group means. Neither within-group HR change reached significance."
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "key": "trained-subgroup-boundary@1",
+      "kind": "qualifies",
+      "subject": "trained-lower-body-strength@1",
+      "object": "pooled-concurrent-strength@1",
+      "reason": "The trained squat/leg-press estimate narrows the mixed-population result. Both reviews include Robineau et al. (2016). Their pooled estimates answer different questions and share trials."
+    }
+  ],
+  "methods": [
+    {
+      "key": "keep-block-objective@1",
+      "synthetic": false,
+      "extracted_by": "Codex (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "periodization",
+      "description": "Retain the chosen block objective while reviewing the next week's available sessions.",
+      "provenance": "Original project programming option, docs/training-plan-design.md, worked cycle A.",
+      "tradeoffs": "Assumes the objective is still feasible. A new restriction may require block review.",
+      "claims": []
+    }
+  ],
+  "withdrawals": []
+}
