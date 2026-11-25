@@ -2,7 +2,7 @@
 
 A research packet records what a research session found, what it could check, and which questions remain open. A reviewed J1 scientific claim describes a specific result in a defined population, comparison, outcome and time horizon. A programming policy describes a choice the coach could make. Accepting a claim does not establish when a planner should act on it.
 
-The research order is **001–006 → 008 → 007 → 009 → 010**. Recovery and autoregulation came forward to inform joint strength and running decisions. Packet 009 is staged for independent review. Packet 010 is next and focuses on longer-term planning, interruptions, resumption and adherence in ordinary personal coaching. Further major packets depend on a concrete coaching shortcoming. J3A.1 and J3B.1 are staged for independent review. [Strength progression curation](curation/README.md) · [Integrated roadmap](research-backlog.md#proposed-integrated-sequence) · [Combined J3 priorities](research-backlog.md#j3-scientific-curation)
+**Scheduled preliminary research collection is complete.** The ten packets were staged in the order **001–006 → 008 → 007 → 009 → 010**. Recovery and autoregulation came forward to inform joint strength and running decisions. J3 scientific curation and practical method development continue independently. J3A.1 and J3B.1 await independent review. [Strength progression curation](curation/README.md) · [Integrated roadmap](research-backlog.md#proposed-integrated-sequence) · [Combined J3 priorities](research-backlog.md#j3-scientific-curation)
 
 ## Packet 001
 
@@ -180,6 +180,16 @@ The minimal coaching profile uses existing structured histories and deterministi
 
 Evaluate software correctness with frozen inputs and all 20 synthetic cases (I-A01–I-A20). Inspect recommendation quality against the objective, feasible alternatives, exclusions and approval boundary. During ordinary use, review practicality, burden, comparable outcomes and the athlete’s reasons for accepting or revising a proposal. An optional shadow comparison freezes both proposals before the outcome. Only the executed plan has an observed outcome. The broader causal and incremental-value questions remain open. [Evaluation methodology](009-individual-training-history.md#47-proportionate-evaluation-for-a-single-user-coach) · [Synthetic cases](009-individual-training-history.md#6-synthetic-evaluation-cases) · [Research crosswalk](research-backlog.md#packet-009-question-crosswalk) · [Human review checklist](009-individual-training-history.md#8-human-review-checklist)
 
+## Packet 010
+
+**Long-term planning, interruptions, resumption and adherence** (revision 0.1, 2026-11-25) closes the scheduled collection. The archive preserves the supplied bytes, SHA-256 `79d04ac2f52a997d822b4ae010a0083ae1071d9eaf22084f2d620c7bfc6cf95e`, Git blob `e2038aef445ef146bd39571a8b82697c37c3d850`. Seven evidence entries (L01–L07) and the earlier findings they cite inform eight research questions (P010/LT-01–08) and seven candidate policies (LT-P01–07). The exact section 5 fragment stages three catalog questions, three sources, four claims and three methods. [Archive](010-long-term-planning-and-resumption.md) · [Exact JSON fragment](drafts/010-evidence-additions.json) · [Reused evidence and review obligations](010-long-term-planning-and-resumption.md#24-reused-evidence-and-review-obligations) · [Questions and scientific review](research-backlog.md#packet-010-question-crosswalk)
+
+**Planning commitments.** Confirm long-term objectives with the athlete. Keep future block intentions provisional. The current approved block defines protected outcomes and bounds. Approve detailed upcoming prescriptions close to execution and record what the athlete actually did against the version in force. This leaves distant sessions open. A calendar endpoint prompts review, and a productive block can continue beyond its initial horizon. Changing a protected commitment requires explicit block or context revision. [Planning hierarchy](010-long-term-planning-and-resumption.md#41-rolling-horizon-and-hierarchy) · [Fourteen-step workflow](010-long-term-planning-and-resumption.md#42-integrated-workflow)
+
+**Interruption and re-entry.** A gap in observations leaves execution unknown. Confirmed missed work creates no workload debt. Elapsed time alone cannot establish lost capacity. Review retained exposure by discipline, current comparable performance and tolerance before proposing a return. Current clinical restrictions override earlier success. When the same sessions repeatedly prove infeasible, ask about time, burden and preferences before offering alternatives. The five worked examples illustrate these decisions. Their numbers supply no prescription defaults. [Decision framework](010-long-term-planning-and-resumption.md#43-interruption-decision-framework) · [Worked examples](010-long-term-planning-and-resumption.md#44-five-synthetic-worked-examples)
+
+**History and evaluation.** Prefer existing planning and history records. Persist confirmed context, approvals, prescriptions, actuals and decision rationale. Retain provisional intentions only when a later decision needs them. Derive exposure, comparable references and adherence among known outcomes from dated inputs. The 20 synthetic cases (L01–L20) test authority and replay across interruptions and transitions. Review recommendation quality against feasible alternatives and personal usefulness against burden and observed outcomes in ordinary use. [Engineering implications](010-long-term-planning-and-resumption.md#45-engineering-implications-no-implementation-authorization) · [Personal-use evaluation](010-long-term-planning-and-resumption.md#46-practical-evaluation-for-personal-use) · [Synthetic cases](010-long-term-planning-and-resumption.md#6-synthetic-evaluation-cases)
+
 ## Strength progression curation
 
 J3A.1 records an AI-assisted appraisal of six papers used in strength progression decisions. Its Appendix A stages one Barsuhn source revision and one claim revision. J3B.1 preserves proposed J3-M01 revision 0.1 for movement progression, working-set exposure and concurrent scheduling. Independent scientific and method reviews are outstanding. The curation index records source-specific obligations, exact archive identities and implementation-review questions. [Curation index](curation/README.md) · [Decision priorities and next tranche](research-backlog.md#strength-progression-curation)
@@ -193,7 +203,7 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 ## From packet to reviewed evidence
 
 1. Extract proposed records into a fragment under `drafts/` for packets or `curation/drafts/` for subsequent appraisals. Keep their source locators, access depth, uncertainty and screening dispositions. Validate the fragment in the context of its full target manifest, including existing relations and withdrawals.
-2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist), [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist), [Packet 004](004-integrated-nutrition-fueling.md#8-human-review-checklist), [Packet 005](005-running-development-measurement.md#8-human-review-checklist), [Packet 006](006-integrated-hybrid-periodization.md#8-human-review-checklist), [Packet 008](008-integrated-recovery-autoregulation.md#8-human-review-checklist), [Packet 007](007-individual-energy-expenditure-estimation.md#8-human-review-checklist) and [Packet 009](009-individual-training-history.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
+2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist), [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist), [Packet 004](004-integrated-nutrition-fueling.md#8-human-review-checklist), [Packet 005](005-running-development-measurement.md#8-human-review-checklist), [Packet 006](006-integrated-hybrid-periodization.md#8-human-review-checklist), [Packet 008](008-integrated-recovery-autoregulation.md#8-human-review-checklist), [Packet 007](007-individual-energy-expenditure-estimation.md#8-human-review-checklist), [Packet 009](009-individual-training-history.md#8-human-review-checklist) and [Packet 010](010-long-term-planning-and-resumption.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
 3. Record the designated reviewer's identity, role, date and explicit decision on each accepted revision in version control. A claim requires reviewed supporting sources. Operational eligibility also requires a reviewed release. A separately authorized release receives a new immutable manifest, registry entry and digest under the [J1 release procedure](../scientific-evidence-catalog.md#review-and-release-procedure).
 
 <a id="checking-the-nine-drafts-against-j1"></a>
@@ -212,15 +222,16 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 | Packet 008 additions | 9 | 8 | 14 | 0 | 6 | 0 |
 | Packet 007 additions | 7 | 8 | 9 | 0 | 4 | 0 |
 | Packet 009 additions | 2 | 2 | 2 | 0 | 2 | 0 |
-| J1 and Packets 001–009 | 58 | 81 | 106 | 4 | 32 | 0 |
+| Packet 010 additions | 3 | 3 | 4 | 0 | 3 | 0 |
+| J1 and Packets 001–010 | 61 | 84 | 110 | 4 | 35 | 0 |
 | J3A.1 pending revisions | 0 | 1 | 1 | 0 | 0 | 0 |
-| **In-memory candidate** | **58** | **82** | **107** | **4** | **32** | **0** |
+| **In-memory candidate** | **61** | **85** | **111** | **4** | **35** | **0** |
 
 Counts refer to exact revisions. Through Packet 002, the 18 source revisions cover 15 distinct publication DOIs. The male Enes, female Enes and Pelland papers each appear at `@1` and `@2`. The Enes perceptual follow-up shares the male strength cohort. Both Enes strength claims retain their pending revisions and original source links. The candidate retains the earlier screening dispositions.
 
-Across J1 and all nine packets there are 78 distinct publication DOIs. The three revision pairs above account for all repeated DOIs. Each source in Packets 004–009 adds a distinct DOI. At integration, main at `1c5205d` (PR #23) contained exactly those nine packet fragments, with 74 pending and seven screening source revisions. J3A.1 adds a fourth revision pair at the existing Barsuhn DOI. The combined candidate has 75 pending and seven screening source revisions across the same 78 publication DOIs.
+The baseline at `c56a05e` (PR #25) combined J1, Packets 001–009 and J3A.1. It had 82 source revisions across 78 distinct publication DOIs, with 75 pending and seven screening. J3A.1 added the fourth revision pair at the existing Barsuhn DOI. Packet 010 adds three pending sources at three distinct new DOIs. The combined candidate now has 85 source revisions across 81 DOIs, with 78 pending and seven screening.
 
-All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. Packet 005’s `comparable-running-performance-review@1` cites claims on field repeatability, submaximal HR measurement and wearable VO2 agreement. In Packet 006, `hierarchical-hybrid-block-construction@1` draws on earlier periodization and adaptive running claims alongside the new hockey and HIFT claims. Packet 008’s `recovery-aware-priority-session-review@1` cites both running trial endpoints and acute running and lifting claims across questions. Packet 007’s `energy-logging-adjusted-maintenance-review@1` links the controlled-maintenance and modeled intake-change comparisons to Packet 004’s athlete reporting claim. Packet 009’s `context-eligible-individual-history-review@1` cites both new repeatability claims alongside running, effort and body-mass measurements. Its `contextual-decision-response-history@1` reuses four earlier claims. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
+All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. Packet 005’s `comparable-running-performance-review@1` cites claims on field repeatability, submaximal HR measurement and wearable VO2 agreement. In Packet 006, `hierarchical-hybrid-block-construction@1` draws on earlier periodization and adaptive running claims alongside the new hockey and HIFT claims. Packet 008’s `recovery-aware-priority-session-review@1` cites both running trial endpoints and acute running and lifting claims across questions. Packet 007’s `energy-logging-adjusted-maintenance-review@1` links the controlled-maintenance and modeled intake-change comparisons to Packet 004’s athlete reporting claim. Packet 009’s `context-eligible-individual-history-review@1` cites both new repeatability claims alongside running, effort and body-mass measurements. Its `contextual-decision-response-history@1` reuses four earlier claims. Packet 010’s `rolling-horizon-block-intentions@1` is the fifth method to cite `habitual-set-maintenance-strength@1`. All five retain that original reference while the J3A.1 revision awaits review. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
 
 Run this check from `backend/` in the project Python environment. The registered loader verifies the J1 digest. Strict schema validation checks exact keys, supporting sources, question membership, relation endpoints and method references across the full graph.
 
@@ -237,7 +248,7 @@ from fitness_intelligence.evidence.retrieval import Catalog
 registered = load_release("j1-screening-1")
 assert registered.digest == "ae9a27a9a257f7b48375ad1892206c5f10d07a6e0625ee717974fe9d73b3cf64"
 manifest = registered.release.model_dump(mode="json")
-manifest["release_id"] = "j3a-001-strength-progression-candidate"
+manifest["release_id"] = "packet-010-and-j3a-001-candidate"
 groups = ("questions", "sources", "claims", "relations", "methods", "withdrawals")
 research = Path("../docs/research")
 
@@ -251,20 +262,21 @@ def append_fragment(path):
 
 for path in sorted((research / "drafts").glob("*.json")):
     append_fragment(path)
-assert tuple(len(manifest[group]) for group in groups) == (58, 81, 106, 4, 32, 0)
+assert tuple(len(manifest[group]) for group in groups) == (61, 84, 110, 4, 35, 0)
 
 for path in sorted((research / "curation/drafts").glob("*.json")):
     append_fragment(path)
 
 data = json.dumps(manifest).encode()
 candidate = CorpusRelease.model_validate_json(data, strict=True)
-assert tuple(len(getattr(candidate, group)) for group in groups) == (58, 82, 107, 4, 32, 0)
+assert tuple(len(getattr(candidate, group)) for group in groups) == (61, 85, 111, 4, 35, 0)
 by_doi = defaultdict(set)
 for source in candidate.sources:
     assert source.doi and source.status in {"pending", "screening"}
+    assert source.approval is None
     by_doi[source.doi.casefold()].add(source.key)
-assert Counter(s.status for s in candidate.sources) == {"pending": 75, "screening": 7}
-assert len(by_doi) == 78
+assert Counter(s.status for s in candidate.sources) == {"pending": 78, "screening": 7}
+assert len(by_doi) == 81
 assert {frozenset(keys) for keys in by_doi.values() if len(keys) > 1} == {
     frozenset({f"{name}@1", f"{name}@2"})
     for name in ("enes-males", "enes-females", "pelland", "barsuhn")
@@ -282,6 +294,7 @@ for revision in (1, 2):
 assert {m.key for m in candidate.methods if "habitual-set-maintenance-strength@1" in m.claims} == {
     "working-set-volume-review@1", "bounded-hybrid-review-transition@1",
     "recovery-aware-set-dose-review@1", "contextual-decision-response-history@1",
+    "rolling-horizon-block-intentions@1",
 }
 assert all("habitual-set-maintenance-strength@2" not in m.claims for m in candidate.methods)
 running_source = "nuuttila-adaptive-running@1"
@@ -337,4 +350,4 @@ assert all(not catalog.methods(q.id) for q in candidate.questions)
 
 Review each method separately from the empirical claims it cites. Identify which choices reflect evidence, athlete preferences or engineering safeguards. Define eligible observations, alternatives (including holding the dose), parameters, authority to change a plan and conditions for deferring a decision. A reviewer must justify any proposed numeric threshold or transfer to an experienced hybrid athlete.
 
-Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. The nine packets, the J3 archives and their draft evidence records are research inputs. E1 continues to use its existing synthetic progression rules.
+Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. The ten packets, the J3 archives and their draft evidence records are research inputs. E1 continues to use its existing synthetic progression rules.

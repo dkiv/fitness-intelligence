@@ -1,0 +1,253 @@
+{
+  "questions": [
+    {
+      "id": "strength-interruption-retraining",
+      "description": "How do interrupted and resumed resistance-training exposures relate to measured strength?",
+      "gap": "Direct comparisons of resumption prescriptions in experienced hybrid athletes and repeated-exposure tolerance remain unavailable."
+    },
+    {
+      "id": "exercise-attendance-planning",
+      "description": "How do exercise attendance planning and schedule flexibility interventions affect actual attendance?",
+      "gap": "No direct evidence here on hybrid prescription adherence or performance; transfer and incremental value require review."
+    },
+    {
+      "id": "longitudinal-coaching-continuity",
+      "description": "How should a personal coach preserve and revise long-term intentions, active blocks and prescriptions through changed circumstances?",
+      "gap": "No validated rolling-horizon or catch-up/resumption algorithm in experienced hybrid athletes; contextual parameters require separate review."
+    }
+  ],
+  "sources": [
+    {
+      "key": "halonen-periodic-retraining@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Halonen EJ, Gabriel I, Kelahaara MM, Ahtiainen JP, Hulmi JJ. Does Taking a Break Matter—Adaptations in Muscle Strength and Size Between Continuous and Periodic Resistance Training. Scand J Med Sci Sports. 2024;34:e14739.",
+      "doi": "10.1111/sms.14739",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/39364857/",
+      "published_on": "2024-10-04",
+      "design": "Randomized supervised parallel resistance-training intervention",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publisher article and PubMed bibliographic record examined; targeted correction search, comprehensive notice check outstanding.",
+      "rights": "Open-access publisher article; confirm exact license and intended reuse. Metadata, links and original summaries only.",
+      "appraisal": "Previously untrained adults; 42 of 55 completed. Same active training duration with differently placed nontraining periods. No equivalence analysis or trained hybrid resumption comparison.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "key": "carrera-exercise-planning@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Carrera M, Royer H, Stehr M, Sydnor J, Taubinsky D. The limits of simple implementation intentions: Evidence from a field experiment on making plans to exercise. J Health Econ. 2018;62:95–104.",
+      "doi": "10.1016/j.jhealeco.2018.09.002",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/30336306/",
+      "published_on": "2018-09-20",
+      "design": "Randomized field experiment",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "PMC author manuscript and PubMed metadata examined; publisher abstract cross-check. Version and comprehensive publication-notice check outstanding.",
+      "rights": "Author manuscript in PMC; reuse rights unverified. Metadata, links and original summaries only.",
+      "appraisal": "Survey respondents from a gym; short follow-up and possible survey selection. Attendance outcome, not training quality or long-term adherence.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "key": "beshears-flexible-incentives@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Beshears J, Lee HN, Milkman KL, Mislavsky R, Wisdom J. Creating Exercise Habits Using Incentives: The Tradeoff between Flexibility and Routinization. Manage Sci. 2021;67(7).",
+      "doi": "10.1287/mnsc.2020.3706",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/35001975/",
+      "published_on": "2020-10-15",
+      "design": "Randomized workplace field experiment",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "PMC author manuscript and PubMed metadata examined; version of record and comprehensive publication-notice check outstanding.",
+      "rights": "Author manuscript in PMC; reuse rights unverified. Metadata, links and original summaries only.",
+      "appraisal": "Workplace attendance incentives, differing qualifying windows and payment amounts. Outcome counts visits, not prescribed exercise exposure. Short follow-up contrast uncertain.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "key": "periodic-rt-cessation-leg-press-change@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-interruption-retraining",
+        "objective": "strength-retention",
+        "population": "healthy-adults",
+        "experience": "untrained",
+        "intervention": "ten-week-cessation-after-ten-week-rt",
+        "comparator": "post-initial-training-measurement",
+        "outcome": "leg-press-one-rm",
+        "horizon": "ten-weeks",
+        "block_context": "resistance-training-interruption"
+      },
+      "assertion": "The periodic group had lower measured leg-press 1RM after cessation than immediately before cessation.",
+      "limitations": "Within-arm contrast, no interruption-specific randomized counterfactual for this estimate; untrained population and one movement.",
+      "quality": "moderate",
+      "assessment": "Supervised prior training and explicit repeated tests; attrition and transfer limit applicability.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "halonen-periodic-retraining@1",
+          "locator": "Results §3.3, Fig. 4; Table 3 leg press row",
+          "result": "Mean individual percent change −5.4% ± 4.4% SD; p<.001.",
+          "restriction": "SD describes dispersion, not CI; no individual decay rate or approved transfer."
+        }
+      ]
+    },
+    {
+      "key": "periodic-v-continuous-rt-final-leg-press@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "strength-interruption-retraining",
+        "objective": "strength-development",
+        "population": "healthy-adults",
+        "experience": "untrained",
+        "intervention": "ten-week-rt-ten-week-cessation-ten-week-retraining",
+        "comparator": "ten-week-no-rt-then-twenty-week-rt",
+        "outcome": "leg-press-one-rm",
+        "horizon": "thirty-weeks",
+        "block_context": "resistance-training-interruption"
+      },
+      "assertion": "The study did not detect a difference in leg-press strength gains between periodic and continuous schedules across their active training periods.",
+      "limitations": "No equivalence test; differently timed schedules; untrained sample and completer attrition.",
+      "quality": "moderate",
+      "assessment": "Randomized comparison with supervised training; direct between-group CI not extracted.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "halonen-periodic-retraining@1",
+          "locator": "Results §3.2.2, Table 3 leg press row; Fig. 4",
+          "result": "Periodic +43.8 kg (95% CI 33.8–53.7); continuous +41.9 kg (36.4–47.4); no detected group-by-time difference.",
+          "restriction": "Within-arm CIs; cannot infer equal results for uninterrupted training of the same total calendar duration or experienced hybrid athletes."
+        }
+      ]
+    },
+    {
+      "key": "exercise-planning-prompt-gym-visits@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "exercise-attendance-planning",
+        "objective": "exercise-attendance",
+        "population": "fitness-facility-members",
+        "experience": "mixed",
+        "intervention": "prospective-gym-visit-planning-prompt",
+        "comparator": "retrospective-gym-visit-recall-prompt",
+        "outcome": "gym-visits",
+        "horizon": "two-weeks",
+        "block_context": "exercise-attendance"
+      },
+      "assertion": "The planning-prompt group did not demonstrate higher gym attendance than the recall-prompt group in the respondent sample.",
+      "limitations": "Short horizon, survey participation may select respondents, attendance does not establish training fidelity or outcomes.",
+      "quality": "moderate",
+      "assessment": "Randomized prompt with electronically recorded visits; no transfer approved.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "carrera-exercise-planning@1",
+          "locator": "Table 3 column 1; Regression Estimates",
+          "result": "Planning minus recall −0.30 visits (95% CI −0.71 to 0.11), n=877 respondents.",
+          "restriction": "Specific prompt and population; not a comparison of adaptive training plans."
+        }
+      ]
+    },
+    {
+      "key": "flexible-incentives-gym-visits@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "exercise-attendance-planning",
+        "objective": "exercise-attendance",
+        "population": "workplace-fitness-program-participants",
+        "experience": "mixed",
+        "intervention": "flexible-gym-attendance-incentives",
+        "comparator": "restricted-window-gym-attendance-incentives",
+        "outcome": "weekly-gym-visits",
+        "horizon": "four-weeks",
+        "block_context": "exercise-attendance"
+      },
+      "assertion": "Flexible attendance incentives produced more weekly gym visits during the intervention than restricted-window incentives in the pooled comparison.",
+      "limitations": "Workplace setting, financial rewards, short horizon, gym attendance rather than adherence or performance.",
+      "quality": "moderate",
+      "assessment": "Randomized incentive conditions with objective attendance; clustered SE; post-intervention evidence less precise.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "beshears-flexible-incentives@1",
+          "locator": "Table 2 Panel A, column 7, Flexible minus Routine Wald test",
+          "result": "+0.19 visits/week (clustered SE 0.06), p<.01.",
+          "restriction": "During incentive intervention only; no approved transfer to ordinary hybrid coaching or durable habit."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "key": "rolling-horizon-block-intentions@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "longitudinal-coaching-continuity",
+      "description": "Preserve athlete-confirmed objectives and an approved current block while recording conditional successor intentions; revisit at meaningful review or event changes.",
+      "provenance": "Packet 010 sections 3–4, LT-P01/02/05/07; extends Packet 006 hierarchical block methodology and Packet 009 contextual history review.",
+      "tradeoffs": "No optimal horizon or transition cadence established; explicit approval for active objective or block changes; event conflicts may require revised priorities.",
+      "claims": [
+        "flexible-dup-powerlifting-total@1",
+        "endurance-taper-controlled-time-trial@1",
+        "habitual-set-maintenance-strength@1"
+      ]
+    },
+    {
+      "key": "interruption-aware-resumption-review@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "longitudinal-coaching-continuity",
+      "description": "Distinguish known missed work, retained exposure and uncertain capacity; protect remaining priority sessions, select credible introductory exposures when necessary, and do not automatically repay missed work.",
+      "provenance": "Packet 010 LT-P03/04, section 4.3; extends IA-P03/05, HP-P02/09 and recovery-aware review.",
+      "tradeoffs": "No universal restart fraction; clinical restrictions override historic success; old PRs do not establish current tolerance.",
+      "claims": [
+        "periodic-rt-cessation-leg-press-change@1",
+        "periodic-v-continuous-rt-final-leg-press@1",
+        "short-detraining-vo2max@1",
+        "long-detraining-vo2max@1"
+      ]
+    },
+    {
+      "key": "adherence-aware-feasible-alternatives@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "longitudinal-coaching-continuity",
+      "description": "Review confirmed deviations and observation coverage; ask about time, preferences and burden, then offer compatible feasible alternatives or seek explicit objective revision.",
+      "provenance": "Packet 010 LT-P06/07 and section 4; original practical methodology.",
+      "tradeoffs": "Attendance research is indirect and incentive-specific; avoid motivation labels; changes remain subject to restrictions, secondary commitments and approval.",
+      "claims": [
+        "exercise-planning-prompt-gym-visits@1",
+        "flexible-incentives-gym-visits@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
