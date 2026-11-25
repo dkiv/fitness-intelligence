@@ -77,6 +77,27 @@ L1 (training context), L2 (daily calories and weight), L3 (daily macros) and L4 
 - Check units, populations and conditions for consensus reference ranges. Review uncertainty in wearable expenditure and food logs, including which reference method and device version were used. A study-average error does not calibrate an individual record. Personalized total daily energy expenditure (TDEE) estimation remains a Packet 007 research question.
 - Verify versions of record, corrections, reuse rights and overlapping cohorts, including reused Caldwell performance data and primary studies shared by reviews. The [human review checklist](004-integrated-nutrition-fueling.md#8-human-review-checklist) retains the source-specific extractions and clinical, methodology and evaluation gates.
 
+## Packet 005
+
+**Running development, progression and measurement validity** (revision 0.1, 2026-11-24) is staged for independent review. The archive preserves all 41 evidence entries (E01–E41), including contextual assessments, and the eight packet-local questions. Its SHA-256 is `c9d63d00023a4adac0b69abe5eac65d813b7f57389f26746fcd7d74d9d182eec`. The draft reproduces the narrower selection in section 5.2. [Archived packet](005-running-development-measurement.md) · [Draft evidence additions](drafts/005-evidence-additions.json)
+
+**First full-text review priority.** Nuuttila et al. (2022, E07) compared a multivariable adaptive program with a predefined program in recreational runners. Among 30 completers, the packet reports that 10-km times improved by **6.2% with individualized training and 2.9% with predefined training**, with a between-group standardized effect of **1.23 (95% CI 0.42–2.02)**. The individualized arm used nocturnal heart-rate variability, perceived recovery and a heart-rate/running-speed index to adjust training twice weekly. The comparison evaluates that program as a whole. It leaves the causal contributions of individual observations, thresholds and progression increments unresolved. Verify allocation and attrition, the decision algorithm and monitoring inputs, prescribed and achieved exposure, adherence, taper and test timing, and transfer to athletes who also lift. The exact protocol remains a scientific review item. [E07 and its source locator](005-running-development-measurement.md#21-running-dose-progression-and-adaptive-intervention-en-01)
+
+The ten candidate policies (EN-P01–EN-P10) apply the observation-aware methodology. Each gives separate requirements for prescription, adherence and effectiveness, alongside scientific readiness, data readiness, fallbacks and richer-data needs. For example, a runner’s recent exposure and reported effort can support an effort-based prescription. Checking interval adherence requires evidence of the work actually performed. Evaluating benefit requires a comparable later outcome and consideration of lifting, fueling and other changes. The packet applies these distinctions to strength-emphasis, endurance-emphasis and balanced blocks. Its 31 synthetic cases (EN-T01–EN-T31) exercise decision behavior. Prospective coaching efficacy remains open. [Methodology](methodology.md) · [Candidate policies](005-running-development-measurement.md#3-candidate-coaching-policies) · [Block archetypes](005-running-development-measurement.md#42-three-archetypes-candidate-methods-not-fixed-calendars) · [Evaluation cases](005-running-development-measurement.md#6-synthetic-evaluation-cases)
+
+### Running observations and engineering follow-up
+
+The measurement appraisal describes canonical observations independently of the provider. Section 2.9 dates the mutable capability snapshot to 2026-11-24. Historical coverage, resolution and comparability determine which decisions a given record can support. [Proxy appraisal](005-running-development-measurement.md#28-dedicated-measurement-and-proxy-validity-assessment) · [Capability snapshot](005-running-development-measurement.md#29-mutable-engineering-inventory-context-only-2026-11-24)
+
+| Decision | Observations and limits |
+| --- | --- |
+| Describe habitual exposure or compare runs | With verified coverage, dated activity summaries support distance, duration, frequency and longest-run exposure. Comparing performance also requires sufficiently similar tasks, effort, terrain and conditions. |
+| Assess interval execution or historical intensity | B2 aggregate split rows can represent several splits. Performed-workout steps describe instructions. Assessing execution requires chronological achieved intervals aligned with intended work. Interpreting time in zone requires valid durations and the boundaries in force at the time. |
+| Assess cardiovascular drift, decoupling or sensor artifacts | Drift and decoupling require chronological, paired HR and speed over comparable early and late segments. B2 aggregates do not establish those pairs. Whole-activity averages cannot recover them. Investigating artifacts requires adequate signal resolution and sensor context, such as time-aligned HR and cadence. |
+| Assess field thresholds | Retain the test protocol, dated anchor, achieved efforts, conditions and uncertainty. A changed device estimate alone cannot establish adaptation. |
+
+Chronological segments, historical zone definitions, sensor provenance and field-test records remain unresolved richer-data extensions. FIT decoding is one possible future source, subject to coverage and validity checks. Bounded Garmin ingestion and initial unified analytics can proceed with the observations they already support. [B2 split and step semantics](../endurance-recovery.md#splits-and-performed-steps) · [Open research and engineering questions](005-running-development-measurement.md#7-research-backlog)
+
 ## Numbering and revisions
 
 Assign the next unused three-digit number to each new research question or packet of related questions. Keep its number and filename stable across revisions. Cite the packet number, revision, section and Git commit when reviewing an extraction or proposing a rule. Evidence IDs such as E02 are local to their packet. J1 references use exact revision keys such as `moesgaard@1`.
@@ -86,10 +107,10 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 ## From packet to reviewed evidence
 
 1. Extract proposed records into a fragment under `drafts/` and keep their source locators, access depth, uncertainty and screening dispositions. Validate the fragment in the context of its full target manifest, including existing relations and withdrawals.
-2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist), [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist) and [Packet 004](004-integrated-nutrition-fueling.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
+2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist), [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist), [Packet 004](004-integrated-nutrition-fueling.md#8-human-review-checklist) and [Packet 005](005-running-development-measurement.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
 3. Record the designated reviewer's identity, role, date and explicit decision on each accepted revision in version control. A claim requires reviewed supporting sources. Operational eligibility also requires a reviewed release. A separately authorized release receives a new immutable manifest, registry entry and digest under the [J1 release procedure](../scientific-evidence-catalog.md#review-and-release-procedure).
 
-### Checking the four drafts against J1
+### Checking the five drafts against J1
 
 | Input | Questions | Source revisions | Claim revisions | Relations | Methods | Withdrawals |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -98,13 +119,14 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 | Packet 002 additions | 1 | 5 | 5 | 0 | 1 | 0 |
 | Packet 003 additions | 6 | 6 | 15 | 3 | 3 | 0 |
 | Packet 004 additions | 10 | 12 | 17 | 0 | 4 | 0 |
-| **In-memory candidate** | **21** | **36** | **47** | **4** | **10** | **0** |
+| Packet 005 additions | 10 | 14 | 16 | 0 | 4 | 0 |
+| **In-memory candidate** | **31** | **50** | **63** | **4** | **14** | **0** |
 
 Counts refer to exact revisions. Through Packet 002, the 18 source revisions cover 15 distinct publication DOIs. The male Enes, female Enes and Pelland papers each appear at `@1` and `@2`. The Enes perceptual follow-up shares the male strength cohort. Both Enes strength claims retain their pending revisions and original source links. The candidate retains the earlier screening dispositions.
 
-Across all four packets and J1 there are 33 distinct DOIs. The three revision pairs above account for all repeated DOIs. Each Packet 004 source introduces a distinct DOI to this candidate.
+Across J1 and all five packets there are 47 distinct DOIs. The three revision pairs above account for all repeated DOIs. Each Packet 004 and Packet 005 source adds a distinct DOI.
 
-All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
+All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. Packet 005’s `comparable-running-performance-review@1` cites claims on field repeatability, submaximal HR measurement and wearable VO2 agreement. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
 
 Run this check from `backend/` in the project Python environment. The registered loader verifies the J1 digest. Strict schema validation checks exact keys, supporting sources, question membership, relation endpoints and method references across the full graph.
 
@@ -119,8 +141,8 @@ from fitness_intelligence.evidence.retrieval import Catalog
 
 base = load_release("j1-screening-1").release
 manifest = base.model_dump(mode="json")
-manifest["release_id"] = "j2c-packets-001-004-candidate"
-for packet in ("001", "002", "003", "004"):
+manifest["release_id"] = "j2d-packets-001-005-candidate"
+for packet in ("001", "002", "003", "004", "005"):
     path = Path(f"../docs/research/drafts/{packet}-evidence-additions.json")
     for group, records in json.loads(path.read_bytes()).items():
         manifest[group].extend(records)
@@ -128,7 +150,7 @@ for packet in ("001", "002", "003", "004"):
 data = json.dumps(manifest).encode()
 candidate = CorpusRelease.model_validate_json(data, strict=True)
 groups = ("questions", "sources", "claims", "relations", "methods", "withdrawals")
-assert tuple(len(getattr(candidate, group)) for group in groups) == (21, 36, 47, 4, 10, 0)
+assert tuple(len(getattr(candidate, group)) for group in groups) == (31, 50, 63, 4, 14, 0)
 assert candidate.approval is None
 assert all(r.kind == "qualifies" for r in candidate.relations)
 catalog = Catalog(candidate, sha256(data).hexdigest())
@@ -145,4 +167,4 @@ assert all(not catalog.methods(q.id) for q in candidate.questions)
 
 Review each method separately from the empirical claims it cites. Identify which choices reflect evidence, athlete preferences or engineering safeguards. Define eligible observations, alternatives (including holding the dose), parameters, authority to change a plan and conditions for deferring a decision. A reviewer must justify any proposed numeric threshold or transfer to an experienced hybrid athlete.
 
-Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. All four packets and their drafts remain research inputs. E1 continues to use its existing synthetic progression rules.
+Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. All five packets and their drafts remain research inputs. E1 continues to use its existing synthetic progression rules.

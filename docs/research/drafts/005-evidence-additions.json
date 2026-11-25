@@ -1,0 +1,872 @@
+{
+  "questions": [
+    {
+      "id": "running-dose-performance",
+      "description": "How are habitual running exposures associated with event performance?",
+      "gap": "No randomized baseline-relative dose/frequency optimization or individual marginal-benefit estimate in hybrid athletes."
+    },
+    {
+      "id": "running-dose-injury",
+      "description": "How are changes in running exposure related to running-related injury?",
+      "gap": "No validated individual safe progression rate, causal threshold or injury predictor."
+    },
+    {
+      "id": "running-adaptive-programming",
+      "description": "Do adaptive running programs improve performance relative to predefined programs?",
+      "gap": "Separate dose, timing, adherence and feedback contributions; no direct dual-experienced trial."
+    },
+    {
+      "id": "running-intensity-distribution",
+      "description": "How do endurance intensity distributions influence specific outcomes?",
+      "gap": "No universal optimal distribution; reconcile method, comparator and overlapping trials."
+    },
+    {
+      "id": "running-intensity-classification",
+      "description": "How does quantification method change observed intensity distribution?",
+      "gap": "Need criterion-specific historical boundaries and aligned observations; no universal provider-zone equivalence."
+    },
+    {
+      "id": "running-field-anchor-validity",
+      "description": "How do field-derived intensity anchors agree with reference protocols and repeat?",
+      "gap": "Method-specific threshold definitions, uncertainty and longitudinal responsiveness need review."
+    },
+    {
+      "id": "running-field-performance-reliability",
+      "description": "How repeatable are standardized running performance tests?",
+      "gap": "No universal minimum meaningful change or unrestricted race comparability."
+    },
+    {
+      "id": "running-submaximal-hr-measurement",
+      "description": "What measurement properties support submaximal exercise HR as a field observation?",
+      "gap": "Team-sport estimates indirect; individual longitudinal fitness inference and response thresholds unvalidated."
+    },
+    {
+      "id": "running-vo2-estimate-agreement",
+      "description": "How do wearable aerobic-capacity estimates agree with laboratory values?",
+      "gap": "Individual change sensitivity, hardware and algorithm versions require validation."
+    },
+    {
+      "id": "running-durability-observation",
+      "description": "How are prolonged-running response descriptors associated with performance?",
+      "gap": "No causal adaptive rule or validated field decoupling threshold."
+    }
+  ],
+  "sources": [
+    {
+      "key": "fokkema-running-dose@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Fokkema T et al. Training for a (half-)marathon: Training volume and longest endurance run related to performance and running injuries. Scand J Med Sci Sports. 2020;30:1692–1704.",
+      "doi": "10.1111/sms.13725",
+      "record_url": "https://doi.org/10.1111/sms.13725",
+      "published_on": "2020-05-18",
+      "design": "Observational questionnaire-based race-preparation cohort",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Relevant Tables 1 and 3 inspected. Regression adjusts measured covariates but cannot establish effect of increasing an individual runner’s mileage.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "frandsen-session-distance@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Frandsen JSB et al. How much running is too much? Identifying high-risk running sessions in a 5200-person cohort study. Br J Sports Med. 2025;59:1203–1210.",
+      "doi": "10.1136/bjsports-2024-109380",
+      "record_url": "https://doi.org/10.1136/bjsports-2024-109380",
+      "published_on": "2025-07-07",
+      "design": "Prospective observational cohort with time-varying distance exposure",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "CC BY-NC 4.0 per article. Catalog use limited to metadata, links and original factual summaries; deployment rights review outstanding.",
+      "appraisal": "Abstract and indexed original Methods, Tables 1–3 context and Fig. 3 description inspected; follow-up publisher fetch blocked. Median experience 9.5 years; self-reported injury; no causal cutoff.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "buist-graded-running@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Buist I et al. No effect of a graded training program on the number of running-related injuries in novice runners: a randomized controlled trial. Am J Sports Med. 2008;36:33–39.",
+      "doi": "10.1177/0363546507307505",
+      "record_url": "https://doi.org/10.1177/0363546507307505",
+      "published_on": "2007-10-16",
+      "design": "Randomized novice running program comparison",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Different program lengths; novice runners, not an isolated weekly volume increment or equivalence test.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "ramskov-run-clever@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Ramskov D et al. Run Clever – No difference in risk of injury when comparing progression in running volume and running intensity in recreational runners: A randomised trial. BMJ Open Sport Exerc Med. 2018;4:e000333.",
+      "doi": "10.1136/bmjsem-2017-000333",
+      "record_url": "https://doi.org/10.1136/bmjsem-2017-000333",
+      "published_on": "2018-02-07",
+      "design": "Randomized program comparison with common preconditioning",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Substantial censoring before the differentiated training phase. Wide interval; no direct performance outcome.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "nuuttila-adaptive-running@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Nuuttila OP, Nummela A, Korhonen E, Häkkinen K, Kyröläinen H. Individualized Endurance Training Based on Recovery and Training Status in Recreational Runners. Med Sci Sports Exerc. 2022;54:1690–1701.",
+      "doi": "10.1249/MSS.0000000000002968",
+      "record_url": "https://doi.org/10.1249/MSS.0000000000002968",
+      "published_on": "2022-08-17",
+      "design": "Controlled longitudinal individualized versus predefined endurance training",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "CC BY 4.0 per PMC record; metadata, links and original factual summaries only until rights review.",
+      "appraisal": "Abstract, indexed original Results and Fig. 1 caption inspected; complete PMC fetch blocked. Verify allocation, realized doses, marker methods, exclusions and taper/testing before review.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "oliveira-polarized@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Oliveira PS, Boppre G, Fonseca H. Comparison of Polarized Versus Other Types of Endurance Training Intensity Distribution on Athletes’ Endurance Performance: A Systematic Review with Meta-analysis. Sports Med. 2024;54:2071–2095.",
+      "doi": "10.1007/s40279-024-02034-z",
+      "record_url": "https://doi.org/10.1007/s40279-024-02034-z",
+      "published_on": "2024-05-08",
+      "design": "Systematic review and meta-analysis of controlled endurance training studies",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Publisher Results §3.5 and limitations inspected. Comparator and outcome heterogeneity; author GRADE high, provisional project rating lower for transfer; duration and training level confounded.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "rosenblat-tid-ipd@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Rosenblat MA et al. Which Training Intensity Distribution Intervention will Produce the Greatest Improvements in Maximal Oxygen Uptake and Time-Trial Performance in Endurance Athletes? A Systematic Review and Network Meta-analysis of Individual Participant Data. Sports Med. 2025;55:655–673.",
+      "doi": "10.1007/s40279-024-02149-3",
+      "record_url": "https://doi.org/10.1007/s40279-024-02149-3",
+      "published_on": "2025-01-31",
+      "design": "Individual-participant network meta-analysis",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Abstract estimates and p values extracted; exact intervals and study overlap outstanding. Mixed modalities and athlete levels.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "filipas-distribution-sequence@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Filipas L, Bonato M, Gallo G, Codella R. Effects of 16 weeks of pyramidal and polarized training intensity distributions in well-trained endurance runners. Scand J Med Sci Sports. 2022;32:498–511.",
+      "doi": "10.1111/sms.14101",
+      "record_url": "https://doi.org/10.1111/sms.14101",
+      "published_on": "2021-11-25",
+      "design": "Four-arm controlled longitudinal runner intervention",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Publisher Tables 3,5 and Results §3.5 inspected. Omnibus interaction and descriptive changes; direct pairwise contrasts, adherence and trial methods need independent appraisal.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "seiler-kjerland-classification@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Seiler KS, Kjerland GØ. Quantifying training intensity distribution in elite endurance athletes: is there evidence for an “optimal” distribution? Scand J Med Sci Sports. 2006;16:49–56.",
+      "doi": "10.1111/j.1600-0838.2004.00418.x",
+      "record_url": "https://doi.org/10.1111/j.1600-0838.2004.00418.x",
+      "published_on": "2004-10-27",
+      "design": "Descriptive repeated classification of training exposure",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Same junior cross-country skiing sessions classified by two different HR methods. Not a program efficacy study.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "galbraith-critical-speed@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Galbraith A, Hopker J, Lelliott S, Diddams L, Passfield L. A single-visit field test of critical speed. Int J Sports Physiol Perform. 2014;9:931–935.",
+      "doi": "10.1123/ijspp.2013-0507",
+      "record_url": "https://doi.org/10.1123/ijspp.2013-0507",
+      "published_on": "2014-03-11",
+      "design": "Field/laboratory method comparison and repeatability",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Abstract reports typical estimation error and repeat-test CV for a specific maximal track protocol. P-value wording on mean comparison inconsistent; do not extract that statement.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "hurst-board-5k@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Hurst P, Board L. Reliability of 5-km Running Performance in a Competitive Environment. Meas Phys Educ Exerc Sci. 2017;21:10–14.",
+      "doi": "10.1080/1091367X.2016.1233421",
+      "record_url": "https://doi.org/10.1080/1091367X.2016.1233421",
+      "published_on": "2016-09-28",
+      "design": "Repeated outdoor competitive 5-km test",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Specific outdoor protocol, small sample. Typical error is not a universal meaningful change threshold.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "shushan-submax-hr@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Shushan T et al. Submaximal Fitness Test in Team Sports: A Systematic Review and Meta-Analysis of Exercise Heart Rate Measurement Properties. Sports Med Open. 2023;9:21.",
+      "doi": "10.1186/s40798-023-00564-w",
+      "record_url": "https://doi.org/10.1186/s40798-023-00564-w",
+      "published_on": "2023-03-24",
+      "design": "Meta-analysis of reliability and convergent validity studies",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Table 5 inspected. Team-sport protocols; convergent validity not demonstrated individual change responsiveness.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "molina-garcia-wearable-vo2@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Molina-Garcia P et al. Validity of Estimating the Maximal Oxygen Consumption by Consumer Wearables: A Systematic Review with Meta-analysis and Expert Statement of the INTERLIVE Network. Sports Med. 2022;52:1577–1597.",
+      "doi": "10.1007/s40279-021-01639-y",
+      "record_url": "https://doi.org/10.1007/s40279-021-01639-y",
+      "published_on": "2022-01-24",
+      "design": "Validation-study meta-analysis and expert statement",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Publisher text and PubMed linked correction inspected. Correction DOI 10.1007/s40279-026-02547-9, online 2026-10-13, describes duplicate reference entries per accessible institutional record; verify publisher correction and analytic study independence before approval.",
+      "rights": "Reuse rights not independently verified; retain bibliographic metadata, links and original factual summaries only.",
+      "appraisal": "Results and Figs. 3–4 inspected. Pooled limits of agreement reflect criterion disagreement; only three studies assessed repeatability.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "key": "smyth-marathon-decoupling@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Smyth B, Maunder E, Meyler S, Hunter B, Muniz-Pumares D. Decoupling of Internal and External Workload During a Marathon: An Analysis of Durability in 82,303 Recreational Runners. Sports Med. 2022;52:2283–2295.",
+      "doi": "10.1007/s40279-022-01680-5",
+      "record_url": "https://doi.org/10.1007/s40279-022-01680-5",
+      "published_on": "2022-05-05",
+      "design": "Observational analysis of marathon segments",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Published bibliographic record and accessible result checked; comprehensive correction/retraction and version-of-record review outstanding.",
+      "rights": "CC BY 4.0 per article; metadata, links and original factual summaries only until rights review.",
+      "appraisal": "Publisher abstract and article context inspected; exact within-race normalized ratios and segment definitions retained. Same-race outcome-related predictor; no adaptive efficacy.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "key": "habitual-mileage-half-marathon@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-dose-performance",
+        "objective": "running-performance",
+        "population": "half-marathon-entrants",
+        "experience": "recreational",
+        "intervention": "weekly-distance-over-32-km",
+        "comparator": "weekly-distance-20-to-32-km",
+        "outcome": "half-marathon-finish-time",
+        "horizon": "race-preparation",
+        "block_context": "endurance-training"
+      },
+      "assertion": "Higher reported preparation mileage was associated with shorter half-marathon finish time in the adjusted model.",
+      "limitations": "Observational, selected finishers, self-reported exposure and residual confounding; no causal dose recommendation.",
+      "quality": "low",
+      "assessment": "Moderate descriptive relevance but weak causal directness.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "fokkema-running-dose@1",
+          "locator": "Table 3, Half marathon, Weekly training volume, >32 versus reference 20–32 km",
+          "result": "Adjusted beta −4.19 min (95% CI −6.52 to −1.85).",
+          "restriction": "Association, not an intervention; observed categories are not targets."
+        }
+      ]
+    },
+    {
+      "key": "habitual-long-run-half-marathon@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-dose-performance",
+        "objective": "running-performance",
+        "population": "half-marathon-entrants",
+        "experience": "recreational",
+        "intervention": "longest-run-over-21-km",
+        "comparator": "longest-run-15-to-21-km",
+        "outcome": "half-marathon-finish-time",
+        "horizon": "race-preparation",
+        "block_context": "endurance-training"
+      },
+      "assertion": "A longer reported longest run was associated with shorter half-marathon finish time.",
+      "limitations": "Same cohort as mileage result; correlated training characteristics, no causal increment established.",
+      "quality": "low",
+      "assessment": "Residual confounding and self-report limit transfer.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "fokkema-running-dose@1",
+          "locator": "Table 3, Half marathon, Longest endurance run, >21 versus 15–21 km",
+          "result": "Adjusted beta −3.87 min (95% CI −6.31 to −1.44).",
+          "restriction": "Not evidence to prescribe a run exceeding race distance."
+        }
+      ]
+    },
+    {
+      "key": "single-session-distance-injury-association@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-dose-injury",
+        "objective": "describe-running-injury-association",
+        "population": "adult-runners",
+        "experience": "mixed",
+        "intervention": "session-distance-increase-over-10-percent",
+        "comparator": "regression-or-up-to-10-percent-increase",
+        "outcome": "self-reported-overuse-injury",
+        "horizon": "up-to-18-months",
+        "block_context": "running-training"
+      },
+      "assertion": "Compared with the preceding longest run, higher single-session distance-change categories were associated with higher overuse injury hazard than the reference category.",
+      "limitations": "Self-reported outcome, observational exposure, residual/time-varying confounding; not a causal risk threshold.",
+      "quality": "moderate",
+      "assessment": "Large cohort, precise associations, but no intervention validation; low confidence in causal action.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "frandsen-session-distance@1",
+          "locator": "Abstract Results; Table 1; Fig. 3A; Methods exposure definition",
+          "result": "Adjusted HRR >10–30% 1.64 (95% CI 1.31–2.05); >30–100% 1.52 (1.16–2.00); >100% 2.28 (1.50–3.48).",
+          "restriction": "Session distance relative to longest run in preceding 30 days, not weekly mileage; HRR not absolute probability."
+        }
+      ]
+    },
+    {
+      "key": "graded-novice-program-injury@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-dose-injury",
+        "objective": "running-injury-prevention",
+        "population": "novice-runners",
+        "experience": "novice",
+        "intervention": "graded-13-week-program",
+        "comparator": "standard-8-week-program",
+        "outcome": "running-related-injury-incidence",
+        "horizon": "program-duration",
+        "block_context": "running-training"
+      },
+      "assertion": "The graded program did not demonstrate lower injury incidence than the standard novice program.",
+      "limitations": "Different program durations, novice sample, not an equivalence test.",
+      "quality": "low",
+      "assessment": "Randomized comparison but indirect and interval not extracted.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "buist-graded-running@1",
+          "locator": "Abstract Results",
+          "result": "20.8% vs 20.3%; p=.90; confidence interval not extracted.",
+          "restriction": "Program comparison, not isolated effect of changing weekly mileage."
+        }
+      ]
+    },
+    {
+      "key": "run-clever-intensity-v-volume-injury@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-dose-injury",
+        "objective": "running-injury-prevention",
+        "population": "recreational-runners",
+        "experience": "recreational",
+        "intervention": "intensity-focused-progression",
+        "comparator": "volume-focused-progression",
+        "outcome": "running-related-injury-risk",
+        "horizon": "sixteen-weeks-after-preconditioning",
+        "block_context": "running-training"
+      },
+      "assertion": "The 16-week injury-risk difference between the two assigned progression programs was uncertain.",
+      "limitations": "Large preconditioning censoring; wide interval; no claim of equivalence or performance benefit.",
+      "quality": "low",
+      "assessment": "Limited precision and indirect hybrid applicability.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ramskov-run-clever@1",
+          "locator": "Abstract Results, RD at 16 weeks",
+          "result": "Reported risk difference −14.0 percentage points (95% CI −36.9 to 8.9).",
+          "restriction": "Confirm sign and censoring estimand against full text before approval."
+        }
+      ]
+    },
+    {
+      "key": "adaptive-running-ten-km-performance@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-adaptive-programming",
+        "objective": "running-performance",
+        "population": "recreational-runners",
+        "experience": "recreational",
+        "intervention": "multivariable-adaptive-endurance-program",
+        "comparator": "predefined-endurance-program",
+        "outcome": "ten-km-running-time",
+        "horizon": "twelve-weeks-after-preparation",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The individualized group improved 10-km time more than the predefined training group in the studied program.",
+      "limitations": "Small multicomponent comparison; allocation, attrition and dose differences require review; no isolated effect of adjusting volume or HRV.",
+      "quality": "moderate",
+      "assessment": "Promising direct adaptive endurance contrast, not validated hybrid policy.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "nuuttila-adaptive-running@1",
+          "locator": "Results, 10-km running time, Fig. 3; T1 to T3",
+          "result": "Change −6.2±2.8% vs −2.9±2.4%; between-group ES 1.23 (95% CI 0.42–2.02), p=.002.",
+          "restriction": "Six-week volume plus six-week interval periods; no transfer approved."
+        }
+      ]
+    },
+    {
+      "key": "polarized-pooled-vo2peak@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-intensity-distribution",
+        "objective": "aerobic-capacity-development",
+        "population": "endurance-athletes",
+        "experience": "mixed",
+        "intervention": "polarized-distribution",
+        "comparator": "other-intensity-distributions",
+        "outcome": "vo2peak",
+        "horizon": "trial-end",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The pooled VO2peak change favored polarized training by a small standardized effect.",
+      "limitations": "Mixed endurance sports/comparators; subgroup duration and training level confounded; not race performance.",
+      "quality": "moderate",
+      "assessment": "Author certainty high; provisional moderate for narrow pooled contrast, low for hybrid policy.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "oliveira-polarized@1",
+          "locator": "Results §3.5.1, Fig. 4",
+          "result": "SMD 0.24 (95% CI 0.01–0.48); 11 studies, 284 participants.",
+          "restriction": "VO2peak only; not individual expected gain or optimum ratio."
+        }
+      ]
+    },
+    {
+      "key": "polarized-pooled-time-trial@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-intensity-distribution",
+        "objective": "running-performance",
+        "population": "endurance-athletes",
+        "experience": "mixed",
+        "intervention": "polarized-distribution",
+        "comparator": "other-intensity-distributions",
+        "outcome": "time-trial-performance",
+        "horizon": "trial-end",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The pooled time-trial contrast did not demonstrate an advantage of polarized training.",
+      "limitations": "Mixed modalities and TT durations; no equivalence test; comparator heterogeneity.",
+      "quality": "moderate",
+      "assessment": "Interval includes effects in either direction; lower directness to running-only hybrids.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "oliveira-polarized@1",
+          "locator": "Results §3.5.2, Fig. 5, time trial",
+          "result": "SMD −0.01 (95% CI −0.28 to 0.25), n=221.",
+          "restriction": "Time-trial outcome, not VO2peak."
+        }
+      ]
+    },
+    {
+      "key": "polarized-pyramidal-ipd-time-trial@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-intensity-distribution",
+        "objective": "running-performance",
+        "population": "endurance-athletes",
+        "experience": "mixed",
+        "intervention": "polarized-hr-time-in-zone",
+        "comparator": "pyramidal-hr-time-in-zone",
+        "outcome": "time-trial-performance",
+        "horizon": "trial-end",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The individual-participant network comparison did not establish a time-trial advantage for polarized versus pyramidal training.",
+      "limitations": "Mixed sports; intervals and network details outstanding; overlap with Oliveira review.",
+      "quality": "low",
+      "assessment": "Abstract-only extraction; no equivalence inference.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "rosenblat-tid-ipd@1",
+          "locator": "Abstract Results, time-in-HR-zone POL versus PYR",
+          "result": "SMD −0.05, p=.34; confidence interval not extracted.",
+          "restriction": "Definition is HR time in zone; not session-goal allocation."
+        }
+      ]
+    },
+    {
+      "key": "distribution-sequence-five-km-interaction@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-intensity-distribution",
+        "objective": "running-performance",
+        "population": "well-trained-male-runners",
+        "experience": "well-trained",
+        "intervention": "four-distribution-sequences",
+        "comparator": "other-assigned-distribution-sequences",
+        "outcome": "five-km-time-trial-time",
+        "horizon": "sixteen-weeks",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The 5-km time trajectories differed across the four assigned intensity-distribution sequences.",
+      "limitations": "Omnibus interaction not a pairwise contrast; small groups, fast male runners; verify actual dose and attrition.",
+      "quality": "moderate",
+      "assessment": "Controlled study supports further sequence appraisal but does not identify optimal hybrid sequence.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "filipas-distribution-sequence@1",
+          "locator": "Results §3.5, Fig. 3A and Table 5",
+          "result": "Group×time F(6,112)=5.2, p=.0001; mean percent changes PYR −0.6±0.6, POL −1.1±1.1, PYR→POL −1.5±0.7, POL→PYR −0.9±0.8 (SD).",
+          "restriction": "Descriptive means and omnibus interaction; no universal sequence conclusion."
+        }
+      ]
+    },
+    {
+      "key": "intensity-classification-denominator@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-intensity-classification",
+        "objective": "describe-training-intensity",
+        "population": "junior-cross-country-skiers",
+        "experience": "well-trained",
+        "intervention": "hr-time-in-zone-classification",
+        "comparator": "hr-session-goal-classification",
+        "outcome": "three-zone-intensity-distribution",
+        "horizon": "thirty-two-days",
+        "block_context": "endurance-training"
+      },
+      "assertion": "Different HR quantification methods classified the same training exposure into different intensity distributions.",
+      "limitations": "Small non-running sample, no intervention efficacy or universal zone boundaries.",
+      "quality": "moderate",
+      "assessment": "Direct descriptive method comparison; transfer limited to conceptual denominator distinction.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "seiler-kjerland-classification@1",
+          "locator": "Results, HR analysis, Fig. 3",
+          "result": "Time-in-zone 91/6.4/2.6%; session-goal 75/8/17%.",
+          "restriction": "Different denominators; not evidence that either distribution is optimal."
+        }
+      ]
+    },
+    {
+      "key": "track-critical-speed-repeatability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-field-anchor-validity",
+        "objective": "estimate-running-intensity-anchor",
+        "population": "male-distance-runners",
+        "experience": "trained",
+        "intervention": "repeated-single-visit-track-test",
+        "comparator": "repeat-of-same-protocol",
+        "outcome": "critical-speed-repeatability",
+        "horizon": "repeat-tests",
+        "block_context": "running-assessment"
+      },
+      "assertion": "Critical speed from the studied single-visit track protocol had low reported repeat-test variability.",
+      "limitations": "Ten men, maximal efforts, protocol dependent; not arbitrary training-run estimates or longitudinal validity.",
+      "quality": "low",
+      "assessment": "Abstract-only, small sample.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "galbraith-critical-speed@1",
+          "locator": "Abstract Results, coefficient of variation of repeat tests",
+          "result": "CS CV 0.4% (95% confidence limits 0.3–0.8%); D′ CV 13% (10–27%).",
+          "restriction": "3600/2400/1200 m protocol; estimates are model parameters, not laboratory threshold measurements."
+        }
+      ]
+    },
+    {
+      "key": "outdoor-five-km-typical-error@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-field-performance-reliability",
+        "objective": "evaluate-running-performance",
+        "population": "endurance-runners",
+        "experience": "trained",
+        "intervention": "competitive-five-km-test",
+        "comparator": "repeat-competitive-five-km-test",
+        "outcome": "finish-time-repeatability",
+        "horizon": "two-weeks",
+        "block_context": "running-assessment"
+      },
+      "assertion": "Repeat competitive outdoor 5-km tests had a reported typical finish-time error of approximately 15 seconds in this sample.",
+      "limitations": "15 runners, protocol and conditions specific; not a universal minimal meaningful change.",
+      "quality": "low",
+      "assessment": "Small repeatability study; no hybrid-specific calibration.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hurst-board-5k@1",
+          "locator": "Abstract Results",
+          "result": "Typical error 14.7 s (95% CI 11.3–21.4); CV 0.95% (95% CI 0.59–1.31).",
+          "restriction": "Repeatability of task performance, not intervention effect."
+        }
+      ]
+    },
+    {
+      "key": "submaximal-hr-typical-error@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-submaximal-hr-measurement",
+        "objective": "evaluate-submaximal-response",
+        "population": "team-sport-athletes",
+        "experience": "mixed",
+        "intervention": "standardized-submaximal-exercise-hr",
+        "comparator": "repeat-same-test",
+        "outcome": "exercise-hr-typical-error",
+        "horizon": "test-retest",
+        "block_context": "field-assessment"
+      },
+      "assertion": "Standardized submaximal exercise HR showed a pooled typical error of 1.6 percentage points in team-sport studies.",
+      "limitations": "Team sports, protocol heterogeneity, no individual response calibration or physiological diagnosis.",
+      "quality": "moderate",
+      "assessment": "Pooled repeatability estimate, prediction interval broader; indirect runner transfer.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "shushan-submax-hr@1",
+          "locator": "Table 5, reliability, TE",
+          "result": "TE 1.6 percentage points (95% CI 1.4–1.9; 95% PI 0.9–3.0).",
+          "restriction": "HR expressed relative to HRmax; not bpm or universal decision threshold."
+        }
+      ]
+    },
+    {
+      "key": "exercise-wearable-vo2-agreement@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-vo2-estimate-agreement",
+        "objective": "evaluate-aerobic-capacity-estimate",
+        "population": "adult-validation-participants",
+        "experience": "mixed",
+        "intervention": "exercise-based-wearable-vo2-estimate",
+        "comparator": "graded-laboratory-vo2max",
+        "outcome": "vo2max-agreement",
+        "horizon": "paired-validation-tests",
+        "block_context": "measurement-validation"
+      },
+      "assertion": "Exercise-based wearable estimates had small pooled mean bias but broad limits of agreement against laboratory VO2max.",
+      "limitations": "Devices and protocols heterogeneous, limited repeatability evidence, correction requires review.",
+      "quality": "moderate",
+      "assessment": "Criterion agreement not longitudinal responsiveness; individual error substantial.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "molina-garcia-wearable-vo2@1",
+          "locator": "Results, Figs. 3B and 4; §3.8",
+          "result": "Bias −0.09 mL/kg/min; pooled limits of agreement −9.92 to +9.74 mL/kg/min.",
+          "restriction": "Limits of agreement, not CI of mean or detectable change."
+        }
+      ]
+    },
+    {
+      "key": "marathon-decoupling-performance-association@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "running-durability-observation",
+        "objective": "describe-marathon-durability",
+        "population": "recreational-marathon-runners",
+        "experience": "recreational",
+        "intervention": "higher-late-early-normalized-hr-speed-ratio",
+        "comparator": "lower-late-early-normalized-hr-speed-ratio",
+        "outcome": "marathon-finish-time",
+        "horizon": "within-marathon",
+        "block_context": "marathon-running"
+      },
+      "assertion": "Runners in higher late/early decoupling groups had slower mean marathon finish times.",
+      "limitations": "Same-race predictor contains speed; confounding and selection; no causal or prospective adaptive validation.",
+      "quality": "moderate",
+      "assessment": "Large observational dataset, indirect to easy runs and shorter races.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "smyth-marathon-decoupling@1",
+          "locator": "Methods segment definitions and abstract Results, low/moderate/high decoupling",
+          "result": "Mean finish time 217.3±33.1, 224.9±31.7, 238.5±30.7 min; group comparisons reported p<.01.",
+          "restriction": "35–40 km vs 5–10 km normalized internal/external ratio; descriptive groups not cutoffs for coaching."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "key": "baseline-relative-running-dose-review@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "running-adaptive-programming",
+      "description": "Review actual habitual running exposure, goals, tolerability and joint constraints before proposing hold, redistribution, increase or reduction.",
+      "provenance": "Research Packet 005, revision 0.1, candidate policies and periodization methodology.",
+      "tradeoffs": "No universal mileage rule; multicomponent intervention does not isolate dose. Maintain productive exposure; defer with unknown history or safety concern.",
+      "claims": [
+        "adaptive-running-ten-km-performance@1",
+        "habitual-mileage-half-marathon@1",
+        "single-session-distance-injury-association@1"
+      ]
+    },
+    {
+      "key": "running-intensity-purpose-and-anchor@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "running-intensity-distribution",
+      "description": "Choose session purpose and suitable intensity anchor; report intended and actual distribution separately with explicit denominator and method.",
+      "provenance": "Research Packet 005, revision 0.1, candidate policies and periodization methodology.",
+      "tradeoffs": "No universal ratio, no physiological zone inference from label; qualitative effort when numerical anchor insufficient.",
+      "claims": [
+        "polarized-pooled-vo2peak@1",
+        "polarized-pooled-time-trial@1",
+        "intensity-classification-denominator@1"
+      ]
+    },
+    {
+      "key": "comparable-running-performance-review@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "running-field-performance-reliability",
+      "description": "Assess task-specific observed performance using comparable protocol and context, report uncertainty, and distinguish estimates from reference outcomes.",
+      "provenance": "Research Packet 005, revision 0.1, candidate policies and periodization methodology.",
+      "tradeoffs": "Test burden and confounding; no universal detectable-change cutoff or causal attribution.",
+      "claims": [
+        "outdoor-five-km-typical-error@1",
+        "submaximal-hr-typical-error@1",
+        "exercise-wearable-vo2-agreement@1"
+      ]
+    },
+    {
+      "key": "running-durability-descriptive-review@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "question": "running-durability-observation",
+      "description": "Use paired segment HR/speed only when granularity and conditions support descriptive comparison; otherwise ask about late-run tolerance.",
+      "provenance": "Research Packet 005, revision 0.1, candidate policies and periodization methodology.",
+      "tradeoffs": "No clinical or performance threshold, no progression triggered by decoupling alone.",
+      "claims": [
+        "marathon-decoupling-performance-association@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
