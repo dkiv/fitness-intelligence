@@ -7,6 +7,9 @@ immutable release with the planner and query it locally. A week can still be gen
 approved programming rules when the catalog returns a gap. The explanation must identify the
 judgment involved. See the [coaching science requirements](coaching-science.md).
 
+J1 implements the local release loader and retrieval contract. The first corpus is available
+for independent review. [Catalog contents and usage](scientific-evidence-catalog.md)
+
 ## What belongs in the catalog
 
 | Record and key | Required content and relationships |

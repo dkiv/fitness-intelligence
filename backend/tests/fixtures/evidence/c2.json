@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "release_id": "fixture-c2",
+  "kind": "fixture",
+  "assembled_on": "2000-01-11",
+  "approval": {
+    "reviewer": "Invented fixture reviewer",
+    "role": "Simulated scientific reviewer",
+    "reviewed_on": "2000-01-10",
+    "independent_human": true
+  },
+  "questions": [
+    {
+      "id": "fixture-intensity",
+      "description": "Invented intensity comparison",
+      "gap": "No reviewed result for the requested group."
+    }
+  ],
+  "sources": [
+    {
+      "key": "paper-a@1",
+      "synthetic": true,
+      "extracted_by": "Fixture author",
+      "status": "approved",
+      "approval": {
+        "reviewer": "Invented fixture reviewer",
+        "role": "Simulated scientific reviewer",
+        "reviewed_on": "2000-01-10",
+        "independent_human": true
+      },
+      "citation": "Invented paper A, fixture proceedings (2000).",
+      "doi": null,
+      "record_url": "https://example.invalid/paper-a",
+      "published_on": "2000-01-01",
+      "design": "Invented comparative study",
+      "access": "full-text",
+      "checked_on": "2000-01-10",
+      "publication_check": "Simulated publication check",
+      "rights": "Original synthetic fixture",
+      "appraisal": "Small invented cohorts",
+      "next_review": "2001-01-10"
+    },
+    {
+      "key": "paper-b@1",
+      "synthetic": true,
+      "extracted_by": "Fixture author",
+      "status": "approved",
+      "approval": {
+        "reviewer": "Invented fixture reviewer",
+        "role": "Simulated scientific reviewer",
+        "reviewed_on": "2000-01-10",
+        "independent_human": true
+      },
+      "citation": "Invented paper B, fixture proceedings (2000).",
+      "doi": null,
+      "record_url": "https://example.invalid/paper-b",
+      "published_on": "2000-01-01",
+      "design": "Invented comparative study",
+      "access": "full-text",
+      "checked_on": "2000-01-10",
+      "publication_check": "Simulated publication check",
+      "rights": "Original synthetic fixture",
+      "appraisal": "Small invented cohorts",
+      "next_review": "2001-01-10"
+    }
+  ],
+  "claims": [
+    {
+      "key": "effect-a@1",
+      "synthetic": true,
+      "extracted_by": "Fixture author",
+      "status": "approved",
+      "approval": {
+        "reviewer": "Invented fixture reviewer",
+        "role": "Simulated scientific reviewer",
+        "reviewed_on": "2000-01-10",
+        "independent_human": true
+      },
+      "scope": {
+        "question": "fixture-intensity",
+        "objective": "strength-development",
+        "population": "fixture-adults",
+        "experience": "trained",
+        "intervention": "intensity-change",
+        "comparator": "fixed-intensity",
+        "outcome": "fixture-strength",
+        "horizon": "eight-weeks",
+        "block_context": "strength-block"
+      },
+      "assertion": "The comparison favors increased intensity in A.",
+      "limitations": "Invented cohort and protocol.",
+      "quality": "low",
+      "assessment": "Small synthetic sample with imprecise results.",
+      "transfers": [
+        {
+          "population": "fixture-adults",
+          "experience": "recreational",
+          "argument": "Shared task, less practice. Direction may differ."
+        }
+      ],
+      "support": [
+        {
+          "source": "paper-a@1",
+          "locator": "Table A, change score",
+          "result": "A favors the increase.",
+          "restriction": "Synthetic strength score only."
+        }
+      ]
+    },
+    {
+      "key": "effect-b@1",
+      "synthetic": true,
+      "extracted_by": "Fixture author",
+      "status": "approved",
+      "approval": {
+        "reviewer": "Invented fixture reviewer",
+        "role": "Simulated scientific reviewer",
+        "reviewed_on": "2000-01-10",
+        "independent_human": true
+      },
+      "scope": {
+        "question": "fixture-intensity",
+        "objective": "strength-development",
+        "population": "fixture-adults",
+        "experience": "trained",
+        "intervention": "intensity-change",
+        "comparator": "fixed-intensity",
+        "outcome": "fixture-strength",
+        "horizon": "eight-weeks",
+        "block_context": "strength-block"
+      },
+      "assertion": "The comparison favors fixed intensity in B.",
+      "limitations": "Invented cohort and protocol.",
+      "quality": "low",
+      "assessment": "Small synthetic sample with imprecise results.",
+      "transfers": [
+        {
+          "population": "fixture-adults",
+          "experience": "recreational",
+          "argument": "Shared task, less practice. Direction may differ."
+        }
+      ],
+      "support": [
+        {
+          "source": "paper-b@1",
+          "locator": "Figure B, fixed-dose contrast",
+          "result": "B favors the fixed dose.",
+          "restriction": "Synthetic strength score only."
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "key": "intensity-disagreement@1",
+      "kind": "conflicts-with",
+      "subject": "effect-a@1",
+      "object": "effect-b@1",
+      "reason": "Opposing directions on the same synthetic endpoint."
+    }
+  ],
+  "methods": [
+    {
+      "key": "preferred-increase@1",
+      "synthetic": true,
+      "extracted_by": "Fixture author",
+      "status": "approved",
+      "approval": {
+        "reviewer": "Invented fixture reviewer",
+        "role": "Simulated scientific reviewer",
+        "reviewed_on": "2000-01-10",
+        "independent_human": true
+      },
+      "question": "fixture-intensity",
+      "description": "The fixture coach prefers an increase.",
+      "provenance": "Original invented programming preference",
+      "tradeoffs": "Assumes the athlete accepts the increased intensity.",
+      "claims": []
+    }
+  ],
+  "withdrawals": []
+}

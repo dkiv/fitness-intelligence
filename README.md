@@ -10,6 +10,9 @@ M3A adds internal [strength progression, weekly volume and activity metrics](doc
 E1 adds an offline, deterministic strength and running planner for the first two weeks of
 the [synthetic press block](docs/training-plan-design.md#using-the-e1-domain-planner).
 
+J1 provides a versioned scientific evidence catalog and deterministic local retrieval.
+The initial five claims await independent review. [Corpus and retrieval contract](docs/scientific-evidence-catalog.md)
+
 ## Repository
 
 - `backend/src/fitness_intelligence/`: API, settings and persistence
