@@ -1,0 +1,741 @@
+{
+  "questions": [
+    {
+      "id": "resistance-effort-measurement",
+      "description": "How accurately do resistance-training participants estimate repetitions to task failure?",
+      "gap": "Individual agreement and within-athlete calibration by task/load/effort not established."
+    },
+    {
+      "id": "resistance-load-autoregulation",
+      "description": "How do autoregulated load prescriptions affect strength compared with standardized loading?",
+      "gap": "Hybrid-specific outcomes and independent effects of adjustment parameters unknown."
+    },
+    {
+      "id": "resistance-velocity-loss",
+      "description": "How do velocity-loss stopping thresholds affect strength and muscle size?",
+      "gap": "Realized repetition exposure differs; not weekly working-set adjustment."
+    },
+    {
+      "id": "resistance-acute-recovery",
+      "description": "How does set structure and proximity to failure affect acute task performance and its recovery?",
+      "gap": "Individual recovery timing and concurrent-running transfer uncertain."
+    },
+    {
+      "id": "endurance-hrv-guided-training",
+      "description": "How does HRV-guided endurance training affect measured outcomes compared with predefined training?",
+      "gap": "Incremental utility beyond performance and subjective feedback and hybrid efficacy untested."
+    },
+    {
+      "id": "sleep-acute-performance",
+      "description": "How does experimentally induced acute sleep loss affect exercise performance?",
+      "gap": "No individual sleep-to-training adjustment function."
+    },
+    {
+      "id": "sleep-device-measurement",
+      "description": "How do sleep observations from wearable devices agree with reference measurements?",
+      "gap": "Model/version-specific agreement not longitudinal sensitivity or intervention efficacy."
+    },
+    {
+      "id": "acute-strength-running-response",
+      "description": "How does an acute resistance-training session affect subsequent measures in runners?",
+      "gap": "Dose-specific kinetics, task specificity and individual scheduling efficacy unresolved."
+    },
+    {
+      "id": "hybrid-recovery-methodology",
+      "description": "How should a coach review observations and propose bounded changes across disciplines?",
+      "gap": "No validated joint recovery score or incremental-benefit model; policy is candidate methodology."
+    }
+  ],
+  "sources": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "halperin-rir-accuracy@1",
+      "citation": "Halperin I, Malleron T, Har-Nir I, et al. Accuracy in predicting repetitions to task failure in resistance exercise: a scoping review and exploratory meta-analysis. Sports Med. 2022;52:377–390.",
+      "doi": "10.1007/s40279-021-01559-x",
+      "record_url": "https://doi.org/10.1007/s40279-021-01559-x",
+      "published_on": "2021-09-20",
+      "design": "Scoping review and exploratory meta-analysis of prediction accuracy",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "F04–05: 12 studies, 414 participants, high heterogeneity; signed bias not individual agreement. Full models, exercise-specific strata and overlap review outstanding.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "helms-rpe-loading@1",
+      "citation": "Helms ER, Byrnes RK, Cooke DM, et al. RPE vs. percentage 1RM loading in periodized programs matched for sets and repetitions. Front Physiol. 2018;9:247.",
+      "doi": "10.3389/fphys.2018.00247",
+      "record_url": "https://doi.org/10.3389/fphys.2018.00247",
+      "published_on": "2018-03-21",
+      "design": "Counterbalanced controlled resistance-training intervention",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "CC BY reported by journal; independent rights and version review outstanding.",
+      "appraisal": "F06: 21 trained men included; comparator was not entirely fixed, load progressed conditionally; small sample and realized intensity/tonnage differences. Verify allocation, attrition and effect size methods.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hickmott-autoregulation@1",
+      "citation": "Hickmott LM, Chilibeck PD, Shaw KA, Butcher SJ. The effect of load and volume autoregulation on muscular strength and hypertrophy: a systematic review and meta-analysis. Sports Med Open. 2022;8:9.",
+      "doi": "10.1186/s40798-021-00404-9",
+      "record_url": "https://doi.org/10.1186/s40798-021-00404-9",
+      "published_on": "2022-01-15",
+      "design": "Systematic review and meta-analysis of load and volume interventions",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "CC BY 4.0 reported by publisher; independent rights review outstanding.",
+      "appraisal": "F07–08: load and velocity-loss comparisons separated; heterogeneity of protocols and realized volume; full forest plots and study-level membership require review.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "moran-navarro-failure-recovery@1",
+      "citation": "Morán-Navarro R, Pérez CE, Mora-Rodríguez R, et al. Time course of recovery following resistance training leading or not to failure. Eur J Appl Physiol. 2017;117:2387–2399.",
+      "doi": "10.1007/s00421-017-3725-7",
+      "record_url": "https://doi.org/10.1007/s00421-017-3725-7",
+      "published_on": "2017-09-30",
+      "design": "Acute within-participant resistance exercise comparison",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "F10: ten trained men, matched repetitions but different set structure, timing and neuromuscular measures; full contrast estimates and ordering outstanding.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "manresa-rocamora-hrv-guided@1",
+      "citation": "Manresa-Rocamora A, Sarabia JM, Javaloyes A, Flatt AA, Moya-Ramón M. Heart rate variability-guided training for enhancing cardiac-vagal modulation, aerobic fitness, and endurance performance: a methodological systematic review with meta-analysis. Int J Environ Res Public Health. 2021;18:10299.",
+      "doi": "10.3390/ijerph181910299",
+      "record_url": "https://doi.org/10.3390/ijerph181910299",
+      "published_on": "2021-09-29",
+      "design": "Methodological systematic review and meta-analysis of endurance training interventions",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "F16–17: small uncertain performance effect; diverse HRV and scheduling protocols, overlap with other reviews. No hybrid outcome or component ablation.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "craven-sleep-loss@1",
+      "citation": "Craven J, McCartney D, Desbrow B, et al. Effects of acute sleep loss on physical performance: a systematic and meta-analytical review. Sports Med. 2022;52:2669–2690.",
+      "doi": "10.1007/s40279-022-01706-y",
+      "record_url": "https://doi.org/10.1007/s40279-022-01706-y",
+      "published_on": "2022-06-16",
+      "design": "Systematic review and meta-analysis of acute sleep-loss experiments",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "F24: pooled percent change across diverse tasks and protocols, very high heterogeneity; no individual cutoff or chronic adaptation estimate.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "miller-wearable-sleep-hrv@1",
+      "citation": "Miller DJ, Sargent C, Roach GD. A validation of six wearable devices for estimating sleep, heart rate and heart rate variability in healthy adults. Sensors. 2022;22:6317.",
+      "doi": "10.3390/s22166317",
+      "record_url": "https://doi.org/10.3390/s22166317",
+      "published_on": "2022-08-22",
+      "design": "Single-night simultaneous wearable/reference agreement study",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "F27–28: specific devices/versions and methods, reference PSG/ECG; not evidence of longitudinal responsiveness or decision efficacy.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "carvalho-silva-acute-running@1",
+      "citation": "de Carvalho e Silva GI, Brandão LHA, Silva DDS, et al. Acute neuromuscular, physiological and performance responses after strength training in runners: a systematic review and meta-analysis. Sports Med Open. 2022;8:105.",
+      "doi": "10.1186/s40798-022-00497-w",
+      "record_url": "https://doi.org/10.1186/s40798-022-00497-w",
+      "published_on": "2022-08-17",
+      "design": "Systematic review and meta-analysis of acute strength-training effects in runners",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Bibliographic publication and specified result access checked; independent version, correction and retraction checks outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "F29: 19 qualitative, 13 meta-analyzed; heterogeneous protocols, no universal recovery time; numerical forest-plot extraction deferred.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "predicted-rir-signed-error@1",
+      "scope": {
+        "question": "resistance-effort-measurement",
+        "objective": "estimate-effort",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "predicted-reps-to-task-failure",
+        "comparator": "observed-reps-to-task-failure",
+        "outcome": "signed-repetition-prediction-error",
+        "horizon": "within-set",
+        "block_context": "resistance-exercise"
+      },
+      "assertion": "Participants tended to underpredict available repetitions on average.",
+      "limitations": "High heterogeneity; signed mean not absolute error or individual bias.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "halperin-rir-accuracy@1",
+          "locator": "Abstract Results, main multilevel model",
+          "result": "Underprediction 0.95 repetitions (95% CI 0.17–1.73); I²=97.9%.",
+          "restriction": "Measurement estimate only; not treatment effect, personalized correction or threshold."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "rpe-load-squat-strength@1",
+      "scope": {
+        "question": "resistance-load-autoregulation",
+        "objective": "strength-development",
+        "population": "resistance-trained-men",
+        "experience": "trained",
+        "intervention": "rpe-selected-load-undulating",
+        "comparator": "percentage-based-load-undulating",
+        "outcome": "squat-one-rm",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Squat 1RM improved in both groups; the between-group difference was not statistically significant.",
+      "limitations": "21 included, realized loads differ, comparator had conditional progression and missed-rep adjustments; no equivalence test.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "helms-rpe-loading@1",
+          "locator": "Results: One-repetition maximum strength and muscle thickness; Abstract",
+          "result": "RPE +17.05±5.44 kg, percentage +13.91±5.89 kg; ES 0.50 with reported 90% confidence limits ±0.63.",
+          "restriction": "Specific trained male sample and protocol; no hybrid transfer approval."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "rpe-load-bench-strength@1",
+      "scope": {
+        "question": "resistance-load-autoregulation",
+        "objective": "strength-development",
+        "population": "resistance-trained-men",
+        "experience": "trained",
+        "intervention": "rpe-selected-load-undulating",
+        "comparator": "percentage-based-load-undulating",
+        "outcome": "bench-one-rm",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Bench press 1RM improved in both groups; the between-group difference was not statistically significant.",
+      "limitations": "Same sample as squat claim; not independent replication, no equivalence; sets/reps matched not realized loads.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "helms-rpe-loading@1",
+          "locator": "Results: One-repetition maximum strength and muscle thickness; Abstract",
+          "result": "RPE +10.70±3.30 kg, percentage +9.64±5.36 kg; ES 0.28 with reported 90% confidence limits ±0.73.",
+          "restriction": "Specific protocol; no independent adjustment-increment efficacy claim."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "autoregulated-load-pooled-one-rm@1",
+      "scope": {
+        "question": "resistance-load-autoregulation",
+        "objective": "strength-development",
+        "population": "resistance-trained-individuals",
+        "experience": "trained",
+        "intervention": "rpe-or-velocity-load-autoregulation",
+        "comparator": "standardized-percentage-loading",
+        "outcome": "one-rm-strength",
+        "horizon": "intervention-end",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Pooled strength estimate favored autoregulated loading with an interval crossing zero.",
+      "limitations": "Six load studies; varied tests/methods; not equivalence or direct RPE rule.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hickmott-autoregulation@1",
+          "locator": "Abstract Results, load-autoregulation contrast",
+          "result": "MD +2.07 kg (95% CI −0.32–4.46), SMD 0.21, p=0.09.",
+          "restriction": "Mixed strength outcomes; no approved individual transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "lower-velocity-loss-one-rm@1",
+      "scope": {
+        "question": "resistance-velocity-loss",
+        "objective": "strength-development",
+        "population": "resistance-trained-individuals",
+        "experience": "trained",
+        "intervention": "velocity-loss-at-most-25-percent",
+        "comparator": "velocity-loss-above-25-percent",
+        "outcome": "one-rm-strength",
+        "horizon": "intervention-end",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Lower velocity-loss conditions had a larger pooled strength improvement.",
+      "limitations": "Realized repetitions differ; method-specific, not weekly set adjustment.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hickmott-autoregulation@1",
+          "locator": "Abstract Results, volume-autoregulation contrast",
+          "result": "MD +2.32 kg (95% CI 0.33–4.31).",
+          "restriction": "Threshold comparison is not a universal operational cutoff or RIR conversion."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "higher-velocity-loss-csa@1",
+      "scope": {
+        "question": "resistance-velocity-loss",
+        "objective": "hypertrophy",
+        "population": "resistance-trained-individuals",
+        "experience": "trained",
+        "intervention": "velocity-loss-above-25-percent",
+        "comparator": "velocity-loss-at-most-25-percent",
+        "outcome": "muscle-cross-sectional-area",
+        "horizon": "intervention-end",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Higher velocity-loss conditions had a larger pooled CSA change.",
+      "limitations": "Same review as strength claim; repetitions differ, no independent threshold effect.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hickmott-autoregulation@1",
+          "locator": "Abstract Results, volume-autoregulation contrast",
+          "result": "MD +0.61 cm² (95% CI 0.05–1.16) favoring higher loss.",
+          "restriction": "Outcome is CSA, not strength or readiness."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "failure-matched-reps-acute-recovery@1",
+      "scope": {
+        "question": "resistance-acute-recovery",
+        "objective": "task-recovery",
+        "population": "resistance-trained-men",
+        "experience": "trained",
+        "intervention": "three-sets-ten-reps-to-failure",
+        "comparator": "six-sets-five-reps-same-total",
+        "outcome": "neuromuscular-performance-recovery",
+        "horizon": "up-to-72-hours",
+        "block_context": "resistance-exercise"
+      },
+      "assertion": "The failure protocol produced greater acute impairment and slower recovery than the matched-repetition alternative.",
+      "limitations": "Ten men, set/rest structure differs, specific jump/velocity tests; no direct hybrid performance or chronic effect.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "moran-navarro-failure-recovery@1",
+          "locator": "Abstract Methods and Results",
+          "result": "Greater acute jump and velocity impairment; slower recovery at 24–48h; precise contrast intervals not extracted.",
+          "restriction": "Acute protocol result, not a mandatory recovery interval."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hrv-guided-pooled-endurance-performance@1",
+      "scope": {
+        "question": "endurance-hrv-guided-training",
+        "objective": "endurance-performance",
+        "population": "endurance-training-participants",
+        "experience": "mixed",
+        "intervention": "hrv-guided-endurance-training",
+        "comparator": "predefined-endurance-training",
+        "outcome": "endurance-performance",
+        "horizon": "intervention-end",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The pooled performance estimate favored HRV-guided training with an interval crossing zero.",
+      "limitations": "Small heterogeneous protocols and overlap; no proof of superiority or equivalence; no component isolation.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "manresa-rocamora-hrv-guided@1",
+          "locator": "Abstract Results, endurance performance",
+          "result": "SMD 0.20 (95% CI −0.09–0.48).",
+          "restriction": "Bundled interventions and specific outcomes, no hybrid transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hrv-guided-pooled-vagal-hrv@1",
+      "scope": {
+        "question": "endurance-hrv-guided-training",
+        "objective": "autonomic-modulation",
+        "population": "endurance-training-participants",
+        "experience": "mixed",
+        "intervention": "hrv-guided-endurance-training",
+        "comparator": "predefined-endurance-training",
+        "outcome": "vagal-related-hrv",
+        "horizon": "intervention-end",
+        "block_context": "endurance-training"
+      },
+      "assertion": "HRV-guided training improved pooled vagal-related HRV indices more than predefined training.",
+      "limitations": "Autonomic outcome is not race performance or global recovery.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "manresa-rocamora-hrv-guided@1",
+          "locator": "Abstract Results, vagal indices",
+          "result": "SMD 0.50 (95% CI 0.09–0.91).",
+          "restriction": "No inference of individual task readiness."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "adaptive-running-max-treadmill-speed@1",
+      "scope": {
+        "question": "running-adaptive-programming",
+        "objective": "running-performance",
+        "population": "recreational-runners",
+        "experience": "recreational",
+        "intervention": "multivariable-adaptive-endurance-program",
+        "comparator": "predefined-endurance-program",
+        "outcome": "maximal-treadmill-speed",
+        "horizon": "twelve-weeks-after-preparation",
+        "block_context": "endurance-training"
+      },
+      "assertion": "Both programs improved maximal treadmill speed; between-group contrast was uncertain.",
+      "limitations": "Same small trial as adaptive-running-ten-km-performance@1; attrition and selective exclusions, little other training.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "nuuttila-adaptive-running@1",
+          "locator": "Results: Performance and laboratory tests, Table 3",
+          "result": "Change +4.0±1.9% IND vs +3.0±2.4% PD; ES 0.46 (95% CI −0.27–1.18), p=0.322.",
+          "restriction": "Separate endpoint from 10-km outcome; not a replication, no HRV component attribution."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "acute-sleep-loss-exercise-performance@1",
+      "scope": {
+        "question": "sleep-acute-performance",
+        "objective": "exercise-performance",
+        "population": "exercise-study-participants",
+        "experience": "mixed",
+        "intervention": "acute-sleep-loss",
+        "comparator": "normal-sleep",
+        "outcome": "exercise-performance-percent-change",
+        "horizon": "acute",
+        "block_context": "exercise-assessment"
+      },
+      "assertion": "Pooled acute exercise performance was lower under sleep loss.",
+      "limitations": "High heterogeneity, diverse protocols/tasks, predominantly male; acute not chronic and no dose-to-adjustment rule.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "craven-sleep-loss@1",
+          "locator": "Abstract Results, pooled performance effect",
+          "result": "−7.56% (95% CI −11.9 to −3.13); I²=98.1%.",
+          "restriction": "No automatic workout cancellation or prediction from hours slept."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "wearable-sleep-stage-reference-agreement@1",
+      "scope": {
+        "question": "sleep-device-measurement",
+        "objective": "evaluate-sleep-measurement",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "six-tested-wearable-sleep-stage-estimates",
+        "comparator": "polysomnography",
+        "outcome": "multi-state-epoch-agreement",
+        "horizon": "one-laboratory-night",
+        "block_context": "sleep-assessment"
+      },
+      "assertion": "Agreement of sleep-stage estimates with PSG varied and was limited in the tested devices.",
+      "limitations": "Single night; specific devices and protocol; prevalence and algorithm dependence, no longitudinal responsiveness estimate.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "miller-wearable-sleep-hrv@1",
+          "locator": "Table 3 and Results, multi-state categorisation",
+          "result": "Across six devices 50–65% agreement; Cohen κ 0.20–0.52.",
+          "restriction": "Measurement agreement, not treatment effect, no generalization to untested device/algorithm."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "wearable-sleep-wake-reference-agreement@1",
+      "scope": {
+        "question": "sleep-device-measurement",
+        "objective": "evaluate-sleep-measurement",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "six-tested-wearable-sleep-wake-estimates",
+        "comparator": "polysomnography",
+        "outcome": "two-state-epoch-agreement",
+        "horizon": "one-laboratory-night",
+        "block_context": "sleep-assessment"
+      },
+      "assertion": "Sleep/wake classification agreement exceeded multi-state agreement in these devices.",
+      "limitations": "Same participants; agreement affected by prevalence, wake detection and algorithm.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "miller-wearable-sleep-hrv@1",
+          "locator": "Table 3 and Results, two-state categorisation",
+          "result": "Across six devices 86–89% agreement; Cohen κ 0.30–0.51.",
+          "restriction": "Not proof of accurate duration or longitudinal sensitivity for every device."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "acute-lifting-running-perceived-effort@1",
+      "scope": {
+        "question": "acute-strength-running-response",
+        "objective": "running-session-tolerance",
+        "population": "runners",
+        "experience": "mixed",
+        "intervention": "acute-strength-training-before-running",
+        "comparator": "control-without-prior-strength-session",
+        "outcome": "running-perceived-exertion",
+        "horizon": "acute",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Pooled perceived exertion was higher following strength training.",
+      "limitations": "Heterogeneous prior lifting/running tasks and delays, effect magnitude not extracted.",
+      "quality": "low",
+      "assessment": "Preliminary AI-assisted appraisal; independent verification and transfer review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "carvalho-silva-acute-running@1",
+          "locator": "Abstract Results and Conclusion, RPE comparison",
+          "result": "Reported p<0.0001; pooled effect estimate and CI not extracted; do not infer magnitude from p.",
+          "restriction": "Acute perceived exertion, not chronic interference, no fixed spacing."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "task-specific-effort-adjustment@1",
+      "question": "resistance-load-autoregulation",
+      "description": "Review comparable completed load and repetitions, optional anchored effort, task purpose and authorized bounds; permit hold, bounded changes or clarification.",
+      "provenance": "Original candidate methodology, Research Packet 008 revision 0.1, sections 3–4.",
+      "tradeoffs": "No exact RIR, automatic increment, or claim that adaptive rule is optimal.",
+      "claims": [
+        "predicted-rir-signed-error@1",
+        "rpe-load-squat-strength@1",
+        "rpe-load-bench-strength@1",
+        "autoregulated-load-pooled-one-rm@1",
+        "load-vs-repetition-progression@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "recovery-aware-set-dose-review@1",
+      "question": "hybrid-recovery-methodology",
+      "description": "Review actual working sets, progression and local tolerance together with endurance demands; hold a productive dose or propose bounded redistribution or reduction.",
+      "provenance": "Original candidate methodology, Research Packet 008 revision 0.1, sections 3–4.",
+      "tradeoffs": "Velocity loss does not establish weekly set rule; local fatigue need not reduce all tasks.",
+      "claims": [
+        "habitual-set-maintenance-strength@1",
+        "set-progression-derived-strain@1",
+        "lower-velocity-loss-one-rm@1",
+        "failure-matched-reps-acute-recovery@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "recovery-observation-eligibility@1",
+      "question": "hybrid-recovery-methodology",
+      "description": "Separate eligible task-matched comparisons, qualitative observations and missing/ineligible data; ask targeted feedback when material to choice.",
+      "provenance": "Original candidate methodology, Research Packet 008 revision 0.1, sections 3–4.",
+      "tradeoffs": "Measurement agreement and responsiveness do not establish incremental utility; no composite readiness score.",
+      "claims": [
+        "predicted-rir-signed-error@1",
+        "wearable-sleep-stage-reference-agreement@1",
+        "wearable-sleep-wake-reference-agreement@1",
+        "load-and-wellbeing@1",
+        "nocturnal-heart-rate@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "recovery-aware-priority-session-review@1",
+      "question": "hybrid-recovery-methodology",
+      "description": "Protect priority sessions, consider local burden and competing explanations, and propose bounded calendar or dose changes rather than automatic rest.",
+      "provenance": "Original candidate methodology, Research Packet 008 revision 0.1, sections 3–4.",
+      "tradeoffs": "Endurance intervention is bundled and not direct hybrid evidence; secondary commitments need review.",
+      "claims": [
+        "adaptive-running-ten-km-performance@1",
+        "adaptive-running-max-treadmill-speed@1",
+        "hrv-guided-pooled-endurance-performance@1",
+        "acute-lifting-running-perceived-effort@1",
+        "failure-matched-reps-acute-recovery@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "contextual-autonomic-sleep-review@1",
+      "question": "hybrid-recovery-methodology",
+      "description": "Use eligible autonomic and sleep observations as context, not deterministic readiness; exclude unknown units or protocol and retain other observations.",
+      "provenance": "Original candidate methodology, Research Packet 008 revision 0.1, sections 3–4.",
+      "tradeoffs": "Optional sensors; no universal thresholds or diagnostic inference; incremental value unverified.",
+      "claims": [
+        "hrv-guided-pooled-endurance-performance@1",
+        "hrv-guided-pooled-vagal-hrv@1",
+        "acute-sleep-loss-exercise-performance@1",
+        "wearable-sleep-stage-reference-agreement@1",
+        "nocturnal-heart-rate@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "bounded-recovery-review-and-approval@1",
+      "question": "hybrid-recovery-methodology",
+      "description": "Review comparable outcomes and actual exposure, propose smallest feasible change consistent with objectives, revalidate restrictions and obtain approval; preserve history.",
+      "provenance": "Original candidate methodology, Research Packet 008 revision 0.1, sections 3–4.",
+      "tradeoffs": "Procedure is not proven efficacy; clinical restrictions and uncertainty override ordinary progression.",
+      "claims": [
+        "load-and-wellbeing@1",
+        "midblock-cessation-dynamic-strength@1",
+        "adaptive-running-ten-km-performance@1",
+        "acute-sleep-loss-exercise-performance@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
