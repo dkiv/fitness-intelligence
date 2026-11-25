@@ -1,0 +1,946 @@
+{
+  "questions": [
+    {
+      "id": "hybrid-periodization-comparison",
+      "description": "How does concentration of concurrent conditioning or training emphasis affect specified performance?",
+      "gap": "Direct running plus lifting comparisons and long-term outcomes lacking."
+    },
+    {
+      "id": "endurance-block-organization",
+      "description": "How does concentrated endurance training affect capacity?",
+      "gap": "No direct optimal hybrid duration."
+    },
+    {
+      "id": "strength-flexible-organization",
+      "description": "How does session-order flexibility affect trained lifting outcomes?",
+      "gap": "No validated adaptive joint policy."
+    },
+    {
+      "id": "strength-maintenance-dose",
+      "description": "How does reduced strength exposure affect retention after development?",
+      "gap": "Outcome-specific minimum in trained hybrid athletes unknown."
+    },
+    {
+      "id": "endurance-maintenance-dose",
+      "description": "How does reduced endurance exposure affect outcome retention?",
+      "gap": "Race-specific and mechanical tolerance floors unknown."
+    },
+    {
+      "id": "endurance-detraining",
+      "description": "How does reduced or stopped training relate to aerobic capacity?",
+      "gap": "Protocol and population heterogeneity; no individual loss prediction."
+    },
+    {
+      "id": "strength-deload-intervention",
+      "description": "How do cessation and reduced-dose recovery weeks affect strength and size?",
+      "gap": "Planned vs reactive and coordinated recovery comparisons missing."
+    },
+    {
+      "id": "endurance-taper-performance",
+      "description": "How does tapering affect endurance time-trial performance?",
+      "gap": "No joint taper dose or event-specific individual optimum."
+    },
+    {
+      "id": "hybrid-block-methodology",
+      "description": "How should a coach construct and adapt joint blocks?",
+      "gap": "Methodology not a validated optimization algorithm."
+    }
+  ],
+  "sources": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "ronnestad-hockey-block@1",
+      "citation": "Rønnestad BR, Øfsteng SJ, Ellefsen S. Block periodization of strength and endurance training is superior to traditional periodization in ice hockey players. Scand J Med Sci Sports. 2019;29:180–188.",
+      "doi": "10.1111/sms.13326",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/30350896/",
+      "published_on": "2018-11-08",
+      "design": "Randomized parallel concurrent-training trial",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Six weeks, 8/group; reported matched assigned volume/intensity, verify realized dose, sex, baseline and outcome contrasts.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "micke-hift-block@1",
+      "citation": "Micke F, Huelle J, D’Hulst G, Isenmann E, Geisler S, Held S. Block periodization vs. traditional periodization in high-intensity functional training: a randomized crossover study. Front Physiol. 2026;17:1810477.",
+      "doi": "10.3389/fphys.2026.1810477",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/42245829/",
+      "published_on": "2026-05-20",
+      "design": "Randomized crossover conditioning trial",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "CC BY stated by publisher; catalog restricted to metadata, links and original summaries pending review.",
+      "appraisal": "Publisher Methods and Results/abstract inspected; unmonitored background lifting, carryover, multiplicity and realized dose limit inference. Complete model/supplement verification outstanding.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "molmen-endurance-block@1",
+      "citation": "Mølmen KS, Øfsteng SJ, Rønnestad BR. Block periodization of endurance training – a systematic review and meta-analysis. Open Access J Sports Med. 2019;10:145–160.",
+      "doi": "10.2147/OAJSM.S180408",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/31802956/",
+      "published_on": "2019-10-17",
+      "design": "Systematic review and meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Six pooled parallel studies, small/low-quality, prediction intervals cross zero, includes hockey trial; original accessible Methods and Results inspected.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "colquhoun-flexible-dup@1",
+      "citation": "Colquhoun RJ et al. Comparison of Powerlifting Performance in Trained Men Using Traditional and Flexible Daily Undulating Periodization. J Strength Cond Res. 2017;31:283–291.",
+      "doi": "10.1519/JSC.0000000000001500",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/28129275/",
+      "published_on": "2017-02-01",
+      "design": "Randomized resistance-training trial",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding. Date uses first day of issue month because day was not verified; resolve before release.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Flexible session order, small trained male sample; direct contrast and precision not extracted.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "bickel-retention@1",
+      "citation": "Bickel CS, Cross JM, Bamman MM. Exercise dosing to retain resistance training adaptations in young and older adults. Med Sci Sports Exerc. 2011;43:1177–1187.",
+      "doi": "10.1249/MSS.0b013e318207c15d",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/21131862/",
+      "published_on": "2011-07-01",
+      "design": "Two-phase randomized reduced-dose trial",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding. Date uses first day of issue month because day was not verified; resolve before release.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Recently acquired gains, age-specific retention; full outcome definitions and contrast precision outstanding.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "ronnestad-soccer-maintenance@1",
+      "citation": "Rønnestad BR, Nymark BS, Raastad T. Effects of in-season strength maintenance training frequency in professional soccer players. J Strength Cond Res. 2011;25:2653–2660.",
+      "doi": "10.1519/JSC.0b013e31822dcd96",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/21873897/",
+      "published_on": "2011-10-01",
+      "design": "Comparative in-season strength maintenance trial",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding. Date uses first day of issue month because day was not verified; resolve before release.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Abstract and partial indexed manuscript table; version and direct contrast not verified; frequency and total dose differ.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "ronnestad-cycling-maintenance@1",
+      "citation": "Rønnestad BR, Hansen EA, Raastad T. In-season strength maintenance training increases well-trained cyclists’ performance. Eur J Appl Physiol. 2010;110:1269–1282.",
+      "doi": "10.1007/s00421-010-1622-4",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/20799042/",
+      "published_on": "2010-08-27",
+      "design": "Comparative concurrent-training intervention",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Six participants per arm; development and maintenance not independently randomized.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hickson-frequency-retention@1",
+      "citation": "Hickson RC, Rosenkoetter MA. Reduced training frequencies and maintenance of increased aerobic power. Med Sci Sports Exerc. 1981;13:13–16.",
+      "doi": "10.1249/00005768-198101000-00011",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/7219129/",
+      "published_on": "1981-01-01",
+      "design": "Two-phase endurance training study",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding. Date uses first day of issue month because day was not verified; resolve before release.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Issue 1 date placeholder; actual date verify. Newly trained young adults, high intensity retained, no race outcome.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hickson-duration-retention@1",
+      "citation": "Hickson RC, Kanakis C Jr, Davis JR, Moore AM, Rich S. Reduced training duration effects on aerobic power, endurance, and cardiac growth. J Appl Physiol. 1982;53:225–229.",
+      "doi": "10.1152/jappl.1982.53.1.225",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/6214534/",
+      "published_on": "1982-07-01",
+      "design": "Two-phase endurance training study",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Publisher abstract; reduced duration at retained intensity and frequency; distinct long-duration outcome; verify numerical table.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hickson-intensity-retention@1",
+      "citation": "Hickson RC, Foster C, Pollock ML, Galassi TM, Rich S. Reduced training intensities and loss of aerobic power, endurance, and cardiac growth. J Appl Physiol. 1985;58:492–499.",
+      "doi": "10.1152/jappl.1985.58.2.492",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/3156841/",
+      "published_on": "1985-02-01",
+      "design": "Two-phase endurance training study",
+      "access": "abstract",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding. Date uses first day of issue month because day was not verified; resolve before release.",
+      "rights": "Reuse rights not independently verified; metadata, links and original factual summaries only.",
+      "appraisal": "Abstract and indexed Methods passages, not complete original; small groups, work-rate reductions, no race outcome.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "zheng-detraining@1",
+      "citation": "Zheng J, Pan T, Jiang Y, Shen Y. Effects of Short- and Long-Term Detraining on Maximal Oxygen Uptake in Athletes: A Systematic Review and Meta-Analysis. Biomed Res Int. 2022;2022:2130993.",
+      "doi": "10.1155/2022/2130993",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/36017396/",
+      "published_on": "2022-08-16",
+      "design": "Systematic review and meta-analysis of detraining observations",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "CC BY stated in article; metadata and original factual summaries only pending review.",
+      "appraisal": "Results and discussion inspected; pre/post estimates, varied partial and complete cessation, long-period publication bias.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "pancar-reduced-deload@1",
+      "citation": "Pancar Z et al. Effects of deload periods in resistance training on muscle hypertrophy and strength endurance in untrained young men using a randomized within subject design. Sci Rep. 2026;16:10299.",
+      "doi": "10.1038/s41598-026-40612-5",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/41730991/",
+      "published_on": "2026-02-24",
+      "design": "Randomized within-subject resistance-training trial",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "CC BY-NC-ND 4.0 stated in PMC record; metadata, links and original factual summaries only pending rights review.",
+      "appraisal": "Publisher Methods and Results inspected; novice unilateral local protocol, crossover effects possible, not whole-body or 1RM outcome.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "wang-endurance-taper@1",
+      "citation": "Wang Z, Wang YT, Gao W, Zhong Y. Effects of tapering on performance in endurance athletes: A systematic review and meta-analysis. PLoS One. 2023;18:e0282838.",
+      "doi": "10.1371/journal.pone.0282838",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37163550/",
+      "published_on": "2023-05-10",
+      "design": "Systematic review and meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Published bibliographic record and stated result access checked; independent version, correction and retraction review outstanding.",
+      "rights": "CC BY stated by publisher; metadata, links and original factual summaries only pending review.",
+      "appraisal": "Publisher Results and subgroup tables inspected. Controlled and pre/post comparisons distinct; review trial overlap and control protocols.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hockey-block-knee-torque@1",
+      "scope": {
+        "question": "hybrid-periodization-comparison",
+        "objective": "performance-development",
+        "population": "ice-hockey-players",
+        "experience": "well-trained",
+        "intervention": "alternating-weekly-strength-power-endurance-focus",
+        "comparator": "mixed-weekly-strength-power-endurance",
+        "outcome": "knee-extension-torque-180-deg-sec",
+        "horizon": "six-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The concentrated group improved knee-extension torque at 180 degrees per second more than mixed weekly training.",
+      "limitations": "8 per group; no direct running or lift 1RM outcome; realized dose and CI unverified.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ronnestad-hockey-block@1",
+          "locator": "Abstract Results",
+          "result": "Change +6.6 ± 8.7% vs −4.2 ± 6.3%; reported p<0.05. Dispersion type verify.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hockey-block-vo2max@1",
+      "scope": {
+        "question": "hybrid-periodization-comparison",
+        "objective": "performance-development",
+        "population": "ice-hockey-players",
+        "experience": "well-trained",
+        "intervention": "alternating-weekly-strength-power-endurance-focus",
+        "comparator": "mixed-weekly-strength-power-endurance",
+        "outcome": "vo2max",
+        "horizon": "six-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The concentrated group improved maximal oxygen uptake more than mixed weekly training.",
+      "limitations": "8 per group; no direct running or lift 1RM outcome; realized dose and CI unverified.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ronnestad-hockey-block@1",
+          "locator": "Abstract Results",
+          "result": "Change +5.1 ± 3.3% vs +1.1 ± 3.5%; reported p<0.05. Dispersion type verify.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hift-conditioning-block-deadlift@1",
+      "scope": {
+        "question": "hybrid-periodization-comparison",
+        "objective": "performance-development",
+        "population": "hift-athletes",
+        "experience": "experienced",
+        "intervention": "concentrated-conditioning-intensity",
+        "comparator": "evenly-distributed-conditioning-intensity",
+        "outcome": "deadlift-one-rm",
+        "horizon": "six-weeks-per-condition",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Deadlift 1RM change favored concentrated conditioning in this crossover.",
+      "limitations": "Unmonitored strength training; possible carryover; no race outcome; model contrast requires verification.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "micke-hift-block@1",
+          "locator": "Abstract Results; Methods 2.2–2.3",
+          "result": "Reported d=0.85, p=0.018 favoring concentrated condition; CI not extracted.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "endurance-block-vo2max@1",
+      "scope": {
+        "question": "endurance-block-organization",
+        "objective": "performance-development",
+        "population": "endurance-and-team-sport-athletes",
+        "experience": "trained-or-well-trained",
+        "intervention": "concentrated-endurance-blocks",
+        "comparator": "traditional-endurance-organization",
+        "outcome": "vo2max",
+        "horizon": "one-to-twelve-weeks",
+        "block_context": "endurance-development"
+      },
+      "assertion": "The pooled estimate favored concentrated endurance blocks for this outcome.",
+      "limitations": "Six small heterogeneous parallel studies; mean PEDro 3.7/10; overlaps hockey study; prediction interval crosses zero.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "molmen-endurance-block@1",
+          "locator": "Results meta-analysis, Figure 2",
+          "result": "SMD 0.40 (95% CI 0.02–0.79); prediction interval −0.32 to 1.12.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "endurance-block-max-power@1",
+      "scope": {
+        "question": "endurance-block-organization",
+        "objective": "performance-development",
+        "population": "endurance-and-team-sport-athletes",
+        "experience": "trained-or-well-trained",
+        "intervention": "concentrated-endurance-blocks",
+        "comparator": "traditional-endurance-organization",
+        "outcome": "incremental-maximal-power",
+        "horizon": "one-to-twelve-weeks",
+        "block_context": "endurance-development"
+      },
+      "assertion": "The pooled estimate favored concentrated endurance blocks for this outcome.",
+      "limitations": "Six small heterogeneous parallel studies; mean PEDro 3.7/10; overlaps hockey study; prediction interval crosses zero.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "molmen-endurance-block@1",
+          "locator": "Results meta-analysis, Figure 3",
+          "result": "SMD 0.28 (95% CI 0.01–0.54); prediction interval −0.18 to 0.73.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "flexible-dup-powerlifting-total@1",
+      "scope": {
+        "question": "strength-flexible-organization",
+        "objective": "performance-development",
+        "population": "resistance-trained-men",
+        "experience": "at-least-six-months",
+        "intervention": "flexible-daily-undulating",
+        "comparator": "fixed-daily-undulating",
+        "outcome": "powerlifting-total",
+        "horizon": "nine-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Both groups improved total; flexible session ordering did not establish superiority.",
+      "limitations": "Small sample; no equivalence design; not arbitrary volume adjustment.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "colquhoun-flexible-dup@1",
+          "locator": "Abstract Results",
+          "result": "Mean change +36.8 vs +40.4 kg; direct contrast CI unavailable.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "young-reduced-dose-hypertrophy-retention@1",
+      "scope": {
+        "question": "strength-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "adults-aged-20-to-35",
+        "experience": "recently-trained",
+        "intervention": "one-third-or-one-ninth-development-dose",
+        "comparator": "end-of-development-reference",
+        "outcome": "muscle-hypertrophy",
+        "horizon": "thirty-two-weeks",
+        "block_context": "strength-maintenance"
+      },
+      "assertion": "The younger group retained acquired hypertrophy under both reduced-dose prescriptions as reported.",
+      "limitations": "Recently trained population; no individual equivalence margin or precise contrast; older subgroup differs.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "bickel-retention@1",
+          "locator": "Abstract Results",
+          "result": "Authors report retention with both reduced doses in younger group; contrast interval not extracted.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "soccer-weekly-strength-retention@1",
+      "scope": {
+        "question": "strength-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "professional-soccer-players",
+        "experience": "trained",
+        "intervention": "weekly-strength-maintenance",
+        "comparator": "alternate-week-strength-maintenance",
+        "outcome": "leg-strength",
+        "horizon": "twelve-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Reported retention patterns differed descriptively between weekly and alternate-week maintenance groups.",
+      "limitations": "7/group; within-group significance difference does not establish interaction; cumulative dose differs.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ronnestad-soccer-maintenance@1",
+          "locator": "Abstract Results",
+          "result": "Reported no detected decline weekly and within-group decline alternate-week (p<0.05); direct contrast unverified.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "cyclist-strength-retention@1",
+      "scope": {
+        "question": "strength-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "well-trained-cyclists",
+        "experience": "trained",
+        "intervention": "once-weekly-strength-after-development",
+        "comparator": "end-of-development-reference",
+        "outcome": "leg-one-rm",
+        "horizon": "thirteen-weeks",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "The combined group retained its preceding strength gain during the maintenance phase as reported.",
+      "limitations": "Six combined participants, no matched development then withdrawal comparator; not a minimum effective dose.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "ronnestad-cycling-maintenance@1",
+          "locator": "Abstract Results",
+          "result": "Authors report preserved preceding strength gain; change estimate and CI unavailable.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "reduced-endurance-frequency-vo2max@1",
+      "scope": {
+        "question": "endurance-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "young-adults",
+        "experience": "recently-trained",
+        "intervention": "two-or-four-days-per-week-retained-intensity-duration",
+        "comparator": "end-of-six-day-development-reference",
+        "outcome": "vo2max",
+        "horizon": "fifteen-weeks",
+        "block_context": "endurance-maintenance"
+      },
+      "assertion": "The two reduced-frequency groups retained newly improved VO2max as reported.",
+      "limitations": "12 participants, cycling and running, high intensity retained; no race outcome or equivalence margin.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hickson-frequency-retention@1",
+          "locator": "Abstract Results",
+          "result": "VO2max reported approximately unchanged after reduction from six days/week; CI not extracted.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "reduced-endurance-duration-long-endurance@1",
+      "scope": {
+        "question": "endurance-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "adults",
+        "experience": "recently-trained",
+        "intervention": "thirteen-minutes-per-day-retained-intensity-frequency",
+        "comparator": "end-of-forty-minute-development-reference",
+        "outcome": "long-duration-endurance",
+        "horizon": "fifteen-weeks",
+        "block_context": "endurance-maintenance"
+      },
+      "assertion": "Long-duration endurance declined after the larger duration reduction.",
+      "limitations": "Small sample, induced training, exact test and precision verify; no race outcome.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hickson-duration-retention@1",
+          "locator": "Publisher abstract Results",
+          "result": "Long-duration endurance declined ~10% in 13-min group despite reported VO2max retention; CI unavailable.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "reduced-endurance-intensity-long-endurance@1",
+      "scope": {
+        "question": "endurance-maintenance-dose",
+        "objective": "performance-retention",
+        "population": "adults",
+        "experience": "recently-trained",
+        "intervention": "one-third-or-two-thirds-work-rate-reduction",
+        "comparator": "end-of-development-reference",
+        "outcome": "long-duration-endurance",
+        "horizon": "fifteen-weeks",
+        "block_context": "endurance-maintenance"
+      },
+      "assertion": "Long-duration endurance declined in both reduced-work-rate groups.",
+      "limitations": "Small groups; not a comparison of HR-zone prescriptions; uncertainty not extracted.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hickson-intensity-retention@1",
+          "locator": "Publisher abstract Results",
+          "result": "Long endurance decreased 21% (184→145 min) and 30% (202→141 min) in respective groups.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "short-detraining-vo2max@1",
+      "scope": {
+        "question": "endurance-detraining",
+        "objective": "performance-retention",
+        "population": "athletes",
+        "experience": "mixed-trained",
+        "intervention": "detraining",
+        "comparator": "pre-detraining-trained-state",
+        "outcome": "vo2max",
+        "horizon": "under-thirty-days",
+        "block_context": "detraining"
+      },
+      "assertion": "Pooled pre/post estimate indicated lower VO2max after detraining.",
+      "limitations": "Varied partial/complete protocols and populations; association not individual loss rate.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "zheng-detraining@1",
+          "locator": "Results 3.3",
+          "result": "ES −0.62 (95% CI −0.94 to −0.31); I² 35.3%.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "long-detraining-vo2max@1",
+      "scope": {
+        "question": "endurance-detraining",
+        "objective": "performance-retention",
+        "population": "athletes",
+        "experience": "mixed-trained",
+        "intervention": "detraining",
+        "comparator": "pre-detraining-trained-state",
+        "outcome": "vo2max",
+        "horizon": "at-least-thirty-days",
+        "block_context": "detraining"
+      },
+      "assertion": "Pooled pre/post estimate indicated lower VO2max after detraining.",
+      "limitations": "Varied partial/complete protocols and populations; association not individual loss rate.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "zheng-detraining@1",
+          "locator": "Results 3.3",
+          "result": "ES −1.42 (95% CI −1.99 to −0.84); I² 76.3% and reported publication bias.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "midblock-cessation-dynamic-strength@1",
+      "scope": {
+        "question": "strength-deload-intervention",
+        "objective": "performance-development",
+        "population": "resistance-trained-young-adults",
+        "experience": "trained",
+        "intervention": "one-week-midblock-complete-rt-cessation",
+        "comparator": "continuous-resistance-training",
+        "outcome": "dynamic-lower-body-strength",
+        "horizon": "nine-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The dynamic strength contrast favored continuous training in point estimates with uncertainty.",
+      "limitations": "Complete cessation not reduced-volume deload; prior source access abstract; verify Table 3/model before approval.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "coleman@1",
+          "locator": "Abstract Results; Table 3 indexed passage noted in P006 H19",
+          "result": "Reported strength estimate favored continuous; Table 3 estimates −4.5 kg [−10.4, 2.8] and −3.6 [−10.4, 3.2] 95% CrI (model-column mapping not verified).",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "reduced-deload-quadriceps-thickness@1",
+      "scope": {
+        "question": "strength-deload-intervention",
+        "objective": "performance-development",
+        "population": "untrained-young-men",
+        "experience": "untrained",
+        "intervention": "two-reduced-volume-frequency-weeks",
+        "comparator": "continuous-unilateral-training",
+        "outcome": "lateral-quadriceps-midsite-thickness",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The paired thickness contrast was uncertain between reduced-dose and continuous protocols.",
+      "limitations": "19 men, local unilateral design, novice; not equivalence or systemic recovery evidence.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "pancar-reduced-deload@1",
+          "locator": "Results muscle thickness, Table 1; lateral 50%",
+          "result": "Paired difference −0.76 mm (95% CI −2.20 to 0.68).",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "endurance-taper-controlled-time-trial@1",
+      "scope": {
+        "question": "endurance-taper-performance",
+        "objective": "performance-development",
+        "population": "endurance-athletes",
+        "experience": "trained",
+        "intervention": "endurance-taper",
+        "comparator": "control-training",
+        "outcome": "time-trial-performance",
+        "horizon": "precompetition-taper",
+        "block_context": "endurance-taper"
+      },
+      "assertion": "Pooled controlled time-trial comparison favored tapering.",
+      "limitations": "Mixed modes and control protocols, contributing trial review needed; no hybrid taper comparison.",
+      "quality": "moderate",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "wang-endurance-taper@1",
+          "locator": "Results Time trial, Figure 3",
+          "result": "SMD −0.73 (95% CI −1.25 to −0.21), I² 31%; negative favors taper.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "endurance-taper-prepost-time-trial@1",
+      "scope": {
+        "question": "endurance-taper-performance",
+        "objective": "performance-development",
+        "population": "endurance-athletes",
+        "experience": "trained",
+        "intervention": "endurance-taper",
+        "comparator": "pre-taper-reference",
+        "outcome": "time-trial-performance",
+        "horizon": "precompetition-taper",
+        "block_context": "endurance-taper"
+      },
+      "assertion": "Time-trial performance improved on average in pooled pre/post comparisons.",
+      "limitations": "Pre/post design, overlapping controlled trials; does not isolate intervention effect or optimum.",
+      "quality": "low",
+      "assessment": "Preliminary appraisal; directness to experienced hybrid athletes is limited; independent review outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "wang-endurance-taper@1",
+          "locator": "Results Time trial, Figure 2",
+          "result": "SMD −0.45 (95% CI −0.68 to −0.23); I² 8%.",
+          "restriction": "Only the stated population, protocol, endpoint and horizon; no approved transfer."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "hierarchical-hybrid-block-construction@1",
+      "question": "hybrid-block-methodology",
+      "description": "Select explicit joint priorities and baseline-relative exposure envelope; generate a feasible week, retaining commitments and allowing bounded review.",
+      "provenance": "Original candidate methodology, Research Packet 006 revision 0.1, sections 3–4.",
+      "tradeoffs": "No validated archetype ranking or duration; method and numerical parameters need separate review.",
+      "claims": [
+        "hockey-block-vo2max@1",
+        "hift-conditioning-block-deadlift@1",
+        "periodized-vs-constant-strength@1",
+        "adaptive-running-ten-km-performance@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "outcome-specific-strength-maintenance@1",
+      "question": "strength-maintenance-dose",
+      "description": "Retain selected lift-specific practice at tolerable loading and review comparable outcomes before further reductions.",
+      "provenance": "Original candidate methodology, Research Packet 006 revision 0.1, sections 3–4.",
+      "tradeoffs": "Evidence from different populations; no guaranteed floor; preserve low existing dose when appropriate.",
+      "claims": [
+        "soccer-weekly-strength-retention@1",
+        "cyclist-strength-retention@1",
+        "young-reduced-dose-hypertrophy-retention@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "outcome-specific-running-maintenance@1",
+      "question": "endurance-maintenance-dose",
+      "description": "Protect agreed running outcomes with habitual-relative specific exposure; assess retention separately from completion.",
+      "provenance": "Original candidate methodology, Research Packet 006 revision 0.1, sections 3–4.",
+      "tradeoffs": "Capacity does not establish running performance; duration and intensity tradeoffs uncertain.",
+      "claims": [
+        "reduced-endurance-frequency-vo2max@1",
+        "reduced-endurance-duration-long-endurance@1",
+        "exercise-wearable-vo2-agreement@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "joint-recovery-review@1",
+      "question": "strength-deload-intervention",
+      "description": "Choose hold, local change or coordinated stress reduction according to purpose, feedback, constraints and outcomes.",
+      "provenance": "Original candidate methodology, Research Packet 006 revision 0.1, sections 3–4.",
+      "tradeoffs": "No evidence-based universal timing or reduction; clinical concerns require appropriate referral.",
+      "claims": [
+        "midblock-cessation-dynamic-strength@1",
+        "reduced-deload-quadriceps-thickness@1",
+        "load-and-wellbeing@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "priority-coordinated-event-taper@1",
+      "question": "endurance-taper-performance",
+      "description": "Protect priority event by shaping both modalities and preserving appropriate specific exposure; compare feasible calendars.",
+      "provenance": "Original candidate methodology, Research Packet 006 revision 0.1, sections 3–4.",
+      "tradeoffs": "Single-discipline evidence does not establish optimal joint taper; no automatic overload or cutoff.",
+      "claims": [
+        "endurance-taper-controlled-time-trial@1",
+        "endurance-taper-prepost-time-trial@1",
+        "resistance-first-dynamic-strength@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction)",
+      "status": "pending",
+      "approval": null,
+      "key": "bounded-hybrid-review-transition@1",
+      "question": "hybrid-block-methodology",
+      "description": "Review comparable outcomes, actual exposure, burden and objectives; retain productive work, propose bounded change or explicit block revision.",
+      "provenance": "Original candidate methodology, Research Packet 006 revision 0.1, sections 3–4.",
+      "tradeoffs": "No causal individual model; missingness and alternative explanations matter; athlete approval required.",
+      "claims": [
+        "habitual-set-maintenance-strength@1",
+        "adaptive-running-ten-km-performance@1",
+        "lea-combined-myofibrillar-synthesis@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
