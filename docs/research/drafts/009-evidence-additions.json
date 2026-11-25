@@ -1,0 +1,155 @@
+{
+  "questions": [
+    {
+      "id": "individual-strength-repeatability",
+      "description": "How repeatable is measured exercise-specific strength or repetition-maximum performance under standardized repeat tests?",
+      "gap": "Ordinary submaximal training-set and e1RM repeatability in experienced hybrid athletes remains context-dependent; no individual threshold approved."
+    },
+    {
+      "id": "individual-history-review-methodology",
+      "description": "How can comparable historical actuals and prior decisions inform bounded personal coaching choices?",
+      "gap": "No direct validation of the complete candidate history workflow; contextual programming judgment and separate review required."
+    }
+  ],
+  "sources": [
+    {
+      "key": "grgic-one-rm-repeatability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction; Packet 009)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Grgic J, Lazinica B, Schoenfeld BJ, Pedisic Z. Test–Retest Reliability of the One-Repetition Maximum (1RM) Strength Assessment: a Systematic Review. Sports Med Open. 2020;6:31.",
+      "doi": "10.1186/s40798-020-00260-z",
+      "record_url": "https://link.springer.com/article/10.1186/s40798-020-00260-z",
+      "published_on": "2020-07-17",
+      "design": "Systematic review of test-retest reliability studies",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publisher full-text article and bibliographic record inspected; dedicated correction/retraction audit remains outstanding.",
+      "rights": "Open-access publisher article. Catalog use limited to metadata, links and original factual summaries; independent rights review outstanding.",
+      "appraisal": "32 studies, total n=1595; 14 studies included previously trained participants. COSMIN appraisal reported moderate or excellent quality; varied tests and descriptive aggregation; ICC is not absolute agreement.",
+      "next_review": "2027-02-25"
+    },
+    {
+      "key": "mitter-bench-repeatability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction; Packet 009)",
+      "status": "pending",
+      "approval": null,
+      "citation": "Mitter B, Csapo R, Bauer P, Tschan H. Reproducibility of strength performance and strength-endurance profiles: A test-retest study. PLoS ONE. 2022;17(5):e0268074.",
+      "doi": "10.1371/journal.pone.0268074",
+      "record_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0268074",
+      "published_on": "2022-05-05",
+      "design": "Test-retest laboratory measurement study",
+      "access": "full-text",
+      "checked_on": "2026-11-25",
+      "publication_check": "Publisher full-text article and bibliographic record inspected; dedicated correction/retraction audit remains outstanding.",
+      "rights": "Creative Commons Attribution license stated on publisher page. Catalog use limited to metadata, links and original factual summaries; independent rights review outstanding.",
+      "appraisal": "24 trained adults, standardized pin-supported bench press; repetition tests at relative loads derived from each visit's measured 1RM. Bayesian estimates, short horizon and small sample; no evaluation of coaching policies.",
+      "next_review": "2027-02-25"
+    }
+  ],
+  "claims": [
+    {
+      "key": "trained-measured-one-rm-repeatability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction; Packet 009)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "individual-strength-repeatability",
+        "objective": "assess-measurement-quality",
+        "population": "adults-with-prior-resistance-training",
+        "experience": "mixed-trained",
+        "intervention": "standardized-measured-one-rm",
+        "comparator": "repeat-measured-one-rm",
+        "outcome": "one-rm-repeatability",
+        "horizon": "study-specific-test-retest",
+        "block_context": "resistance-assessment"
+      },
+      "assertion": "Measured 1RM assessments in studies including previously resistance-trained participants generally had high reported relative repeatability with variable absolute relative error.",
+      "limitations": "Fourteen studies with previously trained participants; mixed exercises, protocols, training experience and retest intervals. Descriptive medians and ranges, not pooled CIs.",
+      "quality": "moderate",
+      "assessment": "Moderate for the reported study summaries; low directness for habitual submaximal sets, e1RM or any specific hybrid athlete threshold.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "grgic-one-rm-repeatability@1",
+          "locator": "Results: Reliability in Relation to Training Status and Familiarization; Table 3 and Fig. 2.",
+          "result": "ICC median 0.98 (range 0.64–0.99); CV median 3.3% (range 0.5–7.8%).",
+          "restriction": "Measured one-repetition maximum repeatability only; no individual change criterion or treatment effect."
+        }
+      ]
+    },
+    {
+      "key": "trained-bench-relative-load-repetition-repeatability@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction; Packet 009)",
+      "status": "pending",
+      "approval": null,
+      "scope": {
+        "question": "individual-strength-repeatability",
+        "objective": "assess-measurement-quality",
+        "population": "resistance-trained-adults",
+        "experience": "trained",
+        "intervention": "bench-repetition-maximum-relative-load",
+        "comparator": "repeat-bench-repetition-maximum-relative-load",
+        "outcome": "repetitions-to-failure-repeatability",
+        "horizon": "one-week-test-retest",
+        "block_context": "resistance-assessment"
+      },
+      "assertion": "Repetitions to momentary failure at the tested relative bench-press loads exhibited nonzero test-retest error.",
+      "limitations": "24 adults; at least one year bench training; loads recalculated from visit-specific 1RM; standardized technique/rest; not ordinary submaximal working sets.",
+      "quality": "moderate",
+      "assessment": "Moderate for protocol-specific posterior estimates; low directness to a personal absolute-load working set or hybrid fatigue context.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "mitter-bench-repeatability@1",
+          "locator": "Abstract Results; Results Table 1 and Fig. 2; Methods Experimental approach.",
+          "result": "SEM at 90% 1RM 0.7 repetitions (90% HDI 0.5–0.9), ICC 0.65 (0.39–0.83); at 70% 1RM SEM 1.1 (0.8–1.4), ICC 0.86 (0.71–0.93).",
+          "restriction": "Relative loads and failure tests; interval is not an individual minimum detectable change, adjustment increment or causal effect."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "key": "context-eligible-individual-history-review@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction; Packet 009)",
+      "status": "pending",
+      "approval": null,
+      "question": "individual-history-review-methodology",
+      "description": "Select task- and context-comparable historical actuals as of the decision, separate current demonstrated performance from historical records, summarize exposure and observed direction, and disclose exclusions and uncertainty before ordinary bounded planning.",
+      "provenance": "Original candidate programming/engineering methodology, Packet 009 sections 3–4; not a tested intervention.",
+      "tradeoffs": "Requires comparable observations or conservative fallback; selection and window choices need review; no universal recency weight, optimal dose or latent fitness inference.",
+      "claims": [
+        "trained-measured-one-rm-repeatability@1",
+        "trained-bench-relative-load-repetition-repeatability@1",
+        "outdoor-five-km-typical-error@1",
+        "predicted-rir-signed-error@1",
+        "morning-mass-variability-active-men@1"
+      ]
+    },
+    {
+      "key": "contextual-decision-response-history@1",
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction; Packet 009)",
+      "status": "pending",
+      "approval": null,
+      "question": "individual-history-review-methodology",
+      "description": "Retain earlier approved changes and actual response; review supporting and contradictory observations in context; use tentative patterns only for relevant, feasible, reversible proposals and update on new evidence.",
+      "provenance": "Original candidate programming/engineering methodology, Packet 009 sections 3–4; not a tested intervention.",
+      "tradeoffs": "Observed association does not establish causality. Requires attributable decision and actual execution or qualified recollection; current restrictions and athlete approval govern any change. No physiological parameter estimation.",
+      "claims": [
+        "habitual-set-maintenance-strength@1",
+        "same-session-trained-lower-body-strength@1",
+        "adaptive-running-ten-km-performance@1",
+        "short-detraining-vo2max@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
