@@ -79,6 +79,16 @@ no row. A reported zero contributes a row with value zero.
 | DailySleepDTO | Total seconds asleep excluding naps, plus light, deep, REM and awake seconds. Preserve confirmed sleep GMT bounds and Garmin's assigned date across midnight. Sleep duration and its breakdown are separate metrics. |
 | HrvChartDTO.hrvSummary | Preserve last-night and trailing-seven-day averages as two metrics. Chart GMT bounds describe overnight coverage. The weekly metric is indexed by its ending provider date and has no asserted UTC endpoints. |
 
+The Personal API v1 schema declares `DailySleepDTO.sleepStartTimestampGMT` and
+`sleepEndTimestampGMT` as date-time strings and describes the confirmed sleep bounds as
+UTC milliseconds. A bounded read of one verified sleep summary returned both as 13-digit
+JSON integers. Both matched the requested day’s vicinity when interpreted as milliseconds
+since the Unix epoch. The sleep mapper accepts that integer form using exact UTC millisecond
+arithmetic, alongside the existing GMT strings (offsetless, `Z`, or numeric offset).
+Missing bounds remain unknown, reversed bounds fail validation, and Garmin’s
+`calendarDate` remains the observation date even across midnight. Other integer widths,
+quoted numbers and fractional numeric tokens remain unsupported. [Garmin Personal API schema](https://developer.garmin.com/gc-developer-program/personal/swagger-docs/)
+
 Garmin describes device HRV in milliseconds. The Personal API v1 summary fields omit a unit.
 B2 records their numbers with `source_unit_unverified`. D1 must exclude these rows from
 millisecond-based comparisons until the API scale is confirmed. Individual HRV readings,

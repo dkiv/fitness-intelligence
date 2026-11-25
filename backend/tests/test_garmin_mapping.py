@@ -429,3 +429,107 @@ def test_fractional_selector_is_never_rounded_into_a_zone() -> None:
                 ]
             ),
         )
+
+
+@pytest.mark.parametrize(
+    "start,end",
+    [
+        (1_730_591_852_123, 1_730_617_741_987),
+        ("2024-11-02T23:57:32.123Z", "2024-11-03T07:09:01.987"),
+        ("2024-11-03T01:57:32.123+02:00", "2024-11-03T02:09:01.987-05:00"),
+    ],
+)
+def test_sleep_window_encodings_across_midnight(start: int | str, end: int | str) -> None:
+    (obs,) = map_day(
+        BINDING,
+        DAY,
+        sleep={
+            "calendarDate": DAY.isoformat(),
+            "userProfilePK": 81,
+            "sleepTimeSeconds": 18000,
+            "sleepStartTimestampGMT": start,
+            "sleepEndTimestampGMT": end,
+        },
+    )
+    assert obs.local_date == DAY
+    assert obs.window_start == datetime(2024, 11, 2, 23, 57, 32, 123000, tzinfo=UTC)
+    assert obs.window_end == datetime(2024, 11, 3, 7, 9, 1, 987000, tzinfo=UTC)
+
+
+@pytest.mark.parametrize("have_start,have_end", [(True, False), (False, True), (False, False)])
+def test_sleep_epoch_partial_window(have_start: bool, have_end: bool) -> None:
+    sleep = {"calendarDate": DAY.isoformat(), "userProfilePK": 81, "sleepTimeSeconds": 18000}
+    if have_start:
+        sleep["sleepStartTimestampGMT"] = 1_730_591_852_123
+    if have_end:
+        sleep["sleepEndTimestampGMT"] = 1_730_617_741_987
+    (obs,) = map_day(BINDING, DAY, sleep=sleep)
+    assert obs.window_start == (
+        datetime(2024, 11, 2, 23, 57, 32, 123000, tzinfo=UTC) if have_start else None
+    )
+    assert obs.window_end == (
+        datetime(2024, 11, 3, 7, 9, 1, 987000, tzinfo=UTC) if have_end else None
+    )
+
+
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        True,
+        0,
+        -1_730_591_852_123,
+        1_730_591_852,
+        1_730_591_852_123_000,
+        1_730_591_852_123_000_000,
+        "1730591852123",
+        Decimal("1730591852123.0"),
+        Decimal("1730591852123.25"),
+        "2024-11-02 23:57:32",
+        "2024-11-02T23:57:32.1234567Z",
+    ],
+)
+def test_reject_unsupported_sleep_instant(invalid: object) -> None:
+    with pytest.raises(MappingError):
+        map_day(
+            BINDING,
+            DAY,
+            sleep={
+                "calendarDate": DAY.isoformat(),
+                "userProfilePK": 81,
+                "sleepEndTimestampGMT": invalid,
+            },
+        )
+
+
+def test_sleep_epoch_rejects_reversed_window_and_other_feed_encodings() -> None:
+    with pytest.raises(MappingError, match="reversed measurement window"):
+        map_day(
+            BINDING,
+            DAY,
+            sleep={
+                "calendarDate": DAY.isoformat(),
+                "userProfilePK": 81,
+                "sleepStartTimestampGMT": 1_730_617_741_987,
+                "sleepEndTimestampGMT": 1_730_591_852_123,
+            },
+        )
+    with pytest.raises(MappingError, match="invalid timestamp"):
+        map_day(
+            BINDING,
+            DAY,
+            daily={
+                "calendarDate": DAY.isoformat(),
+                "userProfileId": 81,
+                "wellnessEndTimeGmt": 1_730_617_741_987,
+            },
+        )
+    with pytest.raises(MappingError, match="invalid timestamp"):
+        map_day(
+            BINDING,
+            DAY,
+            hrv={
+                "userProfilePk": 81,
+                "hrvSummary": {"calendarDate": DAY.isoformat()},
+                "startTimestampGMT": 1_730_591_852_123,
+            },
+        )

@@ -383,9 +383,15 @@ def map_activities(binding: GarminBinding, payload: object) -> tuple[Activity, .
 
 
 def window(row: Row, start_key: str, end_key: str) -> tuple[datetime | None, datetime | None]:
-    def instant(value: object) -> datetime | None:
+    def instant(key: str) -> datetime | None:
+        value = row.get(key)
         if value is None:
             return None
+        if key in ("sleepStartTimestampGMT", "sleepEndTimestampGMT") and type(value) is int:
+            # DailySleepDTO documents UTC milliseconds. Only its observed integer form is supported.
+            if not 10**12 <= value < 10**13:
+                raise MappingError("invalid sleep epoch milliseconds")
+            return datetime(1970, 1, 1, tzinfo=UTC) + timedelta(milliseconds=value)
         result = stamp(value, GMT_STAMP)
         # Offsetless timestamps are accepted exclusively in named GMT fields.
         try:
@@ -393,7 +399,7 @@ def window(row: Row, start_key: str, end_key: str) -> tuple[datetime | None, dat
         except OverflowError:
             raise MappingError("invalid UTC window") from None
 
-    start, end = instant(row.get(start_key)), instant(row.get(end_key))
+    start, end = instant(start_key), instant(end_key)
     if start and end and end < start:
         raise MappingError("reversed measurement window")
     return start, end
