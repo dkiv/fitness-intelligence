@@ -24,7 +24,7 @@ The findings below describe the AI-assisted checks in J3A.1. Independent human s
 
 The [pending fragment](drafts/j3a-001-evidence-revisions.json) reproduces Appendix A exactly. `habitual-set-maintenance-strength@2` cites `barsuhn@2` at the existing DOI. Each has a null approval. Packet 002 retains its original source and claim. Any future replacement requires a separate decision on the exact revisions and a review of each dependent method. The candidate contains no supersession or withdrawal.
 
-Four staged methods directly cite `habitual-set-maintenance-strength@1`: `working-set-volume-review@1`, `bounded-hybrid-review-transition@1`, `recovery-aware-set-dose-review@1` and Packet 009’s `contextual-decision-response-history@1`. The appraisal also flags `task-specific-effort-adjustment@1` and `priority-aware-concurrent-calendar@1` for review of related effort and scheduling claims. The [combined manifest check](../README.md#checking-the-packet-and-curation-drafts-against-j1) verifies the direct references.
+Five staged methods directly cite `habitual-set-maintenance-strength@1`. They are `working-set-volume-review@1`, `bounded-hybrid-review-transition@1`, `recovery-aware-set-dose-review@1`, Packet 009’s `contextual-decision-response-history@1` and Packet 010’s `rolling-horizon-block-intentions@1`. The appraisal also flags `task-specific-effort-adjustment@1` and `priority-aware-concurrent-calendar@1` for review of related effort and scheduling claims. The [combined manifest check](../README.md#checking-the-packet-and-curation-drafts-against-j1) verifies the direct references.
 
 ### Candidate methodology for review
 
@@ -44,4 +44,4 @@ Sections 7–8 preserve all 17 proposed parameters (N01–N17), the exact load i
 4. **Scope of effort deviations.** Determine when a deviation affects an individual set group and when session-wide effort should constrain progression of another, otherwise successful group.
 5. **Planner fit.** Inspect the current planner and its approval and persistence contracts before proposing new prescription fields, representations or stored state.
 
-These questions belong to future method review. J3C.1 approval and operational release preparation are pending. J3A.2 next addresses multiweek block construction and protection of secondary outcomes, followed by practical methodology for that capability. Packet 010 proceeds independently. [Curation roadmap](../research-backlog.md#strength-progression-curation)
+These questions belong to future method review. J3C.1 approval and operational release preparation are pending. Packet 010 closes scheduled preliminary collection. J3A.2 and J3B.2 will address multiweek block construction, protection of secondary outcomes and the corresponding practical method in a separate curation PR. [Curation roadmap](../research-backlog.md#strength-progression-curation)
