@@ -118,7 +118,7 @@ Start J3 with the cross-packet shortlist in section 7.2. Its A1–A10, B1–B2 a
 
 **Integrated recovery, fatigue management and autoregulation** (revision 0.1, 2026-11-25) is staged for independent review. The archive preserves the supplied bytes (SHA-256 `d83b3d570910e65e9538302377084cc2439369bb2e28de47b1aeb1e1d9edd430`). F01–F33 cover more evidence than the section 5 JSON fragment. The eleven packet-qualified research questions organize the appraisal, RE-P01–RE-P11 describe candidate decisions, and the fragment adds nine catalog question IDs. [Archived packet](008-integrated-recovery-autoregulation.md) · [Exact JSON fragment](drafts/008-evidence-additions.json) · [Question crosswalk and source revision requirement](research-backlog.md#packet-008-question-crosswalk)
 
-The research order is **001–006 → 008 → 007 → 009 → 010**. Recovery and autoregulation came forward so their limitations can inform the initial adaptive hybrid coaching methodology. Packet 007 is next and covers individual energy expenditure estimation and nutritional adaptation. J3 scientific curation can now proceed alongside the remaining research. [Integrated roadmap](research-backlog.md#proposed-integrated-sequence) · [Combined J3 priorities](research-backlog.md#j3-scientific-curation)
+The research order is **001–006 → 008 → 007 → 009 → 010**. Recovery and autoregulation came forward so their limitations can inform the initial adaptive hybrid coaching methodology. Packet 007 followed it. Packet 009 is next, with J3 scientific curation continuing in parallel. [Integrated roadmap](research-backlog.md#proposed-integrated-sequence) · [Combined J3 priorities](research-backlog.md#j3-scientific-curation)
 
 ### Candidate recovery observations and decisions
 
@@ -139,6 +139,33 @@ The four worked examples follow a priority press alongside running, threshold ru
 
 Current Garmin recovery ingestion preserves dated observations and provenance for descriptive review even where quantitative coaching use is deferred. Overnight and weekly HRV summaries carry `source_unit_unverified`. Reproducing the Nuuttila RMSSD measure would require verification of the quantity, units, transformation, timing, aggregation and baseline. Different windows require separate validation. Sleep stages cannot establish restoration, aggregate splits cannot establish achieved interval performance, and reported RPE cannot establish exact physiological reserve. Higher-resolution telemetry is optional for the initial planner. [Canonical recovery observations](../endurance-recovery.md) · [Garmin ingestion](../garmin-importer.md) · [Nuuttila protocol appraisal](008-integrated-recovery-autoregulation.md#detailed-protocol-audit-f1921-not-a-deployable-rule)
 
+## Packet 007
+
+**Individual energy expenditure estimation and nutritional adaptation** (revision 0.1, 2026-11-25) is staged for independent review. The archive preserves the supplied Markdown byte-for-byte (SHA-256 `20cc23e4a0e2654cd7262873fe6d1ce2a1118f1ea0f1cdddc680de9067ab9a63`, Git blob `9a79950728e8ca051347b57808d2e5208e9ec748`). The 13 research questions P007/EE-01–13 organize 24 evidence entries E01–E24 and a separate measurement and proxy-validity appraisal. The narrower section 5 fragment adds seven catalog questions. [Archived packet](007-individual-energy-expenditure-estimation.md) · [Exact JSON fragment](drafts/007-evidence-additions.json) · [Question crosswalk and review blockers](research-backlog.md#packet-007-question-crosswalk)
+
+### What intake and weight can identify
+
+| Quantity | Interpretation |
+| --- | --- |
+| True physiological total daily energy expenditure (TDEE) | Energy expended over a specified day, or its mean over a specified interval. The energy-balance identity relates metabolizable intake and expenditure to the change in **stored chemical energy**. |
+| Conditional expenditure estimate | An estimate under stated assumptions about reporting bias, tissue change or device calibration. Report how the estimate varies across defensible assumptions. |
+| Operational logged maintenance intake | Mean reported daily intake associated with a practically stable observed mass trajectory under a sufficiently stable logging regime and representative activity. A change in recording habits or training can make the historical reference stale. |
+| Approved reported-calorie target | The athlete’s agreed intended intake in reported calories. Approval records a decision. Actual intake and adherence require their own observations. |
+| Observed response | Changes in comparable scale measurements and performance. Fluid shifts and changes in tissue composition allow the same mass trajectory to accompany different changes in stored energy. Stable mass alone cannot establish physiological adequacy. |
+
+Under the packet’s additive observation model, increasing true intake, true expenditure and underreporting bias by the same feasible offset, while decreasing wearable bias by that offset, leaves logged intake, wearable readings and energy balance identical. Even noiseless free-living observations cannot distinguish those explanations. Bayesian regularization can favor one explanation while the likelihood remains identical. Independently justified bounds on bias and storage change give a conditional range of compatible expenditures. The archive distinguishes that range from sampling uncertainty and preserves the derivation, tissue-composition counterexample and sensitivity analysis. [Accounting and estimands](007-individual-energy-expenditure-estimation.md#41-physiological-accounting-and-estimands) · [Identifiability](007-individual-energy-expenditure-estimation.md#42-structural-and-practical-identifiability)
+
+### Candidate estimator designs
+
+| Design | Research use and conditions |
+| --- | --- |
+| A | Establish a conditional initial reference or carry forward an appropriate existing target. Label equation-based expenditure, device totals, reported maintenance and an approved target separately. |
+| B | The proposed first longitudinal research design. Use representative reported intake and a robust descriptive trend in comparable weights to review operational maintenance. A direction-based decision to hold or propose a change can be evaluated without estimating physiological expenditure. |
+| C1 | Predict an observable weight trajectory using actual activity by modality. Evaluate the incremental value of activity against simpler baselines on future observations. |
+| C2 | Estimate a physiological latent state only with a suitable independent anchor for the stated estimand. Check identifiability and sensitivity to assumptions. A reference averaged over an interval still leaves its daily partition uncertain. |
+
+The model specifications retain their equations, assumptions and pseudocode. The ten candidate policies EE-P01–EE-P10 link the 15-step feedback workflow to parameter review and session, day and block fueling decisions. The six synthetic longitudinal examples illustrate these distinctions, including two worlds with identical logs. Cases EE01–EE40 cover acceptable actions, prohibited inferences and approval boundaries. Retrospective weight fit alone establishes neither physiological TDEE accuracy nor the benefit of changing a target. Reviewers must justify any tissue-energy approximation, logging coverage criterion, smoothing window or adjustment size for the intended decision. The research supplies no universal logging or wearable correction and no automatic exercise-calorie compensation. Parameter choices and engineering approximations require separate review from empirical intervention claims. [Estimator designs](007-individual-energy-expenditure-estimation.md#43-candidate-estimator-designs) · [Feedback workflow](007-individual-energy-expenditure-estimation.md#44-integrated-feedback-workflow-proposal-not-implementation) · [Worked examples](007-individual-energy-expenditure-estimation.md#47-worked-longitudinal-examples-all-synthetic) · [Synthetic cases](007-individual-energy-expenditure-estimation.md#6-synthetic-evaluation-cases)
+
 ## Numbering and revisions
 
 Allocate a stable three-digit number when adding a packet to the roadmap. A change in execution order preserves that allocation. Keep its number and filename stable across revisions. Cite the packet number, revision, section and Git commit when reviewing an extraction or proposing a rule. Evidence IDs such as E02 are local to their packet. J1 references use exact revision keys such as `moesgaard@1`.
@@ -148,10 +175,10 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 ## From packet to reviewed evidence
 
 1. Extract proposed records into a fragment under `drafts/` and keep their source locators, access depth, uncertainty and screening dispositions. Validate the fragment in the context of its full target manifest, including existing relations and withdrawals.
-2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist), [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist), [Packet 004](004-integrated-nutrition-fueling.md#8-human-review-checklist), [Packet 005](005-running-development-measurement.md#8-human-review-checklist), [Packet 006](006-integrated-hybrid-periodization.md#8-human-review-checklist) and [Packet 008](008-integrated-recovery-autoregulation.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
+2. Assign an independent human reviewer. Use the review checklists in [Packet 001](001-strength-progression-periodization.md#8-human-review-checklist), [Packet 002](002-working-set-volume-adjustment.md#8-human-review-checklist), [Packet 003](003-concurrent-strength-running.md#8-human-review-checklist), [Packet 004](004-integrated-nutrition-fueling.md#8-human-review-checklist), [Packet 005](005-running-development-measurement.md#8-human-review-checklist), [Packet 006](006-integrated-hybrid-periodization.md#8-human-review-checklist), [Packet 008](008-integrated-recovery-autoregulation.md#8-human-review-checklist) and [Packet 007](007-individual-energy-expenditure-estimation.md#8-human-review-checklist). Check each result against its source, including the population, comparator, direction, units, interval and limitations. Review publication notices, reuse rights, overlapping trials, scope terms, provisional quality and any argument for transfer. Record unresolved issues with the affected record.
 3. Record the designated reviewer's identity, role, date and explicit decision on each accepted revision in version control. A claim requires reviewed supporting sources. Operational eligibility also requires a reviewed release. A separately authorized release receives a new immutable manifest, registry entry and digest under the [J1 release procedure](../scientific-evidence-catalog.md#review-and-release-procedure).
 
-### Checking the seven drafts against J1
+### Checking the eight drafts against J1
 
 | Input | Questions | Source revisions | Claim revisions | Relations | Methods | Withdrawals |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -163,19 +190,20 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 | Packet 005 additions | 10 | 14 | 16 | 0 | 4 | 0 |
 | Packet 006 additions | 9 | 13 | 18 | 0 | 6 | 0 |
 | Packet 008 additions | 9 | 8 | 14 | 0 | 6 | 0 |
-| **In-memory candidate** | **49** | **71** | **95** | **4** | **26** | **0** |
+| Packet 007 additions | 7 | 8 | 9 | 0 | 4 | 0 |
+| **In-memory candidate** | **56** | **79** | **104** | **4** | **30** | **0** |
 
 Counts refer to exact revisions. Through Packet 002, the 18 source revisions cover 15 distinct publication DOIs. The male Enes, female Enes and Pelland papers each appear at `@1` and `@2`. The Enes perceptual follow-up shares the male strength cohort. Both Enes strength claims retain their pending revisions and original source links. The candidate retains the earlier screening dispositions.
 
-Across J1 and all seven packets there are 68 distinct publication DOIs. The three revision pairs above account for all repeated DOIs. Each source in Packets 004–006 and 008 adds a distinct DOI. The combined candidate contains 64 pending and seven screening source revisions.
+Across J1 and all eight packets there are 76 distinct publication DOIs. The three revision pairs above account for all repeated DOIs. Each source in Packets 004–008 adds a distinct DOI. The combined candidate contains 72 pending and seven screening source revisions.
 
-All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. Packet 005’s `comparable-running-performance-review@1` cites claims on field repeatability, submaximal HR measurement and wearable VO2 agreement. In Packet 006, `hierarchical-hybrid-block-construction@1` draws on earlier periodization and adaptive running claims alongside the new hockey and HIFT claims. Packet 008’s `recovery-aware-priority-session-review@1` cites both running trial endpoints and acute running and lifting claims across questions. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
+All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. Packet 005’s `comparable-running-performance-review@1` cites claims on field repeatability, submaximal HR measurement and wearable VO2 agreement. In Packet 006, `hierarchical-hybrid-block-construction@1` draws on earlier periodization and adaptive running claims alongside the new hockey and HIFT claims. Packet 008’s `recovery-aware-priority-session-review@1` cites both running trial endpoints and acute running and lifting claims across questions. Packet 007’s `energy-logging-adjusted-maintenance-review@1` links the controlled-maintenance and modeled intake-change comparisons to Packet 004’s athlete reporting claim. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
 
 Run this check from `backend/` in the project Python environment. The registered loader verifies the J1 digest. Strict schema validation checks exact keys, supporting sources, question membership, relation endpoints and method references across the full graph.
 
 ```python
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from hashlib import sha256
 from pathlib import Path
 
@@ -185,8 +213,8 @@ from fitness_intelligence.evidence.retrieval import Catalog
 
 registered = load_release("j1-screening-1")
 manifest = registered.release.model_dump(mode="json")
-manifest["release_id"] = "j2f-packets-001-006-008-candidate"
-for packet in ("001", "002", "003", "004", "005", "006", "008"):
+manifest["release_id"] = "j2g-packets-001-008-candidate"
+for packet in ("001", "002", "003", "004", "005", "006", "008", "007"):
     path = Path(f"../docs/research/drafts/{packet}-evidence-additions.json")
     for group, records in json.loads(path.read_bytes()).items():
         manifest[group].extend(records)
@@ -194,12 +222,13 @@ for packet in ("001", "002", "003", "004", "005", "006", "008"):
 data = json.dumps(manifest).encode()
 candidate = CorpusRelease.model_validate_json(data, strict=True)
 groups = ("questions", "sources", "claims", "relations", "methods", "withdrawals")
-assert tuple(len(getattr(candidate, group)) for group in groups) == (49, 71, 95, 4, 26, 0)
+assert tuple(len(getattr(candidate, group)) for group in groups) == (56, 79, 104, 4, 30, 0)
 by_doi = defaultdict(set)
 for source in candidate.sources:
     assert source.doi and source.status in {"pending", "screening"}
     by_doi[source.doi.casefold()].add(source.key)
-assert len(by_doi) == 68
+assert Counter(s.status for s in candidate.sources) == {"pending": 72, "screening": 7}
+assert len(by_doi) == 76
 assert {frozenset(keys) for keys in by_doi.values() if len(keys) > 1} == {
     frozenset({f"{name}@1", f"{name}@2"})
     for name in ("enes-males", "enes-females", "pelland")
@@ -216,6 +245,13 @@ methods = {m.key: m for m in candidate.methods}
 priority_review = methods["recovery-aware-priority-session-review@1"]
 assert "adaptive-running-ten-km-performance@1" in priority_review.claims
 assert any(claims[key].scope.question != priority_review.question for key in priority_review.claims)
+intake_change = claims["calerie-weight-model-intake-change-agreement@1"]
+assert {edge.source for edge in intake_change.support} == {"sanghvi-intake-change-validation@1"}
+assert sources["sanghvi-intake-change-validation@1"].access == "abstract"
+assert {m.key for m in candidate.methods if intake_change.key in m.claims} == {
+    "energy-logging-adjusted-maintenance-review@1",
+    "energy-identifiability-first-model-comparison@1",
+}
 catalog = Catalog(candidate, sha256(data).hexdigest())
 for claim in candidate.claims:
     assert claim.approval is None and not claim.transfers
@@ -231,4 +267,4 @@ assert all(not catalog.methods(q.id) for q in candidate.questions)
 
 Review each method separately from the empirical claims it cites. Identify which choices reflect evidence, athlete preferences or engineering safeguards. Define eligible observations, alternatives (including holding the dose), parameters, authority to change a plan and conditions for deferring a decision. A reviewer must justify any proposed numeric threshold or transfer to an experienced hybrid athlete.
 
-Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. All seven staged packets and their drafts remain research inputs. E1 continues to use its existing synthetic progression rules.
+Before adopting a rule version, exercise the [synthetic evaluation cases](001-strength-progression-periodization.md#6-evaluation-cases) with pinned block, evidence and rule versions. Check acceptable alternatives, missing feedback, secondary objectives, protected assessments and declined changes. Record the policy decision, review and validation results with any later planner change so historical plans can be replayed with their original rules. Prospective effectiveness is a separate research question. All eight staged packets and their drafts remain research inputs. E1 continues to use its existing synthetic progression rules.
