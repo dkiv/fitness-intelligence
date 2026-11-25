@@ -48,7 +48,7 @@ def listing(run: "HistoryRun", first: date, last: date) -> Iterator[tuple[int, d
             local = stamp(row.get("startTimeLocal"), LIST_STAMP)
             if not first <= local.date() <= last:
                 raise GarminError("activity outside requested range")
-            if ident in seen or (previous is not None and local <= previous):
+            if ident in seen or (previous is not None and local < previous):
                 raise GarminError("activity listing did not converge")
             previous = local
             seen.add(ident)
@@ -71,14 +71,14 @@ def activity_window(run: "HistoryRun", first: date, last: date) -> None:
                 dict(row.receipts) if row and row.pass_key == str(run.scope.pass_id) else {}
             )
             receipts[d].pop("unavailable", None)
-    order = []
+    signatures: dict[int, str] = {}
     totals: Counter[date] = Counter()
     step_counts: Counter[date] = Counter()
     first_scan_finished = False
     attempts = run.client.requests
     try:
         for ident, day, signature, row in listing(run, first, last):
-            order.append((ident, signature))
+            signatures[ident] = signature
             totals[day] += 1
             key = str(ident)
             receipt = receipts[day].get(key)
@@ -172,15 +172,19 @@ def activity_window(run: "HistoryRun", first: date, last: date) -> None:
             if reason:
                 raise GarminError("activity detail requires reconciliation")
         first_scan_finished = True
-        check = [(ident, sig) for ident, _, sig, _ in listing(run, first, last)]
-        if order != check:
+        # Each scan validates local-time order and unique IDs. Its signature includes
+        # the local start, so comparing by ID allows ties to reorder across pages.
+        confirmed = {ident: sig for ident, _, sig, _ in listing(run, first, last)}
+        if signatures != confirmed:
             raise GarminError("activity listing did not converge")
     except (GarminError, MappingError) as exc:
         if run.client.requests > attempts and str(exc) != "verified session expired":
             with run.write():
                 for day in days(first, last):
                     status = (
-                        "partial" if order or first_scan_finished or receipts[day] else "failed"
+                        "partial"
+                        if signatures or first_scan_finished or receipts[day]
+                        else "failed"
                     )
                     run.mark(Category.ACTIVITIES, day, status, receipts=receipts[day])
                     if steps:
