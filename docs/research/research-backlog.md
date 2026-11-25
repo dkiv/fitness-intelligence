@@ -117,7 +117,7 @@ The earlier RE-01/02 monitoring remit asks whether acting on recovery observatio
 Packet 008 reports full-text appraisal of Nuuttila et al. (2022), including Table 3 and the intervention details. The new `adaptive-running-max-treadmill-speed@1` and Packet 005’s `adaptive-running-ten-km-performance@1` both cite `nuuttila-adaptive-running@1`, which records abstract access. The treadmill and 10-km results are separate endpoints in the same trial. [Packet 005 draft](drafts/005-evidence-additions.json) · [Packet 008 protocol audit](008-integrated-recovery-autoregulation.md#detailed-protocol-audit-f1921-not-a-deployable-rule) · [Packet 008 draft](drafts/008-evidence-additions.json)
 
 1. Independently verify the original publication, rights and exact result locators for Table 3 and the 10-km contrast. Check allocation, dropouts, exclusions and endpoint-specific group sizes. Reconstruct prescribed and realized training in both arms, adherence, HRV measurement and reference windows, subjective measures and the Figure 1 decision branches. Check effect direction and uncertainty for each endpoint.
-2. Prepare a new source revision reflecting verified access and locators. Preserve the existing source, claim revisions and their historical links. Review both claim revisions, shared participants, limits of component attribution and transfer from recreational runners with little other training.
+2. J3A.3 stages the proposed full-text `nuuttila-adaptive-running@2` and both revised endpoint claims. The AI-assisted inspection covered article passages, tables, captions and Results prose. Independently verify the figure, supplement, missing-data handling and exact algorithm. Reconcile the individualized HIT counts of 15.8 in Results and 15.6 in Discussion. Review shared participants, endpoint-specific exclusions, test freshness, limits of component attribution and transfer to athletes who lift. All original links remain available. [Running appraisal and source-access limits](curation/README.md#running-evidence-awaiting-independent-review)
 3. The five dependent methods through Packet 008 are `baseline-relative-running-dose-review@1`, `hierarchical-hybrid-block-construction@1`, `bounded-hybrid-review-transition@1`, `recovery-aware-priority-session-review@1` and `bounded-recovery-review-and-approval@1`. Packet 009 adds `contextual-decision-response-history@1` through the 10-km claim. Review that use against the same trial limitations. Study-specific adjustment rules, measurement windows and thresholds remain descriptive pending separate parameter review.
 
 The Coleman source revision, publication-date placeholders, earlier source-access checks and population-transfer questions remain open. Packet 008 adds checks on duplicated cohorts and reviews, individual agreement, acute versus longitudinal outcomes, and safety/referral boundaries. [Packet 006 blockers](#packet-006-scientific-review-blockers) · [Source access requiring review](README.md#source-access-requiring-review) · [Packet 008 checklist](008-integrated-recovery-autoregulation.md#8-human-review-checklist)
@@ -210,7 +210,7 @@ The eight research questions extend earlier planning and history questions. The 
 
 ## J3 scientific curation
 
-Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). Packet 007 adds A17–A19, B5–B8 and C4–C5. Packet 009 adds A20–A22. Packet 010 retains those 35 priorities and adds A23–A25, giving **38 open review entries** (25 essential, eight early extensions, five deferred). The strength progression and hybrid block tranches cover selected parts of these decisions. Overlapping entries share evidence, method review and planning infrastructure. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist) · [Packet 007 source and claim keys, review requirements and data feasibility for each decision](007-individual-energy-expenditure-estimation.md#72-j3-curation-extension-decision-oriented-additions-to-packet-006008-shortlist) · [Packet 009 decision references and fallbacks](009-individual-training-history.md#72-narrow-extension-of-j3-curation-shortlist) · [Packet 010 decision references and fallbacks](010-long-term-planning-and-resumption.md#72-focused-j3-extension)
+Packet 006 contributes A1–A10, B1–B2 and C1. Packet 008 adds A11–A16 (essential), B3–B4 (early optional) and C2–C3 (deferred). Packet 007 adds A17–A19, B5–B8 and C4–C5. Packet 009 adds A20–A22. Packet 010 retains those 35 priorities and adds A23–A25, giving **38 open review entries** (25 essential, eight early extensions, five deferred). The strength progression, hybrid block and running prescription tranches cover selected parts of these decisions. Overlapping entries share evidence, method review and planning infrastructure. Each packet lists the exact supporting revisions, transfer questions, numerical and data needs, and consequences of deferral. [Original shortlist](006-integrated-hybrid-periodization.md#72-prioritized-j3-curation-shortlist--decisions-rather-than-publication-count) · [Recovery extension](008-integrated-recovery-autoregulation.md#72-extension-of-j3-curation-shortlist) · [Packet 007 source and claim keys, review requirements and data feasibility for each decision](007-individual-energy-expenditure-estimation.md#72-j3-curation-extension-decision-oriented-additions-to-packet-006008-shortlist) · [Packet 009 decision references and fallbacks](009-individual-training-history.md#72-narrow-extension-of-j3-curation-shortlist) · [Packet 010 decision references and fallbacks](010-long-term-planning-and-resumption.md#72-focused-j3-extension)
 
 | Priority | Coaching decision | First review action |
 | --- | --- | --- |
@@ -280,13 +280,28 @@ The hybrid block tranche extends this work to the block objectives and exposure 
 | J3A.2 | AI-assisted appraisal complete. Independent scientific review of the six papers, reused Petré appraisal, scope changes and method dependencies is outstanding. [Appraisal obligations](curation/README.md#block-evidence-awaiting-independent-review) |
 | J3B.2 | Candidate J3-M02 revision 0.1 complete. Independent review of the three bundles, B01–B18, worked programs and conformance cases is outstanding. [Method bundles](curation/README.md#j3-m02-review-bundles) · [Implementation-review considerations](curation/README.md#block-implementation-review-considerations) |
 | J3C.2 | Approval and operational release preparation pending. Evidence revisions, method choices and planner authorization require separate decisions. |
-| J3A.3 | Next focused appraisal covers running prescription and progression (A5/A6), followed by practical running methodology. Scheduled preliminary research closed with Packet 010. No new broad packet is scheduled. |
 
 | J3-M02 review bundle | Existing priorities addressed in part |
 | --- | --- |
 | M02a · Goals, archetype and historical reference | A1/A7 for ranked development and protected outcomes. A20/A21 for choosing comparable performance and familiar exposure after a context change. |
 | M02b · Weekly structure, exposure bounds and protected outcomes | A2/A3/A5 for a familiar first week, A4/A7/A15 for feasible scheduling and specific protection, and A11/A12 for keeping local changes within approved block bounds. |
 | M02c · Review, continuation and transition | A9/A13 for exposure versus observed outcome. A16/A23 for weekly authority and block continuation. A21/A24/A25 for interruption, feasible re-entry and changed priorities. |
+
+### Running prescription curation
+
+| Tranche | Status and handoff |
+| --- | --- |
+| J3A.3 | AI-assisted appraisal complete. Independent scientific review of six publications, the Nuuttila full-text revision and two endpoints is outstanding. [Scientific obligations](curation/README.md#running-evidence-awaiting-independent-review) |
+| J3B.3 | Candidate J3-M03 revision 0.1 complete. Independent method review of M03a–M03c, R01–R20, worked programs and conformance cases is outstanding. [Method bundles](curation/README.md#j3-m03-review-bundles) |
+| J3C.3 | Approval and operational release preparation pending. The next activity is a consolidated M01/M02/M03 integration review before generalized planner design. [Integration-review considerations](curation/README.md#running-integration-review-considerations) |
+
+| J3-M03 review bundle | Existing priorities addressed in part |
+| --- | --- |
+| M03a · References, initialization and prescription | A5/A6 for familiar dose, session purpose and eligible effort, pace and HR anchors. A20/A21/A24 for comparable references, sparse history and re-entry. |
+| M03b · Progression and execution-aware adjustment | A5/A6 for action-specific progression. A9/A13/A14 for confirmed actual exposure, measured work and targeted feedback. B3 for review of the adaptive running comparison. |
+| M03c · Concurrent protection and outcome review | A4/A7/A15 for feasible scheduling and protected secondary outcomes. A9/A16/A25 for comparable outcomes, conflicts and block authority. |
+
+All 38 decision-oriented priorities remain open. Scheduled preliminary research closed with Packet 010.
 
 ## Earlier strength-focused priorities
 
