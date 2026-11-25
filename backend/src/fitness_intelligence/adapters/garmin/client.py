@@ -4,6 +4,7 @@ import base64
 import json
 import re
 import time
+from collections import Counter
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -29,6 +30,10 @@ class Endpoint(StrEnum):
     HRV = "/hrv-service/hrv/{day}"
     SLEEP = "/sleep-service/sleep/dailySleep"
     BATTERY = "/wellness-service/wellness/bodyBattery/reports/daily"
+    DAILY_RANGE = "/usersummary-service/v2/dailysummaries"
+    SLEEP_RANGE = "/sleep-service/sleep/dailySleepSummariesByDate"
+    HRV_RANGE = "/hrv-service/hrv/daily/{day}/{end_day}"
+    WEIGHT_RANGE = "/weight-service/weight/all/{day}/{end_day}"
     FOOD = "/nutrition-service/food/logs/{day}"
     WEIGHT = "/weight-service/weight/all/{day}/{day}"
 
@@ -66,6 +71,7 @@ class GarminClient:
         key: str,
         *,
         transport: httpx.BaseTransport | None = None,
+        request_limit: int = 40,
         clock: Callable[[], float] = time.time,
     ) -> None:
         if not re.fullmatch(r"[!-~]{1,8192}", key):
@@ -76,6 +82,10 @@ class GarminClient:
         self._clock = clock
         self._deadline = time.monotonic() + 180
         self._fixed_token = False
+        if not 1 <= request_limit <= 40:
+            raise GarminError("invalid request limit")
+        self.request_limit = request_limit
+        self.attempts: Counter[str] = Counter()
         self.requests = 0
         self._http = httpx.Client(
             base_url="https://personal.connectapi.garmin.com",
@@ -94,13 +104,15 @@ class GarminClient:
         self,
         path: str,
         *,
+        category: str,
         exchange: bool = False,
         archive: bool = False,
         params: dict[str, str | int] | None = None,
     ) -> Reply:
-        if self.requests >= 40 or time.monotonic() >= self._deadline:
+        if self.requests >= self.request_limit or time.monotonic() >= self._deadline:
             raise GarminError("budget_exhausted")
         self.requests += 1
+        self.attempts[category] += 1
         headers = {"Authorization": f"Bearer {self._token}", "Accept": "application/json"}
         if exchange:
             headers = {"Authorization": f"ApiKey {self._key}", "Accept": "*/*"}
@@ -141,7 +153,7 @@ class GarminClient:
 
     def _exchange(self) -> None:
         try:
-            reply = self._request(TOKEN_PATH, exchange=True)
+            reply = self._request(TOKEN_PATH, category="exchange", exchange=True)
         except GarminError as exc:
             if str(exc) in {"response_too_large", "unsupported_encoding"}:
                 raise GarminError("invalid_token_response") from None
@@ -172,11 +184,18 @@ class GarminClient:
         finally:
             self._fixed_token = False
 
+    def check_verified_session(self) -> None:
+        if not self._fixed_token or self._expires <= self._clock() + 5:
+            raise GarminError("verified session expired")
+        if time.monotonic() >= self._deadline:
+            raise GarminError("budget_exhausted")
+
     def read(
         self,
         endpoint: Endpoint,
         *,
         day: str = "",
+        end_day: str = "",
         activity_id: int = 0,
         params: dict[str, str | int] | None = None,
     ) -> Any:
@@ -186,16 +205,22 @@ class GarminClient:
             type(activity_id) is not int or not 0 < activity_id < 2**63
         ):
             raise GarminError("invalid_activity_id")
-        path = endpoint.value.format(day=day, activity_id=activity_id)
+        if "{end_day}" in endpoint.value and (
+            not re.fullmatch(r"\d{4}-\d{2}-\d{2}", end_day, re.ASCII) or end_day < day
+        ):
+            raise GarminError("invalid_date")
+        path = endpoint.value.format(day=day, end_day=end_day, activity_id=activity_id)
         archive = endpoint is Endpoint.ORIGINAL
         if self._expires <= self._clock() + 5:
             if self._fixed_token:
                 raise GarminError("verified session expired")
             self._exchange()
-        reply = self._request(path, archive=archive, params=params)
+        reply = self._request(path, category=endpoint.name.lower(), archive=archive, params=params)
         if reply.status == 401 and not self._fixed_token:
             self._exchange()
-            reply = self._request(path, archive=archive, params=params)
+            reply = self._request(
+                path, category=endpoint.name.lower(), archive=archive, params=params
+            )
         if reply.status != 200:
             raise GarminError(
                 {

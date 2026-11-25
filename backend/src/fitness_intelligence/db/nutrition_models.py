@@ -94,6 +94,7 @@ class BodyWeightObservation(NutritionRecord, Base):
     source_value: Mapped[Quantity]
     source_unit: Mapped[str]
     documented_source_unit: Mapped[str | None]
+    verification_scope: Mapped[str | None]
     measured_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     time_resolution_us: Mapped[int | None]
     upstream_id: Mapped[str | None]

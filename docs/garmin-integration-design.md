@@ -160,3 +160,9 @@ workflow when interpreting the earlier inventory.
    and available history in their own right. If both paths carry a record, designate one
    authoritative source per category and retain the other as corroboration. Similar totals
    alone cannot justify merging individual records.
+
+## Historical synchronization
+
+B3.3B extends the enrolled local importer with explicit historical ranges, overlapping incremental reads and targeted older repairs. The account lock serializes retrievals for categories without revision markers. Canonical observations retain their original identity keys. Separate category/day coverage distinguishes observed, empty, partial, failed and outstanding work. Reconciliation issues can withhold a retained observation from analysis.
+
+B3.3A compared three independent weight references and three paired daily intake totals. This supports range-first positive v2 intake and an explicitly bracketed grams interpretation for weight/all. Source-local dates govern coverage. The original provider and display limitations, sparse responses, edit uncertainty and cost assumptions are recorded in the engineering report. The next live milestone is a separately approved interruption, resume and replay rehearsal. [Historical provider contract](garmin-historical-sync-contract.md) · [Commands and rehearsal procedure](garmin-importer.md#historical-synchronization)
