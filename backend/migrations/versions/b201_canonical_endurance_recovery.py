@@ -201,6 +201,19 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.execute(
+        "LOCK TABLE endurance_activities, activity_split_summaries, activity_performed_steps, "
+        "daily_recovery_observations IN ACCESS EXCLUSIVE MODE"
+    )
+    if op.get_bind().scalar(
+        sa.text("""SELECT EXISTS (SELECT 1 FROM endurance_activities)
+            OR EXISTS (SELECT 1 FROM activity_split_summaries)
+            OR EXISTS (SELECT 1 FROM activity_performed_steps)
+            OR EXISTS (SELECT 1 FROM daily_recovery_observations)""")
+    ):
+        raise RuntimeError(
+            "B2 contains endurance or recovery data; preserve observations before downgrade"
+        )
     op.drop_table("activity_split_summaries")
     op.drop_table("activity_performed_steps")
     op.drop_table("endurance_activities")
