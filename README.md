@@ -10,6 +10,8 @@ B2 adds [canonical endurance and daily recovery models](docs/endurance-recovery.
 The operator completed the bounded live probe using an in-memory credential. See the
 [contract, availability matrix and limits of the sample](docs/garmin-integration-design.md).
 
+B3.1 adds [private Garmin account verification, enrollment and bounded ingestion](docs/garmin-importer.md).
+
 M3A adds internal [strength progression, weekly volume and activity metrics](docs/strength-analytics.md).
 
 E1 adds an offline, deterministic strength and running planner for the first two weeks of

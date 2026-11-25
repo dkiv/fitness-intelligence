@@ -26,6 +26,9 @@ Endurance measurements extend the canonical workout through its existing owner-s
 reference. Split summaries and performed steps belong to that same workout. Daily recovery
 observations use the source-account namespace and provider calendar date. The
 [B2 storage and mapping contract](endurance-recovery.md) describes units, coverage and ownership.
+The [B3.1 local importer](garmin-importer.md) shares the Hevy private binding file checks
+and account advisory lock. It stages one page or day, verifies the account again inside
+the write transaction and stores scoped canonical measurements and retrieval provenance.
 
 ## Canonical strength schema (Milestone 1)
 

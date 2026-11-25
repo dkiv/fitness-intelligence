@@ -1,18 +1,18 @@
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import inspect, text
+from sqlalchemy import MetaData, Table, inspect, select, text
 from sqlalchemy.orm import Session
 from test_strength_models import make_reference, seed
 
 from fitness_intelligence.db.endurance_models import (
     ActivitySplit,
     ActivityStep,
-    DailyRecoveryObservation,
     EnduranceActivity,
 )
 from fitness_intelligence.db.models import SourceAccount, User
@@ -117,22 +117,26 @@ def test_b201_downgrade_preserves_daily_observation(db: Session, config: Config)
     )
     db.add(account)
     db.flush()
-    observation = DailyRecoveryObservation(
-        user_id=owner.id,
-        source_account_id=account.id,
-        provider=account.provider,
-        local_date=date(2024, 3, 10),
-        metric="resting_hr",
-        value=52,
-        unit="bpm",
-        method="reported",
+    # This test targets the historical schema, independently of later ORM columns.
+    table = Table("daily_recovery_observations", MetaData(), autoload_with=db.connection())
+    observation_id = uuid4()
+    db.execute(
+        table.insert().values(
+            id=observation_id,
+            user_id=owner.id,
+            source_account_id=account.id,
+            provider=account.provider,
+            local_date=date(2024, 3, 10),
+            metric="resting_hr",
+            value=52,
+            unit="bpm",
+            method="reported",
+        )
     )
-    db.add(observation)
 
     assert_downgrade_rejected(db, config)
-    db.refresh(observation)
-    assert (observation.source_account_id, observation.value, observation.unit) == (
-        account.id,
-        52,
-        "bpm",
-    )
+    assert db.execute(
+        select(table.c.source_account_id, table.c.value, table.c.unit).where(
+            table.c.id == observation_id
+        )
+    ).one() == (account.id, 52, "bpm")

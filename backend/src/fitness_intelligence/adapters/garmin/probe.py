@@ -4,6 +4,7 @@ import math
 from collections import Counter
 from collections.abc import Iterator
 from datetime import date, timedelta
+from decimal import Decimal
 from typing import Any
 
 from .client import Endpoint, GarminClient, GarminError, TokenExchangeError
@@ -113,7 +114,13 @@ def state(value: Any, kind: str) -> str:
         return "missing"
     if value is None:
         return "null"
-    if kind == "number" and (type(value) is int or type(value) is float and math.isfinite(value)):
+    if kind == "number" and (
+        type(value) is int
+        or type(value) is float
+        and math.isfinite(value)
+        or isinstance(value, Decimal)
+        and value.is_finite()
+    ):
         return "zero" if value == 0 else "present"
     if kind == "flag" and type(value) is bool:
         return "true" if value else "false"

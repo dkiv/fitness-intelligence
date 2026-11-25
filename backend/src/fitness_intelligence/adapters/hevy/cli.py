@@ -1,32 +1,24 @@
 """Private OS-operator entry point; no server route or credential persistence."""
 
 import argparse
-import json
 import os
-import stat
 from pathlib import Path
 from uuid import UUID
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+from fitness_intelligence.adapters.local_account import LocalAccountError, private_config
+
 from .client import HevyClient, HevyError
 from .importer import Importer, LocalBinding, check_active_binding
 
 
 def load_binding(path: Path) -> LocalBinding:
-    # Open without following symlinks, then check the opened file to avoid TOCTOU races.
-    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
-    with os.fdopen(descriptor) as stream:
-        info = os.fstat(stream.fileno())
-        if (
-            not stat.S_ISREG(info.st_mode)
-            or info.st_uid != os.getuid()
-            or stat.S_IMODE(info.st_mode) != 0o600
-            or info.st_size > 4096
-        ):
-            raise HevyError("binding must be an operator-owned mode 0600 regular file")
-        data = json.load(stream)
+    try:
+        data = private_config(path)
+    except LocalAccountError as exc:
+        raise HevyError(str(exc)) from None
     return LocalBinding(
         UUID(data["user_id"]), UUID(data["source_account_id"]), data["provider_account_id"]
     )
