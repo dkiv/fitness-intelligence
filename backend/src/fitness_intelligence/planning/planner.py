@@ -12,7 +12,7 @@ from .prescriptions import RunSession, StrengthSession, fixed
 from .press_block import Availability, PressBlock, PressDose, easy_run, lift
 
 DAY = timedelta(days=1)
-RULES = "synthetic.press.e1.v1"
+RULES = "synthetic.press.e1.v2"
 
 
 class Slot(StrEnum):
@@ -24,7 +24,15 @@ class Slot(StrEnum):
 
 @dataclass(frozen=True)
 class Exposure:
-    """Matched prior press slot. One effort per confirmed prescribed working set."""
+    """Normalized evidence for one matched press slot.
+
+    completed is the explicit whole-slot outcome (True for complete, False for
+    incomplete, None for unknown). confirmed_rpes has one entry per distinct
+    prescribed working set whose completion was independently confirmed. None
+    in that tuple means its effort is unknown. inferred_sets counts prescribed
+    working sets attributed by inference. Any positive count prevents progression
+    because this summary has no set identities with which to resolve overlap.
+    """
 
     completed: bool | None = None
     confirmed_rpes: tuple[Decimal | None, ...] = ()
@@ -170,7 +178,8 @@ def _review(inputs: WeekInputs) -> tuple[bool, list[Finding]]:
         within_cap = (
             peak is not None and len(measured) == len(rpes) and peak <= inputs.block.max_rpe
         )
-        eligible &= complete and within_cap
+        slot_eligible = complete and within_cap and exposure.inferred_sets == 0
+        eligible &= slot_eligible
         reasons.append(
             finding(
                 "confirmed-exposure",
@@ -179,9 +188,11 @@ def _review(inputs: WeekInputs) -> tuple[bool, list[Finding]]:
                 required_sets=prescription.working_sets,
                 confirmed_sets=len(rpes),
                 inferred_sets=exposure.inferred_sets,
+                max_inferred_sets=0,
                 measured_rpes=len(measured),
                 peak_rpe=peak,
                 cap_rpe=inputs.block.max_rpe,
+                eligible=slot_eligible,
             )
         )
     feedback = review.both_manageable if review else None

@@ -73,7 +73,7 @@ def test_a1_two_weeks_of_manual_entry_prescriptions() -> None:
     assert len(BLOCK.intents) == 8
     assert first.inputs.review is None and second.inputs.review == REVIEW
     for i, week in enumerate((first, second)):
-        assert week.rule_version == "synthetic.press.e1.v1"
+        assert week.rule_version == "synthetic.press.e1.v2"
         assert [d.day for d in week.days] == [START + timedelta(days=7 * i + j) for j in range(7)]
         assert [d.day.weekday() for d in week.days if d.is_rest] == [2, 4, 6]
         assert week.running_seconds == 45 * 60
@@ -175,6 +175,39 @@ def test_a2_hold_on_missing_or_insufficient_evidence(
         result.session(Slot.SECOND_PRESS).prescription
         == week_one().session(Slot.SECOND_PRESS).prescription
     )
+
+
+@pytest.mark.parametrize(
+    ("slot", "review"),
+    [
+        (
+            Slot.FIRST_PRESS,
+            replace(REVIEW, first_press=replace(REVIEW.first_press, inferred_sets=1)),
+        ),
+        (
+            Slot.SECOND_PRESS,
+            replace(REVIEW, second_press=replace(REVIEW.second_press, inferred_sets=2)),
+        ),
+    ],
+)
+def test_a2_full_effort_coverage_with_inferred_sets_blocks_progression(
+    slot: Slot, review: WeekReview
+) -> None:
+    inputs = replace(two_inputs(), review=review)
+    held = generate_week(inputs)
+    assert isinstance(held, WeekPlan) and held.press_sets == 5
+    facts = dict(
+        next(
+            f for f in held.explanation if f.rule == "confirmed-exposure" and f.slots == (slot,)
+        ).facts
+    )
+    assert facts["completed"] is True
+    assert facts["required_sets"] == facts["confirmed_sets"] == facts["measured_rpes"]
+    assert facts["inferred_sets"] > facts["max_inferred_sets"] == 0
+    assert facts["eligible"] is False
+
+    requested = generate_week(replace(inputs, thursday=PressDose(3, fixed(6), fixed(D(30)))))
+    conflict(requested, "increase-requires-evidence")
 
 
 def test_a4_infeasible_commitment_and_revision_scope() -> None:

@@ -187,11 +187,16 @@ and one available day. Reducing the maintenance commitment requires a block prop
 ## Using the E1 domain planner
 
 From the backend environment, pass frozen values to the internal Python API. Select week 1
-as the predecessor and pass a normalized review of its two logical press slots. Each effort
-entry represents one confirmed prescribed working set. Use `None` for a confirmed set with
-unknown effort. Inferred sets have their own count. The caller supplies the attribution,
-completion status and as-of instant. The review is scoped to the predecessor's block version
-and local week start.
+as the predecessor and pass a normalized review of its two logical press slots. For each slot,
+`completed` records the explicit whole-slot outcome (complete, incomplete or unknown).
+The caller supplies one `confirmed_rpes` entry per distinct prescribed working set with
+independent completion evidence. Use `None` for a confirmed set with unknown effort.
+`inferred_sets` counts prescribed working sets attributed by inference. A positive count
+holds volume even with a complete slot outcome and full RPE coverage, because the summary
+cannot resolve overlapping set attribution. Progression requires both slots to be explicitly
+complete, every prescribed working set independently confirmed with measured effort within
+the cap, zero inferred sets in either slot, and positive feedback. The review records its
+as-of instant, predecessor block version and local week start.
 
 ```python
 from datetime import UTC, datetime
