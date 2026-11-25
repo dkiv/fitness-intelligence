@@ -1,0 +1,868 @@
+{
+  "questions": [
+    {
+      "id": "nutrition-energy-adaptation",
+      "description": "How does energy availability or restriction affect exercise adaptation and performance?",
+      "gap": "Dual-experienced strength-running populations, long-term outcomes and safe individualized targets remain unresolved."
+    },
+    {
+      "id": "nutrition-energy-surplus",
+      "description": "How does an energy surplus affect resistance-training adaptation?",
+      "gap": "No optimal surplus or combined running outcome established."
+    },
+    {
+      "id": "nutrition-carbohydrate-resistance",
+      "description": "How does acute carbohydrate ingestion affect resistance exercise?",
+      "gap": "Long-term effects, isoenergetic controls and hybrid dose response remain uncertain."
+    },
+    {
+      "id": "nutrition-carbohydrate-recovery",
+      "description": "How does carbohydrate ingestion affect short-term glycogen restoration?",
+      "gap": "Subsequent session and long-term outcomes in hybrid athletes remain unresolved."
+    },
+    {
+      "id": "nutrition-carbohydrate-periodization",
+      "description": "Does periodic carbohydrate restriction improve endurance adaptation?",
+      "gap": "No validated hybrid nutritional periodization or individualized restriction rule."
+    },
+    {
+      "id": "nutrition-protein-concurrent",
+      "description": "How does protein supplementation influence concurrent exercise adaptation?",
+      "gap": "No direct requirement or adequately fueled dual-experienced running dose-response established."
+    },
+    {
+      "id": "nutrition-protein-resistance",
+      "description": "How does protein intake affect adaptation to resistance training?",
+      "gap": "Indirect transfer to endurance/concurrent training; energy-restriction context differs."
+    },
+    {
+      "id": "nutrition-protein-endurance",
+      "description": "What metabolic evidence informs protein requirements during endurance training?",
+      "gap": "No definitive long-term performance dose or concurrent-training requirement."
+    },
+    {
+      "id": "nutrition-observation-validity",
+      "description": "How reliable are food and wearable energy observations?",
+      "gap": "Individual estimates, deduplication and calibration require Packet 007."
+    },
+    {
+      "id": "nutrition-integrated-planning",
+      "description": "How should nutrition inform coordinated training decisions?",
+      "gap": "No reviewed adaptive intervention policy or clinical screening algorithm."
+    }
+  ],
+  "sources": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "oxfeldt-lea@1",
+      "citation": "Oxfeldt M et al. Low energy availability reduces myofibrillar and sarcoplasmic muscle protein synthesis in trained females. J Physiol. 2023;601:3481–3497.",
+      "doi": "10.1113/JP284967",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37329147/",
+      "published_on": "2023-06-16",
+      "design": "Randomized parallel controlled feeding and combined exercise trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Publisher first-published date; Results and Figure 3 inspected. PubMed links a commentary; full publication audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Short, controlled provided-food intervention; high protein held constant on lean-mass basis, energy differs; MPS is not long-term muscle or strength adaptation.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "caldwell-lea@1",
+      "citation": "Caldwell HG, Jeppesen JS et al. The whole-body and skeletal muscle metabolic response to 14 days of highly controlled low energy availability in endurance-trained females. FASEB J. 2024;38:e70157.",
+      "doi": "10.1096/fj.202401780R",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/39530548/",
+      "published_on": "2024-11-12",
+      "design": "Randomized controlled crossover feeding trial",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Publisher first-published date; §3.3.1 inspected. Performance results previously reported; audit duplicate cohort and corrections. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Small female endurance sample, cycling performance; crossover design improves within-person comparison but period/carryover and dose details need appraisal.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "murphy-koehler-energy@1",
+      "citation": "Murphy C, Koehler K. Energy deficiency impairs resistance training gains in lean mass but not strength: A meta-analysis and meta-regression. Scand J Med Sci Sports. 2022;32:125–137.",
+      "doi": "10.1111/sms.14075",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/34623696/",
+      "published_on": "2021-10-13",
+      "design": "Systematic review, meta-analysis and meta-regression",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "PubMed Epub date and abstract verified; selected publisher excerpts inspected but follow-up fetch blocked; full result and correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Analysis A parallel comparisons; Analysis B separate-study matching, not randomized between-arm contrast. Abstract/body rounding differs for lean mass ES; exact CI pending.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "helms-energy-surplus@1",
+      "citation": "Helms ER et al. Effect of Small and Large Energy Surpluses on Strength, Muscle, and Skinfold Thickness in Resistance-Trained Individuals: A Parallel Groups Design. Sports Med Open. 2023;9:102.",
+      "doi": "10.1186/s40798-023-00651-y",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/37914977/",
+      "published_on": "2023-11-02",
+      "design": "Randomized parallel groups trial with secondary regression",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Publisher version-of-record date; Results/Table 6 and abstract inspected; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "17 completers, intended versus achieved surplus, low power for size outcomes; secondary regression not randomized dose comparison.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "king-acute-carbohydrate@1",
+      "citation": "King A, Helms E, Zinn C, Jukic I. The Ergogenic Effects of Acute Carbohydrate Feeding on Resistance Exercise Performance: A Systematic Review and Meta-analysis. Sports Med. 2022;52:2691–2712.",
+      "doi": "10.1007/s40279-022-01716-w",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/35809162/",
+      "published_on": "2022-07-09",
+      "design": "Systematic review and crossover-trial meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Publisher version-of-record date; §3.4, Fig. 3 and Table 4 text inspected; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "High heterogeneity, low GRADE for volume, imputed correlations; acute noncaloric-control contrasts not evidence of chronic adaptation.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "craven-glycogen@1",
+      "citation": "Craven J, Desbrow B, Sabapathy S, Bellinger P, McCartney D, Irwin C. The Effect of Consuming Carbohydrate With and Without Protein on the Rate of Muscle Glycogen Re-synthesis During Short-Term Post-exercise Recovery: a Systematic Review and Meta-analysis. Sports Med Open. 2021;7:9.",
+      "doi": "10.1186/s40798-020-00297-0",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/33507402/",
+      "published_on": "2021-01-28",
+      "design": "Systematic review and meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "PubMed publication date; publisher Results Part 1 and Part 2 extracted; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Biochemical recovery endpoint within eight hours; small heterogeneous trials and nonidentical energy/CHO in some comparisons.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "gejl-nybo-cho@1",
+      "citation": "Gejl KD, Nybo L. Performance effects of periodized carbohydrate restriction in endurance trained athletes – a systematic review and meta-analysis. J Int Soc Sports Nutr. 2021;18:37.",
+      "doi": "10.1186/s12970-021-00435-3",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/34001184/",
+      "published_on": "2021-05-17",
+      "design": "Systematic review and meta-analysis",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "Original publisher publication date; accessible article and abstract result inspected; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Nine studies with different train-low strategies, sports and performance tests; uncertain small effects and energy equivalence.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "hartono-concurrent-protein@1",
+      "citation": "Hartono FA, Martin-Arrowsmith PW, Peeters WM, Churchward-Venne TA. The Effects of Dietary Protein Supplementation on Acute Changes in Muscle Protein Synthesis and Longer-Term Changes in Muscle Mass, Strength, and Aerobic Capacity in Response to Concurrent Resistance and Endurance Exercise in Healthy Adults: A Systematic Review. Sports Med. 2022;52:1295–1328.",
+      "doi": "10.1007/s40279-021-01620-9",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/35113389/",
+      "published_on": "2022-02-03",
+      "design": "Systematic review of controlled interventions",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "PubMed article date and abstract verified; full-text study-level, publication and overlap audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Study counts only, trained and mostly untrained longer-term samples; no inferred pooled dose or effect; different dietary comparators.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "morton-protein@1",
+      "citation": "Morton RW et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults. Br J Sports Med. 2018;52:376–384.",
+      "doi": "10.1136/bjsports-2017-097608",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/28698222/",
+      "published_on": "2017-07-11",
+      "design": "Systematic review and meta-analysis with study-arm breakpoint regression",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "PubMed Epub and publisher first-published date verified; Results and Figure 5 discussion excerpts inspected; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Mixed populations, baseline protein and control variation. FFM effect not a direct muscle measurement; arm-level breakpoint has wide uncertainty.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "kato-endurance-protein@1",
+      "citation": "Kato H, Suzuki K, Bannai M, Moore DR. Protein Requirements Are Elevated in Endurance Athletes after Exercise as Determined by the Indicator Amino Acid Oxidation Method. PLoS One. 2016;11:e0157406.",
+      "doi": "10.1371/journal.pone.0157406",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/27322029/",
+      "published_on": "2016-06-20",
+      "design": "Controlled graded protein intake metabolic study",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "PubMed publication date; Results and Discussion excerpts inspected; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Short indicator amino acid oxidation study on high-volume run day; not a long-term adaptation or direct hybrid dose trial.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "capling-diet-validity@1",
+      "citation": "Capling L et al. Validity of Dietary Assessment in Athletes: A Systematic Review. Nutrients. 2017;9:1313.",
+      "doi": "10.3390/nu9121313",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/29207495/",
+      "published_on": "2017-12-02",
+      "design": "Systematic review with meta-analysis of athlete dietary assessment",
+      "access": "full-text",
+      "checked_on": "2026-11-24",
+      "publication_check": "PubMed publication date; accessible article abstract and result inspected; correction audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Comparison of logged intake to DLW expenditure assumes context of energy balance; actual imbalance and reporting error differ. No individual calibration factor.",
+      "next_review": "2027-02-24"
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "fuller-wearable-validity@1",
+      "citation": "Fuller D et al. Reliability and Validity of Commercially Available Wearable Devices for Measuring Steps, Energy Expenditure, and Heart Rate: Systematic Review. JMIR Mhealth Uhealth. 2020;8:e18694.",
+      "doi": "10.2196/18694",
+      "record_url": "https://pubmed.ncbi.nlm.nih.gov/32897239/",
+      "published_on": "2020-09-08",
+      "design": "Systematic review of wearable validation studies",
+      "access": "abstract",
+      "checked_on": "2026-11-24",
+      "publication_check": "Publication date from journal copyright record; abstract result extracted; detailed EE subgroup and publication audit pending. No comprehensive independent retraction/rights audit performed.",
+      "rights": "Retain bibliographic metadata, DOI links and original factual summaries only; license and intended deployment rights require independent review.",
+      "appraisal": "Studies through May 2019; brand-level result cannot quantify current model, firmware, or individual energy-expenditure error.",
+      "next_review": "2027-02-24"
+    }
+  ],
+  "claims": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "lea-combined-myofibrillar-synthesis@1",
+      "scope": {
+        "question": "nutrition-energy-adaptation",
+        "objective": "muscle-remodeling",
+        "population": "trained-eumenorrheic-women",
+        "experience": "trained",
+        "intervention": "low-ea-combined-exercise",
+        "comparator": "adequate-ea-combined-exercise",
+        "outcome": "integrated-myofibrillar-protein-synthesis",
+        "horizon": "ten-days",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Ten days of lower energy availability reduced integrated myofibrillar protein synthesis relative to the adequate-EA condition in trained women performing combined exercise.",
+      "limitations": "Thirty participants; short metabolic endpoint, diet components vary; not long-term strength/hypertrophy or diagnosis.",
+      "quality": "moderate",
+      "assessment": "Randomized controlled feeding and standardized exercise support study-specific effect; dual-experienced runner and male transfer not reviewed.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "oxfeldt-lea@1",
+          "locator": "Results: Daily integrated myofibrillar and sarcoplasmic muscle protein synthesis; Fig. 3A.",
+          "result": "Change −0.08 percentage points/day (95% CI −0.13 to −0.03) in LEA vs +0.10 (0.05 to 0.14) in OEA; group-by-time p<0.0001.",
+          "restriction": "Study provided 2.2 g protein/kg lean mass/day in both groups; assigned EA 25 vs 50 kcal/kg FFM/day."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "lea-endurance-time-trial-power@1",
+      "scope": {
+        "question": "nutrition-energy-adaptation",
+        "objective": "endurance-performance",
+        "population": "endurance-trained-women",
+        "experience": "trained",
+        "intervention": "low-ea-diet",
+        "comparator": "adequate-ea-diet",
+        "outcome": "cycling-time-trial-power",
+        "horizon": "fourteen-days",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The low-EA dietary period impaired 20-minute cycling time-trial power relative to the adequate-EA period.",
+      "limitations": "Short crossover intervention; carryover and dietary covariation need review. Cycling not running; performance already reported elsewhere.",
+      "quality": "moderate",
+      "assessment": "Controlled crossover and CI support narrow finding; running and long-term transfer unapproved.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "caldwell-lea@1",
+          "locator": "Results §3.3.1, 20-min time trial; between-condition change.",
+          "result": "Time-by-treatment −15.8 W (95% CI −25.1 to −6.4), p=.002.",
+          "restriction": "Twelve women; within-LEA −16.8 W; achieved EA 22.3 vs 51.9 kcal/kg FFM/day."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "energy-deficit-rt-lean-mass@1",
+      "scope": {
+        "question": "nutrition-energy-adaptation",
+        "objective": "muscle-development",
+        "population": "adult-rt-participants",
+        "experience": "mixed",
+        "intervention": "resistance-training-energy-deficit",
+        "comparator": "resistance-training-no-deficit",
+        "outcome": "lean-mass",
+        "horizon": "at-least-three-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Parallel comparisons in the review favored resistance training without energy deficiency for lean-mass gains.",
+      "limitations": "Small number of studies; mixed population, variable energy deficits and lean mass measurement. Full-text result verification outstanding.",
+      "quality": "low",
+      "assessment": "Direction supported by abstract and body excerpts; CI and population details require independent full-text check.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "murphy-koehler-energy@1",
+          "locator": "Abstract Results, Analysis A; body text Fig. 2A rounding requires verification.",
+          "result": "ES −0.57, p=.02 (abstract; body text −0.58). CI not reliably extracted.",
+          "restriction": "Analysis A only; seven studies for lean mass."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "energy-deficit-rt-strength@1",
+      "scope": {
+        "question": "nutrition-energy-adaptation",
+        "objective": "strength-development",
+        "population": "adult-rt-participants",
+        "experience": "mixed",
+        "intervention": "resistance-training-energy-deficit",
+        "comparator": "resistance-training-no-deficit",
+        "outcome": "strength",
+        "horizon": "at-least-three-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The parallel strength comparisons did not establish a clear difference between resistance training with and without energy deficit.",
+      "limitations": "Limited precision and population directness; cannot infer no impairment for an experienced hybrid athlete.",
+      "quality": "low",
+      "assessment": "Abstract and accessible excerpt; verify interval and methods before use.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "murphy-koehler-energy@1",
+          "locator": "Abstract Results, Analysis A; body text Fig. 2B.",
+          "result": "ES −0.31, p=.28; CI not reliably extracted.",
+          "restriction": "Five strength studies; no equivalence test."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "surplus-body-mass-skinfold@1",
+      "scope": {
+        "question": "nutrition-energy-surplus",
+        "objective": "body-composition",
+        "population": "resistance-trained-adults",
+        "experience": "trained",
+        "intervention": "greater-observed-body-mass-gain",
+        "comparator": "lower-observed-body-mass-gain",
+        "outcome": "skinfold-thickness-change",
+        "horizon": "eight-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Across participants, change in body mass was positively associated with change in skinfold thickness.",
+      "limitations": "Small underpowered sample, skinfold proxy, no running outcome; bench 1RM group result differs.",
+      "quality": "low",
+      "assessment": "Association only; does not establish optimal surplus or causal dose response.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "helms-energy-surplus@1",
+          "locator": "Results regression analysis; abstract Results (BF and R²).",
+          "result": "BF10 14.3, R²=.49.",
+          "restriction": "Secondary regression across 17 completers; not randomized dose-effect estimate."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "acute-cho-resistance-volume@1",
+      "scope": {
+        "question": "nutrition-carbohydrate-resistance",
+        "objective": "session-performance",
+        "population": "healthy-exercise-participants",
+        "experience": "mixed",
+        "intervention": "acute-carbohydrate-ingestion",
+        "comparator": "placebo-or-water",
+        "outcome": "resistance-session-volume",
+        "horizon": "single-session",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Acute carbohydrate ingestion increased completed resistance exercise volume in pooled crossover comparisons.",
+      "limitations": "High heterogeneity; imputed correlations; no chronic strength or optimal dose; low GRADE.",
+      "quality": "low",
+      "assessment": "Full-text estimate, but variable protocols and risk of bias; transfer conditional on demand and prior intake.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "king-acute-carbohydrate@1",
+          "locator": "Results §3.4 Fig. 3 and Table 4, overall volume estimate.",
+          "result": "SMD 0.61 (95% CI 0.11–1.11); I² 79%, k=12.",
+          "restriction": "Acute volume only; comparator often noncaloric."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "cho-short-term-glycogen-resynthesis@1",
+      "scope": {
+        "question": "nutrition-carbohydrate-recovery",
+        "objective": "recovery",
+        "population": "exercise-participants",
+        "experience": "mixed",
+        "intervention": "post-exercise-carbohydrate",
+        "comparator": "water-control",
+        "outcome": "muscle-glycogen-resynthesis-rate",
+        "horizon": "up-to-eight-hours",
+        "block_context": "short-recovery"
+      },
+      "assertion": "Postexercise carbohydrate increased short-term muscle glycogen restoration rate compared with water.",
+      "limitations": "Biochemical endpoint; variable exercise protocols and energy difference; no next-session performance estimate.",
+      "quality": "moderate",
+      "assessment": "Pooled result direction consistent in sensitivity analyses; indirect for programming a double day.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "craven-glycogen@1",
+          "locator": "Results Part 1, Fig. 3.",
+          "result": "23.5 mmol/kg dry muscle/h (95% CI 19.0–27.9); I² 66.8%.",
+          "restriction": "10 trials, 86 participants; mean CHO 1.02 g/kg body mass/h."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "cho-protein-glycogen-resynthesis@1",
+      "scope": {
+        "question": "nutrition-carbohydrate-recovery",
+        "objective": "recovery",
+        "population": "exercise-participants",
+        "experience": "mixed",
+        "intervention": "post-exercise-carbohydrate-plus-protein",
+        "comparator": "post-exercise-carbohydrate",
+        "outcome": "muscle-glycogen-resynthesis-rate",
+        "horizon": "up-to-eight-hours",
+        "block_context": "short-recovery"
+      },
+      "assertion": "Adding protein to carbohydrate did not demonstrate a faster glycogen restoration rate in the studied short-recovery comparisons.",
+      "limitations": "No equivalence test; distinct protein-related remodeling outcomes not addressed.",
+      "quality": "moderate",
+      "assessment": "Direct biochemical comparison but not a general conclusion about recovery or protein.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "craven-glycogen@1",
+          "locator": "Results Part 2, pooled CHO+PRO versus CHO.",
+          "result": "0.4 mmol/kg dry muscle/h (95% CI −2.7–3.4); I² 56.4%.",
+          "restriction": "19 trials, 160 participants; carbohydrate amounts not identical across all comparisons."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "periodized-cho-restriction-performance@1",
+      "scope": {
+        "question": "nutrition-carbohydrate-periodization",
+        "objective": "endurance-development",
+        "population": "endurance-trained-athletes",
+        "experience": "trained",
+        "intervention": "periodized-carbohydrate-restriction",
+        "comparator": "normal-high-carbohydrate-availability",
+        "outcome": "endurance-performance",
+        "horizon": "training-intervention-end",
+        "block_context": "endurance-training"
+      },
+      "assertion": "The pooled performance estimate did not establish superiority of periodized carbohydrate restriction over normal/high availability.",
+      "limitations": "Small sample of heterogeneous protocols and sports; energy matching varies; no equivalence.",
+      "quality": "moderate",
+      "assessment": "Interval includes small unfavorable and favorable effects; no approved hybrid transfer.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "gejl-nybo-cho@1",
+          "locator": "Abstract Results and meta-analysis result.",
+          "result": "SMD 0.17 (95% CI −0.15–0.49), p=.29.",
+          "restriction": "Nine studies; not a comparison of every possible carbohydrate timing policy."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "concurrent-protein-muscle-mass-study-count@1",
+      "scope": {
+        "question": "nutrition-protein-concurrent",
+        "objective": "muscle-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "concurrent-training-protein-supplementation",
+        "comparator": "concurrent-training-control",
+        "outcome": "muscle-mass",
+        "horizon": "longer-term-training",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "Five of nine longer-term studies assessing muscle mass reported enhanced gains with protein supplementation during concurrent training.",
+      "limitations": "Abstract-only; dietary control, trial overlap, outcome definitions and study-level effects require review.",
+      "quality": "low",
+      "assessment": "Direct exercise combination but largely untrained and no dose-response synthesis. Keep pending, not operational.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hartono-concurrent-protein@1",
+          "locator": "Abstract Results, longer-term studies, muscle mass.",
+          "result": "5/9 studies; no pooled estimate or CI.",
+          "restriction": "Review-level study count, not an effect size; total longer-term sample 167 trained and 391 untrained across ten studies."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "concurrent-protein-aerobic-study-count@1",
+      "scope": {
+        "question": "nutrition-protein-concurrent",
+        "objective": "endurance-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "concurrent-training-protein-supplementation",
+        "comparator": "concurrent-training-control",
+        "outcome": "maximal-or-peak-oxygen-uptake",
+        "horizon": "longer-term-training",
+        "block_context": "concurrent-training"
+      },
+      "assertion": "None of the six included aerobic-capacity studies reported an additional VO2max/peak gain from protein supplementation.",
+      "limitations": "Abstract-only, heterogeneous diets and training, uncertain power.",
+      "quality": "low",
+      "assessment": "No direct hybrid requirement inference; full-text appraisal outstanding.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "hartono-concurrent-protein@1",
+          "locator": "Abstract Results, longer-term aerobic adaptations.",
+          "result": "0/6 reported additional benefit; no pooled estimate or CI.",
+          "restriction": "Study count; not evidence of equivalence or other endurance outcomes."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "rt-protein-supplement-ffm@1",
+      "scope": {
+        "question": "nutrition-protein-resistance",
+        "objective": "muscle-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "resistance-training-protein-supplementation",
+        "comparator": "resistance-training-control",
+        "outcome": "fat-free-mass",
+        "horizon": "at-least-six-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Protein supplementation modestly increased pooled fat-free-mass gains during resistance training.",
+      "limitations": "Mixed training history, baseline diets and comparators; FFM includes water; not direct hybrid evidence.",
+      "quality": "moderate",
+      "assessment": "Pooled controlled interventions; inspect subgroup and trial bias before transfer.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "morton-protein@1",
+          "locator": "Abstract Results, pooled FFM outcome.",
+          "result": "Mean difference +0.30 kg (95% CI 0.09–0.52).",
+          "restriction": "49 studies overall; outcome-specific count not extracted here."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "rt-protein-supplement-one-rm@1",
+      "scope": {
+        "question": "nutrition-protein-resistance",
+        "objective": "strength-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "resistance-training-protein-supplementation",
+        "comparator": "resistance-training-control",
+        "outcome": "one-rm-strength",
+        "horizon": "at-least-six-weeks",
+        "block_context": "resistance-training"
+      },
+      "assertion": "Protein supplementation modestly increased pooled 1RM gains during resistance training.",
+      "limitations": "Not lift-specific prediction or individualized requirement; populations and controls differ.",
+      "quality": "moderate",
+      "assessment": "Indirect for dual-experienced athletes; review precision and comparator.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "morton-protein@1",
+          "locator": "Abstract Results, pooled 1RM outcome.",
+          "result": "Mean difference +2.49 kg (95% CI 0.64–4.33).",
+          "restriction": "Pooled absolute kg across different strength tests."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "rt-protein-ffm-breakpoint@1",
+      "scope": {
+        "question": "nutrition-protein-resistance",
+        "objective": "muscle-development",
+        "population": "healthy-adults",
+        "experience": "mixed",
+        "intervention": "higher-total-protein-intake",
+        "comparator": "lower-total-protein-intake",
+        "outcome": "fat-free-mass",
+        "horizon": "training-intervention-end",
+        "block_context": "resistance-training"
+      },
+      "assertion": "The study-arm segmented regression estimated a plateau in FFM gains at a total protein intake near 1.62 g/kg body mass/day.",
+      "limitations": "Wide CI, confounding, no concurrent or deficit-specific estimate.",
+      "quality": "low",
+      "assessment": "Modeled association; no approved use as a nutritional cutoff.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "morton-protein@1",
+          "locator": "Figure 5 and Discussion, unadjusted breakpoint.",
+          "result": "1.62 g/kg/day (95% CI 1.03–2.20).",
+          "restriction": "42 arms, 723 participants; arm-level estimate, not individual threshold."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "endurance-protein-iaao-breakpoint@1",
+      "scope": {
+        "question": "nutrition-protein-endurance",
+        "objective": "protein-requirement-estimation",
+        "population": "endurance-trained-adults",
+        "experience": "trained",
+        "intervention": "graded-protein-intake",
+        "comparator": "lower-protein-intake",
+        "outcome": "indicator-amino-acid-oxidation-breakpoint",
+        "horizon": "high-volume-training-day",
+        "block_context": "endurance-training"
+      },
+      "assertion": "A graded-protein metabolic study estimated a protein requirement of 1.65 g/kg body mass/day on a high-volume endurance-training day.",
+      "limitations": "Metabolic estimator, not measured long-term strength/endurance performance; no combined program.",
+      "quality": "low",
+      "assessment": "Useful complementary evidence; method and directness limit precise coaching prescription.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "kato-endurance-protein@1",
+          "locator": "Abstract Results and Discussion, labeled CO2 excretion breakpoint.",
+          "result": "1.65 g/kg/day; upper 95% confidence bound 1.83; alternative oxidation endpoint 1.53, upper bound 1.70.",
+          "restriction": "Simulated 35 km over three days, 20 km run test day, adequate/high carbohydrate."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "athlete-logged-intake-dlw-disagreement@1",
+      "scope": {
+        "question": "nutrition-observation-validity",
+        "objective": "assess-measurement-quality",
+        "population": "athletes",
+        "experience": "mixed",
+        "intervention": "self-reported-energy-intake",
+        "comparator": "doubly-labeled-water-energy-expenditure",
+        "outcome": "intake-expenditure-disagreement",
+        "horizon": "study-observation-window",
+        "block_context": "nutrition-monitoring"
+      },
+      "assertion": "Self-reported energy intake was lower on average than doubly labeled water energy expenditure in the reviewed athlete studies.",
+      "limitations": "Actual energy balance may differ, reporting methods heterogeneous; no individual correction factor.",
+      "quality": "moderate",
+      "assessment": "Measurement warning, not a physiological intervention or TEE estimate.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "capling-diet-validity@1",
+          "locator": "Abstract Results, 11 DLW comparison studies.",
+          "result": "Mean reported underestimation 19%; pooled ES −1.006 (95% CI −1.3 to −0.7).",
+          "restriction": "Comparison of intake with expenditure, not direct measurement of intake error alone."
+        }
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "wearable-energy-expenditure-validity@1",
+      "scope": {
+        "question": "nutrition-observation-validity",
+        "objective": "assess-measurement-quality",
+        "population": "wearable-validation-participants",
+        "experience": "mixed",
+        "intervention": "consumer-wearable-energy-estimation",
+        "comparator": "criterion-energy-measurement",
+        "outcome": "energy-expenditure-validity",
+        "horizon": "study-observation-window",
+        "block_context": "nutrition-monitoring"
+      },
+      "assertion": "The systematic review did not identify a commercial wearable brand with accurate energy-expenditure estimates under its evaluated criteria.",
+      "limitations": "Brand and protocol specific, algorithms change; no current device or individual error estimate.",
+      "quality": "low",
+      "assessment": "Abstract-only extraction; check EE-specific denominators, criteria and recent studies before approval.",
+      "transfers": [],
+      "support": [
+        {
+          "source": "fuller-wearable-validity@1",
+          "locator": "Abstract Results, energy expenditure conclusion.",
+          "result": "No pooled quantitative EE estimate extracted.",
+          "restriction": "158 publications across all reviewed outcomes, nine brands; search through May 2019."
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "methods": [
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "nutrition-coverage-aware-review@1",
+      "question": "nutrition-integrated-planning",
+      "description": "Review training and fueling with actions constrained by per-variable coverage; distinguish absent, partial and reported values.",
+      "provenance": "Original candidate methodology, Fitness Intelligence Research Packet 004, §§3–4; related empirical records are pending.",
+      "tradeoffs": "Conservative engineering and methodology; no inferred intake, EA or diagnosis. More logging is optional and not always appropriate.",
+      "claims": [
+        "athlete-logged-intake-dlw-disagreement@1",
+        "wearable-energy-expenditure-validity@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "nutrition-priority-session-fueling@1",
+      "question": "nutrition-integrated-planning",
+      "description": "Plan feasible carbohydrate and protein opportunities around priority sessions, especially demanding doubles.",
+      "provenance": "Original candidate methodology, Fitness Intelligence Research Packet 004, §§3–4; related empirical records are pending.",
+      "tradeoffs": "Acute outcomes do not establish chronic benefit; schedule changes may be preferable to impractical fueling. No mandatory spacing or dose.",
+      "claims": [
+        "acute-cho-resistance-volume@1",
+        "cho-short-term-glycogen-resynthesis@1",
+        "cho-protein-glycogen-resynthesis@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "nutrition-energy-aware-progression@1",
+      "question": "nutrition-integrated-planning",
+      "description": "Review plausible energy and fueling constraints before escalating combined workload or pursuing a body-composition goal.",
+      "provenance": "Original candidate methodology, Fitness Intelligence Research Packet 004, §§3–4; related empirical records are pending.",
+      "tradeoffs": "Policy has no validated trigger or comparative efficacy; clinical concerns require referral, not automated REDs scoring.",
+      "claims": [
+        "lea-combined-myofibrillar-synthesis@1",
+        "lea-endurance-time-trial-power@1",
+        "energy-deficit-rt-lean-mass@1"
+      ]
+    },
+    {
+      "synthetic": false,
+      "extracted_by": "ChatGPT (AI-assisted extraction, Research Packet 004)",
+      "status": "pending",
+      "approval": null,
+      "key": "nutrition-block-aligned-macros@1",
+      "question": "nutrition-integrated-planning",
+      "description": "Discuss feasible total energy, protein, dietary fat and carbohydrate availability across the session/day/block horizons.",
+      "provenance": "Original candidate methodology, Fitness Intelligence Research Packet 004, §§3–4; related empirical records are pending.",
+      "tradeoffs": "Ranges are contextual and not independently optimized or summed; no numeric defaults or individualized diet prescription.",
+      "claims": [
+        "rt-protein-supplement-ffm@1",
+        "endurance-protein-iaao-breakpoint@1",
+        "periodized-cho-restriction-performance@1"
+      ]
+    }
+  ],
+  "withdrawals": []
+}
