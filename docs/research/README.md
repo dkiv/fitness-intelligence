@@ -2,7 +2,7 @@
 
 A research packet records what a research session found, what it could check, and which questions remain open. A reviewed J1 scientific claim describes a specific result in a defined population, comparison, outcome and time horizon. A programming policy describes a choice the coach could make. Accepting a claim does not establish when a planner should act on it.
 
-**Scheduled preliminary research collection is complete.** The ten packets were staged in the order **001–006 → 008 → 007 → 009 → 010**. Recovery and autoregulation came forward to inform joint strength and running decisions. J3 scientific curation and practical method development continue independently. J3A.1 and J3B.1 await independent review. [Strength progression curation](curation/README.md) · [Integrated roadmap](research-backlog.md#proposed-integrated-sequence) · [Combined J3 priorities](research-backlog.md#j3-scientific-curation)
+**Scheduled preliminary research collection is complete.** The ten packets were staged in the order **001–006 → 008 → 007 → 009 → 010**. Recovery and autoregulation came forward to inform joint strength and running decisions. J3 scientific curation and practical method development continue independently. The strength progression and hybrid block tranches await independent review. [Curation index](curation/README.md) · [Integrated roadmap](research-backlog.md#proposed-integrated-sequence) · [Combined J3 priorities](research-backlog.md#j3-scientific-curation)
 
 ## Packet 001
 
@@ -194,6 +194,10 @@ Evaluate software correctness with frozen inputs and all 20 synthetic cases (I-A
 
 J3A.1 records an AI-assisted appraisal of six papers used in strength progression decisions. Its Appendix A stages one Barsuhn source revision and one claim revision. J3B.1 preserves proposed J3-M01 revision 0.1 for movement progression, working-set exposure and concurrent scheduling. Independent scientific and method reviews are outstanding. The curation index records source-specific obligations, exact archive identities and implementation-review questions. [Curation index](curation/README.md) · [Decision priorities and next tranche](research-backlog.md#strength-progression-curation)
 
+## Hybrid block curation
+
+J3A.2 appraises evidence for choosing a block and protecting a named secondary outcome. Its three revised claims distinguish the conditioning comparison in Micke, the half-squat test in Rønnestad and the pretraining biopsy reference in Bickel. J3B.2 stages J3-M02 revision 0.1 for setting objectives, constructing a feasible week and reviewing continuation or transition. Independent review of the scientific records and programming choices is outstanding. [Appraisals and review bundles](curation/README.md#hybrid-block-construction-and-protected-secondary-outcomes) · [Backlog and running handoff](research-backlog.md#hybrid-block-curation)
+
 ## Numbering and revisions
 
 Allocate a stable three-digit number when adding a packet to the roadmap. A change in execution order preserves that allocation. Keep its number and filename stable across revisions. Cite the packet number, revision, section and Git commit when reviewing an extraction or proposing a rule. Evidence IDs such as E02 are local to their packet. J1 references use exact revision keys such as `moesgaard@1`.
@@ -225,11 +229,12 @@ Keep the supplied revision in Git history. For a correction or follow-up extract
 | Packet 010 additions | 3 | 3 | 4 | 0 | 3 | 0 |
 | J1 and Packets 001–010 | 61 | 84 | 110 | 4 | 35 | 0 |
 | J3A.1 pending revisions | 0 | 1 | 1 | 0 | 0 | 0 |
-| **In-memory candidate** | **61** | **85** | **111** | **4** | **35** | **0** |
+| J3A.2 pending revisions | 0 | 3 | 3 | 0 | 0 | 0 |
+| **In-memory candidate** | **61** | **88** | **114** | **4** | **35** | **0** |
 
 Counts refer to exact revisions. Through Packet 002, the 18 source revisions cover 15 distinct publication DOIs. The male Enes, female Enes and Pelland papers each appear at `@1` and `@2`. The Enes perceptual follow-up shares the male strength cohort. Both Enes strength claims retain their pending revisions and original source links. The candidate retains the earlier screening dispositions.
 
-The baseline at `c56a05e` (PR #25) combined J1, Packets 001–009 and J3A.1. It had 82 source revisions across 78 distinct publication DOIs, with 75 pending and seven screening. J3A.1 added the fourth revision pair at the existing Barsuhn DOI. Packet 010 adds three pending sources at three distinct new DOIs. The combined candidate now has 85 source revisions across 81 DOIs, with 78 pending and seven screening.
+The baseline at `c56a05e` (PR #25) combined J1, Packets 001–009 and J3A.1. It had 82 source revisions across 78 distinct publication DOIs, with 75 pending and seven screening. J3A.1 added the fourth revision pair at the existing Barsuhn DOI. Packet 010 adds three pending sources at three distinct new DOIs. At PR #26’s merge (`0c96d39`), the combined candidate had 85 source revisions across 81 DOIs, with 78 pending and seven screening. J3A.2 adds three pending source revisions at the existing Micke, Rønnestad and Bickel DOIs. The new total is 88 source revisions across 81 DOIs, with 81 pending and seven screening.
 
 All four relations qualify claims on the same question. A method may cite claims on other questions. For example, `priority-aware-concurrent-calendar@1` cites timing and sequence claims. Packet 005’s `comparable-running-performance-review@1` cites claims on field repeatability, submaximal HR measurement and wearable VO2 agreement. In Packet 006, `hierarchical-hybrid-block-construction@1` draws on earlier periodization and adaptive running claims alongside the new hockey and HIFT claims. Packet 008’s `recovery-aware-priority-session-review@1` cites both running trial endpoints and acute running and lifting claims across questions. Packet 007’s `energy-logging-adjusted-maintenance-review@1` links the controlled-maintenance and modeled intake-change comparisons to Packet 004’s athlete reporting claim. Packet 009’s `context-eligible-individual-history-review@1` cites both new repeatability claims alongside running, effort and body-mass measurements. Its `contextual-decision-response-history@1` reuses four earlier claims. Packet 010’s `rolling-horizon-block-intentions@1` is the fifth method to cite `habitual-set-maintenance-strength@1`. All five retain that original reference while the J3A.1 revision awaits review. A valid link establishes that the cited revision exists. Reviewers still need to judge its scientific support, the proposed scope terms and transfer to hybrid athletes.
 
@@ -248,7 +253,7 @@ from fitness_intelligence.evidence.retrieval import Catalog
 registered = load_release("j1-screening-1")
 assert registered.digest == "ae9a27a9a257f7b48375ad1892206c5f10d07a6e0625ee717974fe9d73b3cf64"
 manifest = registered.release.model_dump(mode="json")
-manifest["release_id"] = "packet-010-and-j3a-001-candidate"
+manifest["release_id"] = "j3a-002-hybrid-block-candidate"
 groups = ("questions", "sources", "claims", "relations", "methods", "withdrawals")
 research = Path("../docs/research")
 
@@ -269,17 +274,20 @@ for path in sorted((research / "curation/drafts").glob("*.json")):
 
 data = json.dumps(manifest).encode()
 candidate = CorpusRelease.model_validate_json(data, strict=True)
-assert tuple(len(getattr(candidate, group)) for group in groups) == (61, 85, 111, 4, 35, 0)
+assert tuple(len(getattr(candidate, group)) for group in groups) == (61, 88, 114, 4, 35, 0)
 by_doi = defaultdict(set)
 for source in candidate.sources:
     assert source.doi and source.status in {"pending", "screening"}
     assert source.approval is None
     by_doi[source.doi.casefold()].add(source.key)
-assert Counter(s.status for s in candidate.sources) == {"pending": 78, "screening": 7}
+assert Counter(s.status for s in candidate.sources) == {"pending": 81, "screening": 7}
 assert len(by_doi) == 81
 assert {frozenset(keys) for keys in by_doi.values() if len(keys) > 1} == {
     frozenset({f"{name}@1", f"{name}@2"})
-    for name in ("enes-males", "enes-females", "pelland", "barsuhn")
+    for name in (
+        "enes-males", "enes-females", "pelland", "barsuhn",
+        "micke-hift-block", "ronnestad-soccer-maintenance", "bickel-retention",
+    )
 }
 assert candidate.approval is None
 assert all(r.kind == "qualifies" for r in candidate.relations)
@@ -297,6 +305,28 @@ assert {m.key for m in candidate.methods if "habitual-set-maintenance-strength@1
     "rolling-horizon-block-intentions@1",
 }
 assert all("habitual-set-maintenance-strength@2" not in m.claims for m in candidate.methods)
+# Each expected change names the original and proposed scope values.
+block_revisions = (
+    ("hift-conditioning-block-deadlift", "micke-hift-block",
+     "hierarchical-hybrid-block-construction@1", {}),
+    ("soccer-weekly-strength-retention", "ronnestad-soccer-maintenance",
+     "outcome-specific-strength-maintenance@1", {"outcome": ("leg-strength", "half-squat-one-rm")}),
+    ("young-reduced-dose-hypertrophy-retention", "bickel-retention",
+     "outcome-specific-strength-maintenance@1", {
+         "comparator": ("end-of-development-reference", "pretraining-baseline"),
+         "outcome": ("muscle-hypertrophy", "mean-myofiber-area"),
+     }),
+)
+for claim_id, source_id, method_key, expected_changes in block_revisions:
+    original, revised = (claims[f"{claim_id}@{rev}"] for rev in (1, 2))
+    for rev, record in ((1, original), (2, revised)):
+        source = sources[f"{source_id}@{rev}"]
+        assert record.status == source.status == "pending"
+        assert {edge.source for edge in record.support} == {source.key}
+    before, after = original.scope.model_dump(), revised.scope.model_dump()
+    assert {k: (v, after[k]) for k, v in before.items() if v != after[k]} == expected_changes
+    assert {m.key for m in candidate.methods if original.key in m.claims} == {method_key}
+    assert all(revised.key not in m.claims for m in candidate.methods)
 running_source = "nuuttila-adaptive-running@1"
 assert sources[running_source].access == "abstract"
 for key in ("adaptive-running-ten-km-performance@1", "adaptive-running-max-treadmill-speed@1"):
