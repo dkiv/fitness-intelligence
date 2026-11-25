@@ -1,7 +1,8 @@
 # B1 · Run the Garmin verification locally
 
 This command reads a small sample of your own account and prints a JSON capability report
-to your terminal. Only you run the personal-data probe. No live result has been recorded.
+to your terminal. The operator completed the two-window live probe using the full key
+supplied in memory. The default Keychain lookup returned a shorter value in that run.
 The [design and availability matrix](garmin-integration-design.md) describe what Garmin documents.
 
 ## Set up the key on macOS

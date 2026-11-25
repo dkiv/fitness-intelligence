@@ -2,8 +2,9 @@
 
 **Status, 2026-11-24.** The contract below comes from Garmin's published Personal API
 documentation, OpenAPI 3.0.1 specification (API version 1.0.0) and official Python client.
-The local verifier has synthetic coverage. Account-specific observations are pending the
-operator's [two-date probe](garmin-verification.md).
+The operator completed the [two-date probe](garmin-verification.md) with the full key
+supplied in memory. Token exchange and the bounded read sequence succeeded. The default
+Keychain lookup returned a shortened value, so that credential path still needs confirmation.
 
 ## Credentials, permissions and transport
 
@@ -42,9 +43,12 @@ redirect or retries token failures. See the [operation schemas](https://develope
 
 ## Availability matrix and proposed canonical mapping
 
-Each row describes documented fields and the evidence B1 can collect. **Live coverage is
-unknown for every row.** A nonempty response may contain only metadata. Inspect the specified
-measurement fields and date evidence before promoting a category to ingestion.
+All sampled endpoint groups responded in the operator's run. Activity detail, performed
+workouts and original-file response headers were reachable in both windows. A successful
+response can carry empty meal slots, missing upstream attribution or a summary without
+individual readings. The sample establishes neither continuous history nor consistent
+nutrition or weight transfer. The table describes the schema and the checks that can be
+repeated on another account. Individual results stay local.
 
 | Category | Documented representation | What the local sample can establish | Proposed normalization |
 | --- | --- | --- | --- |

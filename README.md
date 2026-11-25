@@ -6,8 +6,8 @@ migrations and tests. M2B.1 mapping and M2B.2 private local Hevy synchronization
 No health-data endpoints, authentication, AI or web UI. See [Hevy setup and synchronization](docs/hevy-importer.md).
 
 B1 adds a local [Garmin Personal API verification command](docs/garmin-verification.md).
-The [contract and availability matrix](docs/garmin-integration-design.md) identify which
-personal-account capabilities still need a local run.
+The operator completed the bounded live probe using an in-memory credential. See the
+[contract, availability matrix and limits of the sample](docs/garmin-integration-design.md).
 
 M3A adds internal [strength progression, weekly volume and activity metrics](docs/strength-analytics.md).
 
