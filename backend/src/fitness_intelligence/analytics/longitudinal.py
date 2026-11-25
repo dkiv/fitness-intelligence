@@ -13,7 +13,7 @@ from fitness_intelligence.domain.endurance import Source
 @dataclass(frozen=True)
 class ObservationId:
     source: Source
-    entity: Literal["daily_intake", "body_weight"]
+    entity: Literal["daily_intake", "body_weight", "daily_recovery"]
     id: UUID
 
 
@@ -23,18 +23,21 @@ class Observation:
     provider_date: date
     report_date: date | None
     occurred_at: datetime | None
-    retrieved_at: datetime
+    retrieved_at: datetime | None
     recorded_at: datetime | None
     value: Decimal
     unit: str
     method: str
-    source_field: str
-    mapping_version: str
+    source_field: str | None
+    mapping_version: str | None
     upstream_writer: str | None
 
 
 @dataclass(frozen=True)
 class IntakeObservation(Observation):
+    retrieved_at: datetime
+    source_field: str
+    mapping_version: str
     source_data_present: bool | None
     logging_completeness: str
     exclusion_reason: str | None
@@ -42,6 +45,9 @@ class IntakeObservation(Observation):
 
 @dataclass(frozen=True)
 class WeighIn(Observation):
+    retrieved_at: datetime
+    source_field: str
+    mapping_version: str
     source_value: Decimal
     interpreted_unit: str
     documented_unit: str | None
@@ -123,10 +129,27 @@ class DailyWeight:
 
 
 @dataclass(frozen=True)
+class ExpenditureObservation(Observation):
+    component: str
+    window_start: datetime | None
+    window_end: datetime | None
+
+
+@dataclass(frozen=True)
+class DailyExpenditure:
+    total: Metric
+    active: Metric
+    basal: Metric
+    facts: tuple[ExpenditureObservation, ...]
+    coverage: Coverage
+
+
+@dataclass(frozen=True)
 class ReportDay:
     provider_date: date
     intake: DailyIntake
     weight: DailyWeight
+    expenditure: DailyExpenditure | None = None
 
 
 @dataclass(frozen=True)
@@ -136,10 +159,11 @@ class LongitudinalReport:
     period: Period
     source_zones: tuple[tuple[UUID, str], ...]
     days: tuple[ReportDay, ...]
-    contract_version: str = "d1b-v1"
+    contract_version: str = "d1c-v1"
     policy_version: str = "intake-weight-v1"
     date_basis: str = "provider_local"
     observation_state: str = "latest_accepted"
+    expenditure_source: Source | None = None
 
 
 def daily_median(values: tuple[Decimal, ...]) -> Decimal | None:
