@@ -14,6 +14,7 @@
 | M3A · Strength analytics foundation | Merged through PR #5. The internal, owner-scoped Polars reports cover exercise progression, weekly volume and training consistency. [Metric definitions](strength-analytics.md) [PR #5](https://github.com/dkiv/fitness-intelligence/pull/5) |
 | E1 · Deterministic training planner | Merged through PR #8. Pure generation and move review for the first two weeks of synthetic cycle A. |
 | E2 · Persistence and approval | Internal PostgreSQL commands seal, preview, approve or decline E1 revisions and recover historical prescriptions. [Scope and invariants](training-plan-design.md#e2-persistence-and-owner-review) |
+| E3 · Execution and first adaptive cycle | Internal two-week synthetic workflow with durable outcomes, verified J1 retrieval and approval-time revalidation. [Demonstration and coverage](adaptive-coaching-cycle.md) |
 
 On November 22, 2026, the personal historical Hevy import completed locally with 303 workouts,
 1,618 exercise entries and 4,818 sets. A repeat reconciliation and a read-only integrity audit
@@ -32,7 +33,7 @@ Research Garmin read eligibility (B) and Training API eligibility (G) alongside 
 on-device record availability (C) independently. D incorporates each validated source as it
 arrives. F can then use those additional observations. G adds delivery of approved plans and H
 evaluates their outcomes. Apply ownership and privacy controls throughout, with I as the gate
-for public access. A and the E1/E2 slices have internal implementations. The remaining acceptance criteria describe planned capabilities.
+for public access. A and the E1–E3 slices have internal implementations. The remaining acceptance criteria describe planned capabilities.
 
 ## Workstreams and acceptance criteria
 

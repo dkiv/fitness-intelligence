@@ -301,7 +301,8 @@ with Session(engine) as db, db.begin():
     )
 ```
 
-To add week 2, capture any updated feedback with `expected_context=context_id`, then call
+To add week 2, record the first week’s outcomes and feedback through the
+[E3 execution commands](adaptive-coaching-cycle.md), then call
 `submit(cycle, candidate, Generate(2))`. A missing review follows E1's hold rule. To revise
 the latest detailed week, submit a `Move(slot, local_date, local_time)` or generate that week
 again. The service loads the predecessor from the approved head. Compare by week and logical
@@ -334,9 +335,8 @@ latter includes the base revision and terminal receipt where present.
   for a finalized candidate also conflicts. Missing or out-of-scope IDs use the same lookup error.
 
 E2 covers one fixed block per independent cycle and changes to its latest detailed week.
-Selection among active cycles, multi-block manifests, execution/outcome matching, catalog
-lookups and evidence withdrawal, and per-owner export/erasure remain deferred. Restrict direct
-SQL write privileges to trusted processes. E1 replay and payload validation are application
+Selection among active cycles, multi-block manifests, and per-owner export/erasure remain deferred. E3 adds explicit
+execution attribution, catalog lookups and withdrawal checks. Restrict direct SQL write privileges to trusted processes. E1 replay and payload validation are application
 checks. PostgreSQL enforces lineage, row immutability and atomic approval. A database
 administrator with DDL privileges controls those guards. Downgrade refuses any populated E2
 schema. Preserve such a database and use a separately reviewed migration for its data.

@@ -43,6 +43,8 @@ from fitness_intelligence.db.plan_snapshot import (
     read,
     snapshot,
 )
+from fitness_intelligence.db.review import render_review
+from fitness_intelligence.planning.outcomes import Actual, WorkingSet
 from fitness_intelligence.planning.planner import (
     Exposure,
     Slot,
@@ -101,6 +103,7 @@ def test_two_week_approval_move_decline_and_historical_read(
     first = cmd.submit(plan, None, FIRST)
     first_preview = cmd.preview(plan, first)
     assert cmd.current(plan) is None and len(first_preview.changes) == 4
+    monkeypatch.setattr(PlanCommands, "_now", lambda *_: datetime(2027, 1, 2, tzinfo=UTC))
     approve(cycle, first)
     monkeypatch.setattr(PlanCommands, "_today", lambda *_: BLOCK.start + timedelta(days=6))
     review = WeekReview(
@@ -111,9 +114,28 @@ def test_two_week_approval_move_decline_and_historical_read(
         Exposure(True, (Decimal(7),) * 2),
         feedback,
     )
-    context = cmd.capture_context(replace(CONTEXT, review=review), expected_context=cycle.context)
+    monkeypatch.setattr(PlanCommands, "_now", lambda *_: review.as_of)
+    for slot, count, effort in ((Slot.FIRST_PRESS, 3, 6), (Slot.SECOND_PRESS, 2, 7)):
+        session = first_preview.candidate.week.session(slot)
+        cmd.record_outcome(
+            plan,
+            first,
+            1,
+            slot,
+            Actual(
+                status="completed",
+                confirmed_barbell_press=True,
+                manageable=feedback,
+                working_sets=tuple(WorkingSet(ordinal=i + 1, rpe=effort) for i in range(count)),
+            ),
+            occurred_at=datetime.combine(session.day, session.start, CONTEXT.availability.zone),
+            command_id=uuid4(),
+        )
+    context = cmd.capture_context(CONTEXT, expected_context=cycle.context)
     refs = (EvidenceRef("synthetic-release", "synthetic-claim"),)
-    second = cmd.submit(plan, first, SECOND, evidence=refs)
+    with pytest.raises(ValueError, match="catalog retrieval"):
+        cmd.submit(plan, first, SECOND, evidence=refs)
+    second = cmd.submit(plan, first, SECOND)
     preview = cmd.preview(plan, second)
     week = preview.candidate.week
     assert first_preview.candidate.week == generate_week(WeekInputs(BLOCK, CONTEXT.availability, 1))
@@ -123,7 +145,7 @@ def test_two_week_approval_move_decline_and_historical_read(
     assert cmd.current(plan).revision_id == first
     assert (week.press_sets, week.running_seconds) == (sets, 2700)
     assert week.inputs.review == review and week.inputs.previous == first_preview.candidate.week
-    assert week.inputs.block == BLOCK and preview.candidate.evidence == refs
+    assert week.inputs.block == BLOCK and preview.candidate.evidence == ()
     assert {c.week for c in preview.changes} == {2} and len(preview.changes) == 4
     approve(cycle, second, first)
 
@@ -141,6 +163,7 @@ def test_two_week_approval_move_decline_and_historical_read(
     receipt = cmd.decide(plan, declined, **arguments)
     assert receipt.choice == "decline" and receipt.decided_at.utcoffset() == timedelta(0)
     assert cmd.current(plan).candidate.week == week
+    assert "Current availability conflict · long-run" in render_review(cmd.current(plan))
     moved = cmd.submit(plan, second, move)
     approve(cycle, moved, second)
     db.commit()
@@ -333,7 +356,10 @@ def test_sql_guards_for_sealed_rows_and_head(db: Session, cycle: Cycle) -> None:
         update(PlanRevision).values(snapshot={}),
         delete(PlanRevision),
         update(PlanRevision).values(base_id=None),
-        text("TRUNCATE athlete_contexts, training_plans, plan_revisions, plan_decisions"),
+        text(
+            "TRUNCATE athlete_contexts, training_plans, plan_revisions, "
+            "plan_decisions, session_outcomes"
+        ),
         update(PlanDecision).values(choice="approve"),
         delete(PlanDecision),
         update(AthleteContext).values(snapshot={}),
@@ -444,6 +470,7 @@ def test_e2_migration_preflight_and_prior_head_roundtrip(db: Session) -> None:
     assert db.scalar(text("SELECT to_regprocedure('e2_apply_decision()') IS NULL"))
     db.commit()
     command.upgrade(config, "e201")
+    command.upgrade(config, "head")
     command.check(config)
     owner = User()
     db.add(owner)
