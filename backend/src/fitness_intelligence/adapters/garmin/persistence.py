@@ -18,6 +18,7 @@ from fitness_intelligence.db.models import ExternalReference, Workout
 from fitness_intelligence.domain.endurance import Activity, DailyObservation
 
 from .client import GarminError
+from .mapping import start_times
 from .projection import VERSION
 
 
@@ -56,22 +57,23 @@ def ambiguous_children(name: str, prior: list[dict], current: list[dict]) -> boo
 
 
 def merged_start(
-    item: Activity, previous: dict[str, Any], same_version: bool
+    item: Activity, previous: dict[str, Any], revision_resolution: int | None
 ) -> tuple[datetime, int]:
     if not previous:
         return item.started_at, item.start_resolution_us
     old_start = datetime.fromisoformat(previous["started_at"])
     old_resolution = previous["start_resolution_us"]
-    common = max(old_resolution, item.start_resolution_us)
 
-    def rounded(instant: datetime) -> datetime:
-        return instant.replace(microsecond=instant.microsecond // common * common)
+    def agrees(resolution: int) -> bool:
+        common = max(resolution, item.start_resolution_us)
+        return old_start.replace(
+            microsecond=old_start.microsecond // common * common
+        ) == item.started_at.replace(microsecond=item.started_at.microsecond // common * common)
 
-    if rounded(old_start) == rounded(item.started_at):
-        if old_resolution < item.start_resolution_us:
-            return old_start, old_resolution
-    elif same_version:
+    if revision_resolution is not None and not agrees(revision_resolution):
         raise GarminError("conflicting activity version")
+    if old_resolution < item.start_resolution_us and agrees(old_resolution):
+        return old_start, old_resolution
     return item.started_at, item.start_resolution_us
 
 
@@ -82,7 +84,6 @@ def store_children(
     projection: dict[str, Any],
     provenance: dict[str, Any],
     retrieved: datetime,
-    same_version: bool,
 ) -> bool:
     complete = True
     for name, children in child_values(snapshot.activity).items():
@@ -90,23 +91,25 @@ def store_children(
             {k: str(v) if isinstance(v, Decimal) else v for k, v in row.items()} for row in children
         ]
         prior = projection.get(name)
+        # The performed-workout GET has no revision. An activity detail timestamp
+        # cannot order successive responses from that endpoint.
+        revision = snapshot.updated.isoformat() if name == "splits" and snapshot.updated else None
+        if (
+            prior != canonical
+            and prior is not None
+            and revision is not None
+            and provenance.get(name, {}).get("source_updated_at") == revision
+        ):
+            if len(prior) != len(canonical) or any(
+                value is not None and new[key] is not None and new[key] != value
+                for old, new in zip(prior, canonical, strict=True)
+                for key, value in old.items()
+            ):
+                raise GarminError("conflicting activity version")
         if prior and ambiguous_children(name, prior, canonical):
             complete = False
             continue
         if prior != canonical:
-            if (
-                same_version
-                and prior is not None
-                and (
-                    len(prior) != len(canonical)
-                    or any(
-                        value is not None and new[key] != value
-                        for old, new in zip(prior, canonical, strict=True)
-                        for key, value in old.items()
-                    )
-                )
-            ):
-                raise GarminError("conflicting activity version")
             model = ActivitySplit if name == "splits" else ActivityStep
             session.execute(
                 delete(model).where(
@@ -120,7 +123,7 @@ def store_children(
         provenance[name] = {
             "source": snapshot.split_source if name == "splits" else "ActivityWorkoutDTO.steps",
             "retrieved_at": retrieved.isoformat(),
-            "source_updated_at": snapshot.updated.isoformat() if snapshot.updated else None,
+            "source_updated_at": revision,
         }
     return complete
 
@@ -195,39 +198,80 @@ def save_activity(session: Session, snapshot: Snapshot, retrieved: datetime) -> 
     previous = dict(projection)
     provenance = dict((ref.sync_metadata or {}).get("fields", {}))
     same_version = snapshot.updated is not None and snapshot.updated == ref.source_updated_at
-    started, resolution = merged_start(item, previous, same_version)
+    revision = snapshot.updated.isoformat() if snapshot.updated else None
+    revision_resolution = None
+    if same_version:
+        revision_resolution = ref.sync_metadata.get("revision_start_resolution_us")
+        if revision_resolution is None:
+            # Older B3.1 rows retain the actual last search/detail inputs.
+            inputs = ref.raw_payload["source"]
+            _, _, revision_resolution = start_times(
+                inputs["search"], inputs["detail"]["summaryDTO"]
+            )
+        if previous["local_date"] != item.local_date.isoformat():
+            raise GarminError("conflicting activity version")
+    started, resolution = merged_start(item, previous, revision_resolution)
     projection.update(
         started_at=started.isoformat(),
         start_resolution_us=resolution,
         local_date=item.local_date.isoformat(),
     )
     workout.started_at, activity.local_date = started, item.local_date
+    if not creating and previous.get("subtype") is not None and "subtype" not in provenance:
+        # Earlier B3.1 projections have no subtype provenance. Recover only what the
+        # last saved DTO actually observed before a sparse replay replaces that DTO.
+        inputs = ref.raw_payload["source"]
+        if any(
+            inputs[level].get(key, {}).get("typeKey") is not None
+            for level, key in (("search", "activityType"), ("detail", "activityTypeDTO"))
+        ):
+            provenance["subtype"] = {
+                "retrieved_at": ref.last_synced_at.isoformat(),
+                "source_updated_at": ref.source_updated_at.isoformat()
+                if ref.source_updated_at
+                else None,
+            }
     if creating or item.subtype is not None:
+        if (
+            revision is not None
+            and provenance.get("subtype", {}).get("source_updated_at") == revision
+            and previous.get("subtype") != item.subtype
+        ):
+            raise GarminError("conflicting activity version")
+        if item.subtype is not None:
+            provenance["subtype"] = {
+                "retrieved_at": retrieved.isoformat(),
+                "source_updated_at": revision,
+            }
         activity.sport, activity.subtype = item.sport, item.subtype
         projection.update(sport=item.sport, subtype=item.subtype)
     for field, path in item.measurement_sources:
         value = getattr(item, field)
+        if (
+            revision is not None
+            and provenance.get(field, {}).get("source_updated_at") == revision
+            and getattr(activity, field) != value
+        ):
+            raise GarminError("conflicting activity version")
         setattr(activity, field, value)
         projection[field] = str(value)
         provenance[field] = {
             "source": path,
             "retrieved_at": retrieved.isoformat(),
-            "source_updated_at": snapshot.updated.isoformat() if snapshot.updated else None,
+            "source_updated_at": revision,
         }
 
-    if same_version and any(
-        value is not None and projection[key] != value
-        for key, value in previous.items()
-        if key not in {"start_resolution_us", "started_at", "sport"}
-    ):
-        raise GarminError("conflicting activity version")
     session.flush()
-    complete = store_children(
-        session, snapshot, workout, projection, provenance, retrieved, same_version
-    )
+    complete = store_children(session, snapshot, workout, projection, provenance, retrieved)
     changed = projection != previous or ref.source_updated_at != snapshot.updated
     ref.raw_payload = {"canonical": projection, "source": snapshot.replay_inputs}
-    ref.sync_metadata = {"mapping_version": VERSION, "fields": provenance}
+    ref.sync_metadata = {
+        "mapping_version": VERSION,
+        "fields": provenance,
+        "revision_start_resolution_us": min(
+            item.start_resolution_us, revision_resolution or item.start_resolution_us
+        ),
+    }
     ref.source_updated_at, ref.last_synced_at = snapshot.updated, retrieved
     if not complete:
         return "partial"
@@ -252,12 +296,19 @@ def save_observation(session: Session, obs: DailyObservation, retrieved: datetim
     else:
         result = "unchanged"
     start, end = obs.window_start, obs.window_end
-    if start is None and end is None:
+    same_measurement = (row.value, row.unit, row.method, row.source_field, row.mapping_version) == (
+        obs.value,
+        obs.unit,
+        obs.method,
+        obs.source_field,
+        VERSION,
+    )
+    if (
+        same_measurement
+        and (start is None or start == row.window_start)
+        and (end is None or end == row.window_end)
+    ):
         start, end = row.window_start, row.window_end
-    elif start == row.window_start and end is None:
-        end = row.window_end
-    elif end == row.window_end and start is None:
-        start = row.window_start
     values = dict(
         value=obs.value,
         unit=obs.unit,

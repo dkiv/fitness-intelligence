@@ -123,7 +123,7 @@ Use this separate operator procedure before enabling any personal observation wr
    against the original identity before resuming. A disconnected or unresolved account
    fails closed. B2 exposes no enrollment command.
 
-See the [B3.1 operator workflow](garmin-importer.md) for the implemented checks and enrollment gate.
+The [B3.1 operator workflow](garmin-importer.md) covers this independently confirmed path and the authorized locally witnessed enrollment alternative.
 
 ## B3 importer boundary
 

@@ -175,3 +175,26 @@ class DailyRecoveryObservation(OwnedRecord, Base):
     retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     mapping_version: Mapped[str | None]
     source_field: Mapped[str | None]
+
+
+class GarminEnrollment(Base):
+    __tablename__ = "garmin_enrollments"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "provider", "source_account_id"],
+            ["source_accounts.user_id", "source_accounts.provider", "source_accounts.id"],
+            ondelete="CASCADE",
+        ),
+        CheckConstraint("provider = 'garmin'", name="garmin_provider"),
+        CheckConstraint(
+            "(evidence_type = 'independent' AND approved_pin IS NULL) OR "
+            "(evidence_type = 'locally_witnessed' AND approved_pin IS NOT NULL "
+            "AND length(approved_pin) = 64)",
+            name="valid_evidence",
+        ),
+    )
+    source_account_id: Mapped[UUID] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    provider: Mapped[str]
+    evidence_type: Mapped[str]
+    approved_pin: Mapped[str | None]

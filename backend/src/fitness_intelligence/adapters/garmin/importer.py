@@ -8,9 +8,17 @@ from sqlalchemy import Engine
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.adapters.local_account import locked_account
-from fitness_intelligence.db.models import SourceAccount
 
-from .binding import Evidence, Feed, VerifiedSample, detail_for, feed_for, search_page, verify
+from .binding import (
+    Evidence,
+    EvidenceType,
+    Feed,
+    VerifiedSample,
+    detail_for,
+    feed_for,
+    search_page,
+    verify,
+)
 from .client import Endpoint, GarminClient, GarminError
 from .mapping import DETAIL_STAMP, WorkoutResponse, map_activity, map_day, obj, stamp
 from .persistence import Snapshot, save_activity, save_observation
@@ -29,7 +37,7 @@ class Importer:
         self.engine, self.evidence, self.client = engine, evidence, client
 
     def activities(self, day: date, sample: VerifiedSample, steps: bool) -> list[Snapshot]:
-        binding = self.evidence.binding
+        binding = sample.binding
         anchor = day == self.evidence.day
         page = sample.page if anchor else search_page(self.client, binding, day)
         result = []
@@ -64,27 +72,41 @@ class Importer:
             )
         return result
 
-    def run(self, mode: Mode, *, day: date | None = None, steps: bool = False) -> dict[str, int]:
+    def run(
+        self, mode: Mode, *, day: date | None = None, steps: bool = False
+    ) -> dict[str, int | str]:
         mode = Mode(mode)
         evidence = self.evidence
-        source = evidence.binding.source
+        source = evidence.source
         writing_data = mode in (Mode.ACTIVITIES, Mode.RECOVERY)
         if writing_data != (day is not None) or (steps and mode != Mode.ACTIVITIES):
             raise GarminError("invalid operation")
         if mode == Mode.RECOVERY and not evidence.feeds:
             raise GarminError("no verified recovery feeds selected")
-        if mode != Mode.VERIFY and not evidence.durability_confirmed:
+        if (
+            mode != Mode.VERIFY
+            and evidence.kind == EvidenceType.INDEPENDENT
+            and not evidence.durability_confirmed
+        ):
             raise GarminError("independent durability evidence required")
         if mode == Mode.VERIFY:
             with Session(self.engine) as session:
-                evidence.account(session, allow_new=True)
-            verify(self.client, evidence)
-            return self.comparisons()
+                expected = evidence.resolve(session, allow_new=True)
+            sample = verify(self.client, evidence, expected)
+            # A discovered profile may already belong to another account of this owner.
+            with Session(self.engine) as session:
+                current = evidence.resolve(
+                    session, allow_new=expected is None, observed=sample.binding
+                )
+            result = self.comparisons()
+            if evidence.kind == EvidenceType.WITNESSED and current is None:
+                result["candidate_pin"] = evidence.receipt(sample.binding)
+            return result
 
         with locked_account(self.engine, source.source_account_id) as session:
             with session.begin():
-                evidence.account(session, allow_new=mode == Mode.ENROLL)
-            sample = verify(self.client, evidence)
+                expected = evidence.resolve(session, allow_new=mode == Mode.ENROLL)
+            sample = verify(self.client, evidence, expected)
             activities = []
             observations = ()
             counts: Counter[str] = Counter()
@@ -96,28 +118,24 @@ class Importer:
                     feeds.clear()
                     for feed in evidence.feeds:
                         try:
-                            feeds[feed] = feed_for(self.client, evidence.binding, day, feed)
+                            feeds[feed] = feed_for(self.client, sample.binding, day, feed)
                         except GarminError as exc:
                             # Garmin documents 204 for HRV. The anchor already verified this feed.
                             if feed != Feed.HRV or str(exc) != "no_content":
                                 raise
                             counts["feeds_without_content"] += 1
-                observations = map_day(evidence.binding, day, **feeds)
+                observations = map_day(sample.binding, day, **feeds)
 
             retrieved = datetime.now(UTC)
             with session.begin():
-                account = evidence.account(session, allow_new=mode == Mode.ENROLL, for_write=True)
+                account = evidence.resolve(
+                    session,
+                    allow_new=mode == Mode.ENROLL and expected is None,
+                    observed=sample.binding,
+                    for_write=True,
+                )
                 if mode == Mode.ENROLL:
-                    if account is None:
-                        session.add(
-                            SourceAccount(
-                                id=source.source_account_id,
-                                user_id=source.owner_id,
-                                provider="garmin",
-                                provider_account_id=str(evidence.binding.profile_id),
-                                status="active",
-                            )
-                        )
+                    evidence.enroll(session, sample.binding, account)
                     return {"enrolled" if account is None else "already_enrolled": 1}
                 for snapshot in activities:
                     counts[save_activity(session, snapshot, retrieved)] += 1
@@ -125,7 +143,7 @@ class Importer:
                     counts[save_observation(session, obs, retrieved)] += 1
             return {"observed": len(activities) + len(observations), **counts}
 
-    def comparisons(self) -> dict[str, int]:
+    def comparisons(self) -> dict[str, int | str]:
         return dict.fromkeys(
             (
                 "search_owner_matched",

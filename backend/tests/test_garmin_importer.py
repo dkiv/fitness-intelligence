@@ -20,7 +20,13 @@ from sqlalchemy.orm import Session
 from test_garmin import jwt
 
 from fitness_intelligence.adapters.garmin import cli
-from fitness_intelligence.adapters.garmin.binding import ComparisonError, Evidence, Feed, verify
+from fitness_intelligence.adapters.garmin.binding import (
+    ComparisonError,
+    Evidence,
+    EvidenceType,
+    Feed,
+    verify,
+)
 from fitness_intelligence.adapters.garmin.client import (
     TOKEN_PATH,
     Endpoint,
@@ -36,6 +42,7 @@ from fitness_intelligence.db.endurance_models import (
     ActivityStep,
     DailyRecoveryObservation,
     EnduranceActivity,
+    GarminEnrollment,
 )
 from fitness_intelligence.db.models import ExternalReference, SourceAccount, User, Workout
 from fitness_intelligence.domain.endurance import Source
@@ -157,7 +164,13 @@ class Provider:
 
 def evidence(user: User) -> Evidence:
     return Evidence(
-        GarminBinding(Source(user.id, "garmin", uuid4()), PROFILE), IDENT, DAY, tuple(Feed), True
+        Source(user.id, "garmin", uuid4()),
+        IDENT,
+        DAY,
+        tuple(Feed),
+        EvidenceType.INDEPENDENT,
+        PROFILE,
+        True,
     )
 
 
@@ -256,12 +269,12 @@ def test_activity_replay_edit_sparse_and_privacy(
         "userProfileId",
     ):
         assert forbidden not in stored
-    replayed = replay_activity(importer.evidence.binding, ref)
+    replayed = replay_activity(GarminBinding(importer.evidence.source, PROFILE), ref)
     with pytest.raises(MappingError, match="invalid replay reference"):
         replay_activity(
             replace(
-                importer.evidence.binding,
-                source=replace(importer.evidence.binding.source, source_account_id=uuid4()),
+                GarminBinding(importer.evidence.source, PROFILE),
+                source=replace(importer.evidence.source, source_account_id=uuid4()),
             ),
             ref,
         )
@@ -424,7 +437,7 @@ def test_reject_inconclusive_evidence(failure: str) -> None:
 def test_lock_and_owner_isolation(db: Session, setup: tuple[Importer, Provider]) -> None:
     importer, provider = setup
     enroll(importer)
-    original = importer.evidence.binding.source
+    original = importer.evidence.source
     with locked_account(db.bind, original.source_account_id):
         calls = len(provider.calls)
         with pytest.raises(LocalAccountError, match="already running"):
@@ -441,7 +454,7 @@ def test_lock_and_owner_isolation(db: Session, setup: tuple[Importer, Provider])
         account_id = uuid4()
         source = Source(owner, "garmin", account_id)
         profile = PROFILE + (1 if same_owner else 2)
-        second = replace(importer.evidence, binding=GarminBinding(source, profile))
+        second = replace(importer.evidence, source=source, profile_id=profile)
         p = Provider()
         p.summaries[DAY][0]["ownerId"] = p.details[IDENT]["userProfileId"] = profile
         p.summaries[DAY][0]["distance"] = 123
@@ -486,7 +499,7 @@ def test_lock_and_owner_isolation(db: Session, setup: tuple[Importer, Provider])
     ):
         local = Importer(
             db.bind,
-            replace(importer.evidence, binding=GarminBinding(wrong, PROFILE)),
+            replace(importer.evidence, source=wrong),
             importer.client,
         )
         with pytest.raises((MappingError, GarminError)):
@@ -508,7 +521,7 @@ def test_disconnect_during_network_reads(db: Session, setup: tuple[Importer, Pro
 
     def disconnect(req: httpx.Request) -> httpx.Response:
         if req.url.path == Endpoint.SLEEP:
-            account = db.get(SourceAccount, importer.evidence.binding.source.source_account_id)
+            account = db.get(SourceAccount, importer.evidence.source.source_account_id)
             account.status = "disconnected"
             db.commit()
         return provider.handle(req)
@@ -549,7 +562,7 @@ def test_cli_rehearsal_and_privacy(
 ) -> None:
     importer, provider = setup
     file = tmp_path / "operator.json"
-    src = importer.evidence.binding.source
+    src = importer.evidence.source
     config = dict(
         user_id=str(src.owner_id),
         source_account_id=str(src.source_account_id),
@@ -603,6 +616,10 @@ def test_recovery_provenance_downgrade_guard(db: Session, setup: tuple[Importer,
     enroll(importer)
     importer.run(Mode.RECOVERY, day=DAY)
     config = Config(str(Path(__file__).parents[1] / "alembic.ini"))
+    # Exercise the historical b301 downgrade guard in isolation.
+    db.delete(db.scalars(select(GarminEnrollment)).one())
+    db.commit()
+    command.downgrade(config, "b301")
     with pytest.raises(RuntimeError, match="preserve recovery provenance"):
         command.downgrade(config, "b201")
     assert db.scalar(text("SELECT version_num FROM alembic_version")) == "b301"
@@ -660,7 +677,7 @@ def test_same_start_in_hevy_keeps_separate_workout(
     db: Session, setup: tuple[Importer, Provider]
 ) -> None:
     importer, _ = setup
-    owner = importer.evidence.binding.source.owner_id
+    owner = importer.evidence.source.owner_id
     started = datetime(2024, 11, 4, 3, 30, 0, 123000, tzinfo=UTC)
     hevy = SourceAccount(
         user_id=owner, provider="hevy", provider_account_id="synthetic", status="active"
@@ -685,3 +702,242 @@ def test_same_start_in_hevy_keeps_separate_workout(
         len(db.scalars(select(Workout.id).filter_by(user_id=owner, started_at=started)).all()) == 2
     )
     assert db.scalar(select(EnduranceActivity.workout_id)) != workout.id
+
+
+def test_sparse_revision_completion_and_independent_steps(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    original, provider = setup
+    importer = Importer(db.bind, replace(original.evidence, feeds=()), original.client)
+    enroll(importer)
+
+    def sync(steps: bool = True) -> dict[str, int | str]:
+        result = importer.run(Mode.ACTIVITIES, day=DAY, steps=steps)
+        db.expire_all()
+        return result
+
+    assert sync()["created"] == 1
+    ref = db.scalars(select(ExternalReference)).one()
+    activity = db.scalars(select(EnduranceActivity)).one()
+    v1 = dict(ref.sync_metadata["fields"])
+    assert v1["steps"]["source_updated_at"] is None
+    detail = provider.details[IDENT]
+    summary = provider.summaries[DAY][0]
+    detail["metadataDTO"]["lastUpdateDate"] = "2024-11-06T01:00:00.000"
+    detail["summaryDTO"] = {}
+    detail.pop("splitSummaries")
+    summary.pop("activityType")
+    summary.pop("beginTimestamp")
+    summary["distance"] = 123
+    assert sync(steps=False)["updated"] == 1
+    v2 = ref.sync_metadata["fields"]["distance_m"]
+    assert v2["source_updated_at"] != v1["distance_m"]["source_updated_at"]
+    for field in ("average_hr_bpm", "splits", "steps", "subtype"):
+        assert ref.sync_metadata["fields"][field] == v1[field]
+    assert activity.average_hr_bpm == 120
+    assert db.scalar(select(ActivitySplit.count)) == 2
+
+    detail["summaryDTO"]["averageHR"] = 126
+    detail["splitSummaries"] = [{"splitType": "RUN_ACTIVE", "noOfSplits": 3, "distance": 15}]
+    summary["activityType"] = {"typeKey": "trail_running"}
+    summary["beginTimestamp"] = 1730691000456
+    provider.steps[0]["steps"][0]["durationValue"] = 40
+    assert sync()["updated"] == 1
+    assert activity.distance_m == 123 and activity.average_hr_bpm == 126
+    assert db.scalar(select(Workout.started_at)).microsecond == 456000
+    assert activity.subtype == "trail_running"
+    for field in ("average_hr_bpm", "splits", "subtype"):
+        assert ref.sync_metadata["fields"][field]["source_updated_at"] == v2["source_updated_at"]
+    assert db.scalar(select(ActivitySplit.count)) == 3
+    assert db.scalar(select(ActivityStep.duration_value)) == 40
+    provider.steps[0]["steps"][0]["durationValue"] = 50
+    assert sync()["updated"] == 1
+    assert db.scalar(select(ActivityStep.duration_value)) == 50
+    assert ref.sync_metadata["fields"]["steps"]["source_updated_at"] is None
+    accepted = ref.last_synced_at
+
+    detail["summaryDTO"]["averageHR"] = 131
+    with pytest.raises(GarminError, match="conflicting activity version"):
+        sync()
+    detail["summaryDTO"]["averageHR"] = 126
+    # One changed known split value is a contradiction even if another field is missing.
+    detail["splitSummaries"] = [{"splitType": "RUN_ACTIVE", "distance": 16}]
+    with pytest.raises(GarminError, match="conflicting activity version"):
+        sync()
+    db.expire_all()
+    assert activity.average_hr_bpm == 126 and ref.last_synced_at == accepted
+    assert db.scalar(select(ActivitySplit.distance_m)) == 15
+    detail["metadataDTO"]["lastUpdateDate"] = UPDATE
+    provider.steps = []
+    assert sync()["older"] == 1
+    assert ref.last_synced_at == accepted and db.scalar(select(ActivityStep.duration_value)) == 50
+
+
+def test_daily_windows_belong_to_the_accepted_value(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    original, p = setup
+    importer = Importer(db.bind, replace(original.evidence, feeds=(Feed.DAILY,)), original.client)
+    enroll(importer)
+
+    def bounds() -> tuple[datetime | None, datetime | None]:
+        importer.run(Mode.RECOVERY, day=DAY)
+        return db.execute(
+            select(
+                DailyRecoveryObservation.window_start, DailyRecoveryObservation.window_end
+            ).filter_by(metric="resting_hr")
+        ).one()
+
+    start, end = bounds()
+    assert start is not None and end is not None
+    assert bounds() == (start, end)
+    p.daily.pop("wellnessEndTimeGmt")
+    assert bounds() == (start, end)
+    p.daily.pop("wellnessStartTimeGmt")
+    assert bounds() == (start, end)
+    p.daily["restingHeartRate"] += 1
+    assert bounds() == (None, None)
+    p.daily["wellnessStartTimeGmt"] = start.isoformat()
+    assert bounds() == (start, None)
+    p.daily.pop("wellnessStartTimeGmt")
+    p.daily["wellnessEndTimeGmt"] = end.isoformat()
+    assert bounds() == (None, end)
+    p.daily["wellnessStartTimeGmt"] = start.isoformat()
+    assert bounds() == (start, end)
+    p.daily["restingHeartRate"] += 1
+    p.daily.pop("wellnessStartTimeGmt")
+    assert bounds() == (None, end)
+
+
+def test_witnessed_candidate_approval_and_pinned_revalidation(
+    db: Session,
+    setup: tuple[Importer, Provider],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    original, provider = setup
+    source = original.evidence.source
+    config = dict(
+        user_id=str(source.owner_id),
+        source_account_id=str(source.source_account_id),
+        evidence_type="locally_witnessed",
+        known_activity_id=IDENT,
+        known_day=str(DAY),
+        feeds=list(Feed),
+        key_issued_in_authenticated_session=True,
+        owned_activity_confirmed=True,
+    )
+    file = tmp_path / "garmin.json"
+    file.touch(mode=0o600)
+    monkeypatch.delenv("SSLKEYLOGFILE", raising=False)
+    monkeypatch.setattr(cli, "keychain_key", lambda: KEY)
+    monkeypatch.setattr(
+        cli,
+        "GarminClient",
+        lambda key: GarminClient(key, transport=httpx.MockTransport(provider.handle)),
+    )
+    caplog.set_level(logging.DEBUG, logger="httpx")
+
+    def run(mode: str, *args: str, ok: bool) -> dict:
+        file.write_text(json.dumps(config))
+        monkeypatch.setattr(sys, "argv", ["cli", "--binding", str(file), mode, *args])
+        assert cli.main() == (0 if ok else 1)
+        msg = capsys.readouterr()
+        for private in (str(PROFILE), str(IDENT), str(DAY), KEY, PRIVATE):
+            assert private not in msg.out + msg.err + caplog.text
+        return json.loads(msg.out) if ok else {}
+
+    for attestation in ("key_issued_in_authenticated_session", "owned_activity_confirmed"):
+        config[attestation] = False
+        run("verify-only", ok=False)
+        config[attestation] = True
+    assert provider.calls == []
+    provider.sleep["userProfilePK"] += 1
+    run("verify-only", ok=False)
+    provider.sleep["userProfilePK"] -= 1
+    before = len(provider.calls)
+    result = run("verify-only", ok=True)
+    assert len(provider.calls) - before == 6
+    receipt = result["candidate_pin"]
+    assert db.scalar(select(SourceAccount)) is None and db.scalar(select(GarminEnrollment)) is None
+    run("activities", "--day", str(DAY), ok=False)
+    run("enroll", ok=False)
+    config["approved_pin"] = receipt
+
+    def set_profile(profile: int) -> None:
+        provider.summaries[DAY][0]["ownerId"] = provider.details[IDENT]["userProfileId"] = profile
+        provider.daily["userProfileId"] = provider.sleep["userProfilePK"] = provider.hrv[
+            "userProfilePk"
+        ] = profile
+
+    set_profile(PROFILE + 1)
+    run("enroll", ok=False)
+    assert db.scalar(select(SourceAccount)) is None
+    set_profile(PROFILE)
+    assert run("enroll", ok=True) == {"enrolled": 1}
+    assert run("enroll", ok=True) == {"already_enrolled": 1}
+    policy = db.scalars(select(GarminEnrollment)).one()
+    assert policy.evidence_type == "locally_witnessed" and policy.approved_pin == receipt
+    assert db.scalar(select(SourceAccount.provider_account_id)) == str(PROFILE)
+    assert (
+        db.scalar(select(Workout)) is None and db.scalar(select(DailyRecoveryObservation)) is None
+    )
+
+    monkeypatch.setattr(cli, "keychain_key", lambda: "replacement-synthetic-key")
+    assert run("recovery", "--day", str(DAY), ok=True)["created"] == 11
+    set_profile(PROFILE + 1)
+    for mode in ("verify-only", "enroll"):
+        run(mode, ok=False)
+    run("activities", "--day", str(DAY), ok=False)
+    set_profile(PROFILE)
+    provider.summaries[DAY] = []
+    run("activities", "--day", str(DAY), ok=False)
+    config["known_activity_id"] = IDENT + 1
+    before = len(provider.calls)
+    run("verify-only", ok=False)
+    assert before == len(provider.calls)
+    config.update(
+        evidence_type="independent",
+        profile_id=PROFILE,
+        independent_profile_confirmed=True,
+        durability_confirmed=True,
+        known_activity_id=IDENT,
+    )
+    run("enroll", ok=False)
+    assert db.scalar(select(Workout)) is None
+    assert policy.approved_pin == receipt and db.scalar(
+        select(SourceAccount.provider_account_id)
+    ) == str(PROFILE)
+    db.close()  # Release the read transaction before requesting the exclusive DDL lock.
+    with pytest.raises(RuntimeError, match="preserve enrollment evidence"):
+        command.downgrade(Config(str(Path(__file__).parents[1] / "alembic.ini")), "b301")
+
+
+def test_preexisting_account_requires_independent_evidence(
+    db: Session, setup: tuple[Importer, Provider]
+) -> None:
+    importer, provider = setup
+    ev = importer.evidence
+    db.add(
+        SourceAccount(
+            id=ev.source.source_account_id,
+            user_id=ev.source.owner_id,
+            provider="garmin",
+            status="active",
+            provider_account_id=str(PROFILE),
+        )
+    )
+    db.commit()
+    witnessed = replace(
+        ev, kind=EvidenceType.WITNESSED, profile_id=None, durability_confirmed=False
+    )
+    with pytest.raises(GarminError, match="evidence mismatch"):
+        Importer(db.bind, witnessed, importer.client).run(Mode.VERIFY)
+    assert not provider.calls
+    assert importer.run(Mode.VERIFY)["detail_owner_matched"] == 1
+    assert db.scalar(select(GarminEnrollment)) is None
+    assert importer.run(Mode.ENROLL) == {"already_enrolled": 1}
+    policy = db.scalars(select(GarminEnrollment)).one()
+    assert policy.evidence_type == "independent" and policy.approved_pin is None
