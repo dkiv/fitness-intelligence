@@ -32,7 +32,7 @@ class GarminCoverage(HistoryDay, Base):
     attempted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     last_success: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     eligible_count: Mapped[int | None]
-    # Temporary receipts for accepted activity details in an unfinished listing pass.
+    # Activity detail receipts, intake source outcomes, or a retryable acquisition gap.
     receipts: Mapped[dict[str, dict]] = mapped_column(JSON)
 
 

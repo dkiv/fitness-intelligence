@@ -160,7 +160,7 @@ def coverage(
     if status in ("observed", "empty"):
         row.last_success = row.attempted_at
         row.eligible_count = count
-        row.receipts = {}
+        row.receipts = dict(receipts or {})
     elif receipts is not None:
         row.receipts = dict(receipts)
 
@@ -207,10 +207,13 @@ def day_status(session: Session, source: Source, category: Category, day: date) 
     key = day_key(source, category, day)
     row = session.get(GarminCoverage, key)
     active = list(session.scalars(select(GarminIssue.reason).filter_by(**key, resolved_at=None)))
-    return dict(
+    result = dict(
         acquisition=row.status if row else "never_queried",
         last_success=row.last_success if row else None,
         last_eligible_count=row.eligible_count if row else None,
         reconciliation="unresolved" if active else "no_open_issue",
         reasons=sorted(set(active)),
     )
+    if category == Category.INTAKE:
+        result["sources"] = row.receipts.get("sources", {}) if row else {}
+    return result

@@ -70,6 +70,7 @@ def activity_window(run: "HistoryRun", first: date, last: date) -> None:
             receipts[d] = (
                 dict(row.receipts) if row and row.pass_key == str(run.scope.pass_id) else {}
             )
+            receipts[d].pop("unavailable", None)
     order = []
     totals: Counter[date] = Counter()
     step_counts: Counter[date] = Counter()

@@ -261,6 +261,7 @@ def test_weight_segment_and_quarantine(
     p.weights = [original | {"weight": 73500.0}, second]
     assert get()["observations"]["unresolved"] == 1
     assert stored[0].mass_kg == Decimal("72.125")
+    assert day_status(db, ev.source, Category.WEIGHT, DAY)["last_eligible_count"] == 1
     held = select_weight_day(db, ev.source, DAY)
     assert (
         held.reasons == ("ambiguous_correction",)
@@ -274,11 +275,27 @@ def test_weight_segment_and_quarantine(
     assert get()["categories"]["weight"]["open_issues"] == 0
     p.weights = [original, original, second]
     assert get()["observations"]["unresolved"] == 2
+    assert day_status(db, ev.source, Category.WEIGHT, DAY)["last_eligible_count"] == 1
+    assert not select_weight_day(db, ev.source, DAY).measurements
+    last_success = day_status(db, ev.source, Category.WEIGHT, DAY)["last_success"]
     p.weights = [original | {"weight": 72.125}, second]
     result = get()
     assert result["stopped"] == "weight verification required"
     assert result["observations"]["unchanged"] == 0
     assert result["categories"]["weight"]["remaining"] == 1
+    partial = day_status(db, ev.source, Category.WEIGHT, DAY)
+    assert partial["last_success"] == last_success and partial["last_eligible_count"] == 1
+    next_day = DAY + timedelta(days=1)
+    cfg["end"] = str(next_day)
+    path.write_text(json.dumps(cfg))
+    wider = WeightSegment.load(path, ev.source)
+    route = Endpoint.WEIGHT_RANGE.value.format(day=DAY, end_day=DAY)
+    p.errors[route] = 404
+    interrupted = run(db, bound, (Category.WEIGHT,), end=next_day, segment=wider)
+    assert interrupted["stopped"] == "not_found" and interrupted["requests"]["weight_range"] == 1
+    assert day_status(db, ev.source, Category.WEIGHT, next_day)["acquisition"] == "never_queried"
+    del p.errors[route]
+    assert not select_weight_day(db, ev.source, DAY).measurements
     p.weights = []
     assert get()["stopped"] == "weight verification required"
     p.weights = [original, second]
@@ -292,10 +309,6 @@ def test_weight_segment_and_quarantine(
     p.weights = [second | {"timestampGMT": second["timestampGMT"] + 200}]
     assert get()["categories"]["weight"]["open_issues"] == 1
     assert len(list(db.scalars(select(BodyWeightObservation)))) == 3
-    next_day = DAY + timedelta(days=1)
-    cfg["end"] = str(next_day)
-    path.write_text(json.dumps(cfg))
-    wider = WeightSegment.load(path, ev.source)
     new_stamp = original["timestampGMT"] + 100000
     p.weights = [
         original | {"timestampGMT": new_stamp},
@@ -304,6 +317,8 @@ def test_weight_segment_and_quarantine(
     crossing = run(db, bound, (Category.WEIGHT,), mode="repair", end=next_day, segment=wider)
     assert crossing["observations"]["unresolved"] == 2 and crossing["observations"]["created"] == 0
     assert "instant_collision" in select_weight_day(db, ev.source, next_day).reasons
+    status = day_status(db, ev.source, Category.WEIGHT, next_day)
+    assert status["acquisition"] == "observed" and status["last_eligible_count"] == 0
 
 
 def test_full_page_budget_resume_and_disappearance(
@@ -662,3 +677,192 @@ def test_unexpected_v2_presence_and_sparse_single_day_failure(
     result = run(db, bound, (Category.INTAKE,))
     assert result["stopped"] == "not_found"
     assert day_status(db, ev.source, Category.INTAKE, DAY)["acquisition"] == "partial"
+
+
+def test_unavailable_day_allows_resume_and_repair(
+    db: Session, bound: tuple[Evidence, HistoricalProvider], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ev, p = bound
+    gap = DAY + timedelta(days=1)
+    last = gap + timedelta(days=2)
+    original = p.handle
+    offline = True
+    requests = []
+
+    def by_date(req: httpx.Request) -> httpx.Response:
+        if req.url.path == Endpoint.DAILY and req.url.params["calendarDate"] != str(DAY):
+            d = req.url.params["calendarDate"]
+            requests.append(d)
+            if offline and d == str(gap):
+                return httpx.Response(404)
+            return httpx.Response(200, json=dict(p.daily, calendarDate=d))
+        return original(req)
+
+    monkeypatch.setattr(p, "handle", by_date)
+    categories = (Category.RESTING,)
+    result = run(db, bound, categories, start=gap, end=last, limit=8)
+    assert requests == [str(gap), str(gap + timedelta(days=1))]
+    assert result["categories"]["resting_hr"]["completed"] == 1
+    requests.clear()
+    resumed = run(db, bound, categories, start=gap, end=last, limit=7)
+    assert requests == [str(last)]
+    status = resumed["categories"]["resting_hr"]
+    assert (status["completed"], status["remaining"], status["resume"]) == (2, 1, str(gap))
+    assert day_status(db, ev.source, Category.RESTING, gap)["acquisition"] == "failed"
+    assert status["completed_through"] is None
+    assert status["gaps"] == [[str(gap), str(gap)]]
+    assert run(db, bound, categories, start=gap, end=last)["stopped"] == "not_found"
+    offline = False
+    repaired = run(db, bound, categories, mode="repair", start=gap, end=gap)
+    assert repaired["observations"]["created"] == 1
+    final = run(db, bound, categories, start=gap, end=last)
+    assert final["categories"]["resting_hr"]["completed_through"] == str(last)
+    assert final["categories"]["resting_hr"]["gaps"] == []
+
+
+def test_daily_total_survives_unavailable_food(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, p = bound
+    p.v2 = []
+    p.errors[Endpoint.FOOD.value.format(day=DAY)] = 404
+    out = run(db, bound, (Category.INTAKE,))
+    assert out["observations"]["created"] == 1
+    selected = select_daily_intake(db, ev.source.owner_id, DAY)
+    assert selected.reported_kcal == 1900 and selected.completeness == "unknown"
+    assert day_status(db, ev.source, Category.INTAKE, DAY)["acquisition"] == "partial"
+    row = db.scalars(select(DailyIntakeObservation)).one()
+    assert row.upstream_writer is None
+
+
+def test_conflict_waits_for_unavailable_corroboration(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, p = bound
+    cats = (Category.INTAKE,)
+    p.daily["consumedKilocalories"] = 2050
+    assert run(db, bound, cats, mode="repair")["categories"]["intake"]["open_issues"] == 1
+    p.daily["consumedKilocalories"] = 1900
+    p.errors[Endpoint.FOOD.value.format(day=DAY)] = 404
+    run(db, bound, cats, mode="repair")
+    retained = db.scalars(select(DailyIntakeObservation.reported_kcal)).all()
+    assert retained == [1900] * 3
+    assert day_status(db, ev.source, Category.INTAKE, DAY)["reconciliation"] == "unresolved"
+    assert select_daily_intake(db, ev.source.owner_id, DAY).status == "conflict"
+    p.errors.clear()
+    repaired = run(db, bound, cats)
+    assert repaired["requests"]["food"] == 1
+    assert repaired["categories"]["intake"]["open_issues"] == 0
+    assert select_daily_intake(db, ev.source.owner_id, DAY).reported_kcal == 1900
+
+
+@pytest.mark.parametrize("fallback_status", [404, 503])
+def test_unavailable_daily_intake_preserves_other_sources_and_later_day(
+    db: Session,
+    bound: tuple[Evidence, HistoricalProvider],
+    monkeypatch: pytest.MonkeyPatch,
+    fallback_status: int,
+) -> None:
+    ev, p = bound
+    first = DAY + timedelta(days=1)
+    last = first + timedelta(days=1)
+    original = p.handle
+
+    def dated(req: httpx.Request) -> httpx.Response:
+        path = req.url.path
+        if path == Endpoint.DAILY_RANGE:
+            return httpx.Response(
+                200, json={"data": [dict(p.v2[0], calendarDate=str(d)) for d in (first, last)]}
+            )
+        if path == Endpoint.DAILY and req.url.params["calendarDate"] == str(first):
+            return httpx.Response(fallback_status)
+        if path == Endpoint.DAILY and req.url.params["calendarDate"] == str(last):
+            return httpx.Response(200, json=dict(p.daily, calendarDate=str(last)))
+        if path.startswith("/nutrition-service/food/logs/"):
+            return httpx.Response(200, json=dict(p.food, mealDate=path.rsplit("/", 1)[-1]))
+        return original(req)
+
+    monkeypatch.setattr(p, "handle", dated)
+    result = run(db, bound, (Category.INTAKE,), mode="repair", start=first, end=last)
+    assert result["categories"]["intake"]["gaps"] == [[str(first), str(first)]]
+    assert result["requests"]["food"] == 2 and result["requests"]["daily"] == 3
+    status = day_status(db, ev.source, Category.INTAKE, first)
+    assert status["acquisition"] == "partial" and status["sources"] == {
+        "v2": "observed",
+        "daily": "unavailable",
+        "food": "observed",
+    }
+    assert day_status(db, ev.source, Category.INTAKE, last)["acquisition"] == "observed"
+    selected = select_daily_intake(db, ev.source.owner_id, first)
+    assert selected.reported_kcal == 1900 and len(selected.observation_ids) == 2
+
+
+def test_unsupported_zero_with_missing_corroboration(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, p = bound
+    p.v2[0]["calories"]["consumedValue"] = 0
+    p.daily["consumedKilocalories"] = 0
+    p.errors[Endpoint.FOOD.value.format(day=DAY)] = 404
+    result = run(db, bound, (Category.INTAKE,))
+    assert result["observations"]["created"] == 0
+    status = day_status(db, ev.source, Category.INTAKE, DAY)
+    assert status["acquisition"] == "partial" and status["last_success"] is None
+    assert status["sources"] == {"v2": "no_eligible", "daily": "no_eligible", "food": "unavailable"}
+    p.food = {"mealDate": str(DAY)}
+    p.errors.clear()
+    run(db, bound, (Category.INTAKE,))
+    status = day_status(db, ev.source, Category.INTAKE, DAY)
+    assert status["acquisition"] == "empty" and set(status["sources"].values()) == {"no_eligible"}
+    assert select_daily_intake(db, ev.source.owner_id, DAY).status == "missing"
+
+
+@pytest.mark.parametrize(("code", "expected"), [(404, 2), (503, 2), (401, 1), (403, 1), (429, 1)])
+def test_dated_outage_and_context_limits(
+    db: Session,
+    bound: tuple[Evidence, HistoricalProvider],
+    monkeypatch: pytest.MonkeyPatch,
+    code: int,
+    expected: int,
+) -> None:
+    ev, p = bound
+    first = DAY + timedelta(days=1)
+    end = first + timedelta(days=5)
+    attempts = []
+    original = p.handle
+
+    def outage(req: httpx.Request) -> httpx.Response:
+        if req.url.path == Endpoint.DAILY and req.url.params["calendarDate"] != str(DAY):
+            attempts.append(req.url.params["calendarDate"])
+            return httpx.Response(code)
+        return original(req)
+
+    monkeypatch.setattr(p, "handle", outage)
+    result = run(db, bound, (Category.RESTING,), start=first, end=end)
+    assert len(attempts) == len(set(attempts)) == expected
+    assert (
+        result["requests"]["exchange"] == 1 and result["categories"]["resting_hr"]["completed"] == 0
+    )
+    assert day_status(db, ev.source, Category.RESTING, end)["acquisition"] == "never_queried"
+
+
+def test_persistent_gap_leaves_budget_for_other_category(
+    db: Session, bound: tuple[Evidence, HistoricalProvider], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ev, p = bound
+    target = DAY + timedelta(days=1)
+    original = p.handle
+
+    def dated(req: httpx.Request) -> httpx.Response:
+        if req.url.path == Endpoint.DAILY and req.url.params["calendarDate"] == str(target):
+            return httpx.Response(404)
+        return original(req)
+
+    monkeypatch.setattr(p, "handle", dated)
+    p.errors[Endpoint.HRV_RANGE.value.format(day=target, end_day=target)] = 204
+    cats = (Category.RESTING, Category.HRV)
+    run(db, bound, cats, start=target, end=target, limit=7)
+    second = run(db, bound, cats, start=target, end=target, limit=7)
+    assert second["requests"]["hrv_range"] == 1
+    assert day_status(db, ev.source, Category.RESTING, target)["acquisition"] == "failed"
+    assert day_status(db, ev.source, Category.HRV, target)["acquisition"] == "empty"

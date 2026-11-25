@@ -10,14 +10,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.db.endurance_models import DailyRecoveryObservation
+from fitness_intelligence.db.history_models import GarminIssue
 from fitness_intelligence.db.nutrition_models import DailyIntakeObservation
 from fitness_intelligence.domain.endurance import DailyMetric, DailyObservation
 
 from .binding import Feed, feed_for
 from .client import Endpoint, GarminClient, GarminError
-from .history_state import Category, account_key, close_issues, days, issue
+from .history_state import Category, account_key, close_issues, day_key, days, issue
 from .mapping import GarminBinding, MappingError, Row, integer, map_day, obj, rows, window
-from .nutrition import Intake, account_scoped, daily_intake, food_intake
+from .nutrition import Intake, account_scoped, food_intake
 from .persistence import save_observation
 
 DAILY = (Category.EXPENDITURE, Category.RESTING, Category.INTAKE)
@@ -110,10 +111,7 @@ def v2_intake(series: Sequence[Row]) -> Intake | None:
     return Intake(V2 + "consumedValue", Decimal(kcal), None) if kcal else None
 
 
-def targeted_intake(
-    client: GarminClient, binding: GarminBinding, day: date, daily: Row
-) -> list[Intake]:
-    first = daily_intake(binding, day, daily)
+def read_food_intake(client: GarminClient, day: date) -> Intake | None:
     food = obj(
         client.read(
             Endpoint.FOOD,
@@ -121,12 +119,11 @@ def targeted_intake(
             params={"includeGoals": "false", "includeMedia": "false", "includeNutrition": "true"},
         )
     )
-    second = food_intake(day, food)
-    return [total for total in (first, second) if total is not None]
+    return food_intake(day, food)
 
 
 def intake_conflict(
-    session: Session, binding: GarminBinding, day: date, when: datetime, positive: bool
+    session: Session, binding: GarminBinding, day: date, when: datetime, confirmed: set[str]
 ) -> bool:
     observations = session.scalars(
         select(DailyIntakeObservation).filter_by(**account_key(binding.source), local_date=day)
@@ -144,11 +141,22 @@ def intake_conflict(
             when,
         )
         return True
-    if positive:
+    if values and values.keys() <= confirmed:
         close_issues(
             session, binding.source, Category.INTAKE, day, "day", ("source_disagreement",), when
         )
-    return False
+        return False
+    return (
+        session.scalar(
+            select(GarminIssue.reason).filter_by(
+                **day_key(binding.source, Category.INTAKE, day),
+                subject="day",
+                reason="source_disagreement",
+                resolved_at=None,
+            )
+        )
+        is not None
+    )
 
 
 def recovery(
