@@ -38,9 +38,15 @@ class Example:
     workouts: dict[str, UUID]
     foreign: tuple[UUID, ...]
 
-    def report(self, db: Session, *, known_zone: bool = True) -> IntegratedReport:
+    def report(
+        self,
+        db: Session,
+        *,
+        known_zone: bool = True,
+        lower_body_templates: frozenset[str] = frozenset({"squat", "lunge"}),
+    ) -> IntegratedReport:
         profile = HevyHistoryProfile(
-            self.hevy.id, frozenset({"squat", "lunge"}), frozenset({"squat", "lunge"})
+            self.hevy.id, frozenset({"squat", "lunge"}), lower_body_templates
         )
         daily = query_longitudinal(
             db.get_bind(),
@@ -253,6 +259,40 @@ def test_cross_domain_evidence_and_timing(db: Session, example: Example) -> None
     assert report.inspect_workout(ids["monday_run"])["calendar_aligned"]
     unknown_zone = example.report(db, known_zone=False)
     assert not unknown_zone.proximity.pairs and len(unknown_zone.proximity.excluded_runs) == 6
+
+
+def test_render_proximity_withheld_outings(db: Session, example: Example) -> None:
+    report = example.report(db)
+    assert (
+        "Aligned strength/run pairs · 3, including 0 tentative · 2 outings withheld "
+        "(1 with an activity reconciliation hold, 1 with conflicting provider and report dates)"
+    ) in report.render().splitlines()
+    assert (
+        "Aligned strength/run pairs · 0, including 0 tentative · 0 outings withheld"
+        in report.render(PERIOD.start).splitlines()
+    )
+
+    no_lower_body = example.report(db, lower_body_templates=frozenset())
+    assert (
+        "Aligned strength/run pairs · 0, including 0 tentative · 2 outings withheld "
+        "(1 with an activity reconciliation hold, 1 with conflicting provider and report dates)"
+    ) in no_lower_body.render().splitlines()
+
+    # The February run has two independent exclusion reasons when its calendar is unknown.
+    hold = issue(example.garmin, -5, "activities", "contradictory_revision")
+    hold.subject = "101"
+    db.add(hold)
+    db.commit()
+    unknown_calendar = example.report(db, known_zone=False)
+    assert (
+        "Strength/run proximity could not be assessed · 1 outing withheld "
+        "(1 with an activity reconciliation hold, 1 with unverified calendar alignment)"
+    ) in unknown_calendar.render(START - 5 * DAY).splitlines()
+    assert (
+        "Strength/run proximity could not be assessed · 4 outings withheld "
+        "(1 with an activity reconciliation hold, 3 with unverified calendar alignment, "
+        "1 with conflicting provider and report dates)"
+    ) in unknown_calendar.render().splitlines()
 
 
 def test_five_week_summary_and_inspection(db: Session, example: Example) -> None:

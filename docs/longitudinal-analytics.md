@@ -267,7 +267,7 @@ Squash · at least 1 session, distance unavailable
 Reviewed run · elapsed time change -60 s
 Sampled running sessions/week · median 0 from 2/4 preceding weeks. Habitual exposure unknown.
 Excluded weeks, observed sessions · 2025-02-24 1 (lower bound), 2025-03-03 1 (lower bound)
-Aligned strength/run pairs · 3, including 0 tentative
+Aligned strength/run pairs · 3, including 0 tentative · 2 outings withheld (1 with an activity reconciliation hold, 1 with conflicting provider and report dates)
 ```
 
 The focus week has the following supporting results.

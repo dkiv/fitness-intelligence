@@ -12,7 +12,12 @@ from zoneinfo import ZoneInfo
 from fitness_intelligence.analytics.exposure import ExposureValue, SportExposure
 from fitness_intelligence.analytics.longitudinal import Coverage, ReportDay
 from fitness_intelligence.analytics.performance import PerformanceReport, StrengthDifference
-from fitness_intelligence.analytics.proximity import TrainingProximity, training_proximity
+from fitness_intelligence.analytics.proximity import (
+    ProximityExclusion,
+    ProximityPair,
+    TrainingProximity,
+    training_proximity,
+)
 from fitness_intelligence.analytics.references import (
     REFERENCE_METRICS,
     RecoveryReference,
@@ -251,6 +256,40 @@ def _recovery_summary(p: PerformanceReport, w: Week, focus: date) -> dict:
         },
         references=[_recovery_ref(p.recovery_reference(focus, m)) for m in REFERENCE_METRICS],
     )
+
+
+def _render_proximity(
+    pairs: list[ProximityPair], excluded: list[ProximityExclusion], recorded_runs: set[UUID]
+) -> str:
+    withheld = {run.running_workout_id for run in excluded}
+    if withheld and withheld == recorded_runs:
+        description = "Strength/run proximity could not be assessed"
+    else:
+        tentative = sum(pair.evidence == "tentative_inferred" for pair in pairs)
+        description = f"Aligned strength/run pairs · {len(pairs)}, including {tentative} tentative"
+
+    noun = "outing" if len(withheld) == 1 else "outings"
+    line = f"{description} · {len(withheld)} {noun} withheld"
+    if not withheld:
+        return line
+
+    reason_labels = {
+        "activity_reconciliation_hold": "with an activity reconciliation hold",
+        "calendar_alignment_unverified": "with unverified calendar alignment",
+        "provider_report_date_disagreement": "with conflicting provider and report dates",
+        "enumerated_count_mismatch": "with conflicting acquisition and retained counts",
+        "retained_after_empty": "retained after an empty acquisition",
+        "observed_without_retained_activity": "with an acquisition missing its recorded activity",
+    }
+    by_reason: dict[str, set[UUID]] = defaultdict(set)
+    for run in excluded:
+        for reason in run.reasons:
+            by_reason[reason].add(run.running_workout_id)
+    reasons = ", ".join(
+        f"{len(ids)} {reason_labels.get(reason, reason.replace('_', ' '))}"
+        for reason, ids in sorted(by_reason.items())
+    )
+    return f"{line} ({reasons})"
 
 
 @dataclass(frozen=True)
@@ -525,10 +564,16 @@ class IntegratedReport:
             if excluded:
                 lines.append("Excluded weeks, observed sessions · " + ", ".join(excluded))
         if view["proximity"]["selected"]:
-            pairs = view["proximity"]["pairs"]
+            dates = set(view["requested_dates"])
+            recorded_runs = {
+                run.fact.workout_id
+                for run in self.performance.running
+                if run.fact.provider_date in dates
+            }
             lines.append(
-                f"Aligned strength/run pairs · {len(pairs)}, including "
-                f"{sum(p.evidence == 'tentative_inferred' for p in pairs)} tentative"
+                _render_proximity(
+                    view["proximity"]["pairs"], view["proximity"]["excluded_runs"], recorded_runs
+                )
             )
         if r := view["recovery"]:
             for series in r["series"]:
