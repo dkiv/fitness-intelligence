@@ -1,13 +1,23 @@
 """Daily analytical results on the source calendar. No display rounding or persistence."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, localcontext
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
 from fitness_intelligence.analytics.strength import Period
 from fitness_intelligence.domain.endurance import Source
+
+if TYPE_CHECKING:
+    from fitness_intelligence.adapters.hevy.analytics import HevyHistoryProfile
+    from fitness_intelligence.analytics.exposure import (
+        EnduranceExposure,
+        RecoveryExposure,
+        StrengthExposure,
+    )
 
 
 @dataclass(frozen=True)
@@ -129,10 +139,13 @@ class DailyWeight:
 
 
 @dataclass(frozen=True)
-class ExpenditureObservation(Observation):
+class RecoveryObservation(Observation):
     component: str
     window_start: datetime | None
     window_end: datetime | None
+
+
+ExpenditureObservation = RecoveryObservation
 
 
 @dataclass(frozen=True)
@@ -150,6 +163,9 @@ class ReportDay:
     intake: DailyIntake
     weight: DailyWeight
     expenditure: DailyExpenditure | None = None
+    strength: StrengthExposure | None = None
+    endurance: EnduranceExposure | None = None
+    recovery: RecoveryExposure | None = None
 
 
 @dataclass(frozen=True)
@@ -159,11 +175,14 @@ class LongitudinalReport:
     period: Period
     source_zones: tuple[tuple[UUID, str], ...]
     days: tuple[ReportDay, ...]
-    contract_version: str = "d1c-v1"
+    contract_version: str = "d1d-v1"
     policy_version: str = "intake-weight-v2"
     date_basis: str = "provider_local"
     observation_state: str = "latest_accepted"
     expenditure_source: Source | None = None
+    hevy_profile: HevyHistoryProfile | None = None
+    endurance_source: Source | None = None
+    recovery_source: Source | None = None
 
 
 def daily_median(values: tuple[Decimal, ...]) -> Decimal | None:

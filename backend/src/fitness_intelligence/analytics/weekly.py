@@ -8,6 +8,11 @@ from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from itertools import groupby
 from uuid import UUID
 
+from fitness_intelligence.analytics.exposure import (
+    EnduranceExposure,
+    RecoveryExposure,
+    StrengthExposure,
+)
 from fitness_intelligence.analytics.longitudinal import (
     Coverage,
     LongitudinalReport,
@@ -145,6 +150,9 @@ class Week:
     intake: WeeklyIntake
     expenditure: WeeklyExpenditure | None
     weight: WeeklyWeight
+    strength: StrengthExposure | None = None
+    endurance: EnduranceExposure | None = None
+    recovery: RecoveryExposure | None = None
 
     @property
     def fully_requested(self) -> bool:
@@ -324,7 +332,27 @@ def aggregate_weeks(
             series,
             changes,
         )
-        weeks.append(Week(start, dates, closed, intake, expenditure, weight))
+        strength = None
+        if days[0].strength is not None:
+            strength = replace(
+                days[0].strength,
+                dates=dates,
+                facts=tuple(f for d in days for f in d.strength.facts),
+            )
+        endurance = None
+        if days[0].endurance is not None:
+            endurance = EnduranceExposure(
+                tuple(native for d in days for native in d.endurance.days), reference_date
+            )
+        recovery = None
+        if days[0].recovery is not None:
+            recovery = RecoveryExposure(
+                tuple(c for d in days for c in d.recovery.coverage),
+                tuple(c for d in days for c in d.recovery.cells),
+            )
+        weeks.append(
+            Week(start, dates, closed, intake, expenditure, weight, strength, endurance, recovery)
+        )
     return WeeklyReport(
         report.owner_id,
         report.period,

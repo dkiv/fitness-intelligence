@@ -68,16 +68,22 @@ class Activity:
     start_resolution_us: int = 1_000_000
 
     def running_pace(self) -> tuple[PaceState, Decimal | None]:
-        """Seconds/km from reported average m/s, rounded half-even to milliseconds."""
-        for value in (self.distance_m, self.average_speed_mps):
-            if value is not None and (not value.is_finite() or value < 0):
-                raise ValueError("invalid pace input")
-        if self.sport != "running" or self.distance_m == 0 or self.average_speed_mps == 0:
-            return PaceState.NOT_APPLICABLE, None
-        if self.average_speed_mps is None:
-            return PaceState.MISSING, None
-        pace = Decimal(1000) / self.average_speed_mps
-        return PaceState.DERIVED, pace.quantize(Decimal(".001"), rounding=ROUND_HALF_EVEN)
+        return running_pace(self.sport, self.distance_m, self.average_speed_mps)
+
+
+def running_pace(
+    sport: str, distance_m: Decimal | None, average_speed_mps: Decimal | None
+) -> tuple[PaceState, Decimal | None]:
+    """Seconds/km from reported average m/s, rounded half-even to milliseconds."""
+    for value in (distance_m, average_speed_mps):
+        if value is not None and (not value.is_finite() or value < 0):
+            raise ValueError("invalid pace input")
+    if sport != "running" or distance_m == 0 or average_speed_mps == 0:
+        return PaceState.NOT_APPLICABLE, None
+    if average_speed_mps is None:
+        return PaceState.MISSING, None
+    pace = Decimal(1000) / average_speed_mps
+    return PaceState.DERIVED, pace.quantize(Decimal(".001"), rounding=ROUND_HALF_EVEN)
 
 
 class DailyMetric(StrEnum):
