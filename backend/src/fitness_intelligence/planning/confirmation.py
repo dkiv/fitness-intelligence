@@ -340,8 +340,11 @@ class Support(Record):
     confirmed: dict[Name, Value]
     unconfirmed: tuple[Name, ...]
     independent_report: AthleteReport | None
+    ambiguous_set_link: bool = False
 
     @property
     def effective_link(self) -> Attribution | None:
         link = self.history[-1].link
+        if self.ambiguous_set_link:
+            return None
         return link if self.state == "confirmed" and link and link.current else None

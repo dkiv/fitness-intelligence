@@ -94,7 +94,7 @@ The columns use the original case numbers from [M01](research/curation/j3b-001-s
 | 08 | X · low-count set trial | X · joint increase | P · exact recoveries implemented, additional rep operator disabled | D · adverse squat review |
 | 09 | X · simultaneous set/load increase | I · reserved time grants no extra work | P · scoped achieved steps and explicit manual occurrence links, D1 deferred | X · Q0 entry |
 | 10 | P · synthetic outing summary confirmation, live projection deferred | P · fixed versus movable placement works, post-approval moves deferred | X · quality-duration progression | P · supplied achieved fields selectable, quality operator disabled |
-| 11 | P · changed confirmation display rejected, decision support recheck deferred | I · adjacent elapsed spacing | X · easy-duration progression | P · scoped batch confirmation implemented, planner consumption deferred |
+| 11 | P · changed confirmation display rejected, decision support recheck deferred | I · adjacent elapsed spacing | X · easy-duration progression | P · batch confirmation preserves repeated sets, one explicit link per prescribed ordinal, planner consumption deferred |
 | 12 | X · RPE-free progression | P · inferred history rejected, descriptive imports deferred | D · HR/conditions | D · re-entry after travel |
 | 13 | P · decline and conflict supported, moves deferred | P · closure conflict and immutable execution supported, block revision deferred | D · pace comparability | I · restriction invalidates proposal and blocks affected work |
 | 14 | P · frozen replay supported, withdrawal deferred | D · interrupted baseline | P · manual partial work and tolerance visible, adaptive review deferred | P · adherence/exposure visible, comparable outcome direction deferred |

@@ -1,5 +1,6 @@
 """Owner-scoped synthetic confirmation commands, bound by PlanCommands."""
 
+from collections import Counter, defaultdict
 from datetime import datetime
 from uuid import UUID
 
@@ -49,6 +50,39 @@ def _tips(owner: UUID) -> Select[tuple[Member]]:
         )
         .exists(),
     )
+
+
+# A current execution assertion pins exactly one approved occurrence. Its prescription
+# has unique movement/variation pairs, group keys per exercise and ordinals per group.
+type PrescribedSet = tuple[UUID, str, str, str, int]
+
+
+def _prescribed_set(outcome: UUID, source: c.StrengthFact) -> PrescribedSet:
+    return outcome, source.movement, source.variation, source.group, source.ordinal
+
+
+def _linked_sets(
+    db: Session, owner: UUID, outcomes: set[UUID], replacing: set[UUID]
+) -> Counter[PrescribedSet]:
+    counts: Counter[PrescribedSet] = Counter()
+    if not outcomes:
+        return counts
+    rows = db.execute(
+        _tips(owner)
+        .join(Stored, (Stored.user_id == Member.user_id) & (Stored.command == Member.command))
+        .where(Member.outcome.in_(outcomes), Member.member.not_in(replacing))
+        .with_only_columns(Stored, Member.member)
+    )
+    # Decode each receipt once. Only its still-effective member edges occupy ordinals.
+    members_by_receipt: dict[Stored, set[UUID]] = defaultdict(set)
+    for receipt_row, member in rows:
+        members_by_receipt[receipt_row].add(member)
+    for receipt_row, members in members_by_receipt.items():
+        intent = decode(receipt_row).intent
+        for fact, answer in zip(intent.display.members, intent.answers, strict=True):
+            if fact.member in members and isinstance(fact, c.StrengthFact) and answer.outcome:
+                counts[_prescribed_set(answer.outcome, fact)] += 1
+    return counts
 
 
 def _link(db: Session, owner: UUID, fact: c.Fact, outcome: UUID) -> tuple[UUID, str]:
@@ -168,6 +202,12 @@ def record(
     ).all()
     by_workout = {w: (p, s) for w, p, s in linked}
     by_occurrence = {(p, s): w for w, p, s in linked}
+    strength_outcomes = {
+        answer.outcome
+        for fact, answer in zip(intent.display.members, intent.answers, strict=True)
+        if isinstance(fact, c.StrengthFact) and answer.outcome is not None
+    }
+    occupied = _linked_sets(db, owner, strength_outcomes, replacing=ids)
     for fact, answer in zip(intent.display.members, intent.answers, strict=True):
         tip = tips.get(fact.member)
         if (tip.command if tip else None) != answer.supersedes:
@@ -190,6 +230,11 @@ def record(
                 or by_occurrence.setdefault(key, fact.workout) != fact.workout
             ):
                 raise ValueError("workout or planned occurrence already linked elsewhere")
+            if isinstance(fact, c.StrengthFact):
+                ordinal = _prescribed_set(answer.outcome, fact)
+                if occupied[ordinal]:
+                    raise ValueError("prescribed set ordinal already linked to another source set")
+                occupied[ordinal] += 1
     row = Stored(
         user_id=owner,
         actor=owner,
@@ -227,6 +272,15 @@ def review(
                     answer=answer,
                     link=_attribution(db, owner, answer.outcome) if answer.outcome else None,
                 )
+    # Earlier receipts can predate the uniqueness check. Include other batches even
+    # when the caller reviews only one of the two members sharing an ordinal.
+    outcomes = {
+        a.link.outcome
+        for chain in chains.values()
+        for a in chain.values()
+        if isinstance(a.source, c.StrengthFact) and a.link and a.link.current
+    }
+    occupied = _linked_sets(db, owner, outcomes, replacing=set())
     result = []
     for displayed in scope.members:
         chain = chains[displayed.member]
@@ -260,6 +314,12 @@ def review(
                 history=tuple(history),
                 state=state,
                 reason=reason,
+                ambiguous_set_link=bool(
+                    isinstance(source, c.StrengthFact)
+                    and tip.link
+                    and tip.link.current
+                    and occupied[_prescribed_set(tip.link.outcome, source)] > 1
+                ),
                 confirmed=confirmed,
                 unconfirmed=tuple(sorted(source.eligible.keys() - confirmed.keys())),
                 independent_report=answer.reported,
