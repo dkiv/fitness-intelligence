@@ -116,3 +116,5 @@ The columns use the original case numbers from [M01](research/curation/j3b-001-s
 | 30 | — | — | I · existing fixture replay | — |
 
 E4.2A implements generalized in-force attribution, append-only manual corrections and descriptive weekly review. E4.2B owns scoped imported-observation confirmation and correction. E4.2C owns D1 projection, decision-time inputs and writer coordination. [Execution guide](generalized-execution.md) · [Planning regressions](../backend/tests/test_familiar.py)
+
+For local Hevy manifests and manual Garmin worksheets derived from sealed occurrences, see [G1B workout handoff](workout-handoff.md).

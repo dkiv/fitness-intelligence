@@ -1,0 +1,341 @@
+{
+  "source": {
+    "schema_version": "fi.prescription-export.v1",
+    "owner_id": "c13399d0-4e41-50ef-b9e4-25fff100dadd",
+    "cycle": "10ac84e1-50e5-4bce-a754-0dbe0d2250f0",
+    "block_revision": "f25b7548-f4c7-44e9-9efd-539c6e5d4f16",
+    "revision": "ae9e1617-c18a-4374-9015-ae83ff106ec5",
+    "week": 1,
+    "rule": "synthetic.familiar.hold.v2",
+    "approval": "synthetic-approved-fixture",
+    "approval_command_id": "f6bb9f84-8dd7-44ed-857d-e6bf8989d93e",
+    "publication_authorized": false,
+    "zone": "America/Toronto",
+    "session": {
+      "occurrence": "901f37d8-d820-5bad-a7d8-174ce1c10ba4",
+      "template": "gym-a",
+      "day": "2027-01-04",
+      "start_utc": "2027-01-04T23:00:00Z",
+      "prescription": {
+        "sport": "strength",
+        "role": "gym",
+        "preparation_seconds": 300,
+        "exercises": [
+          {
+            "movement": "press",
+            "variation": "standing",
+            "equipment": "barbell",
+            "load_convention": "total-external-kg",
+            "load_step_kg": "2.5",
+            "transition_seconds": 120,
+            "groups": [
+              {
+                "key": "prepare",
+                "kind": "warmup",
+                "effort": {
+                  "scale": "set-rpe-0-10",
+                  "target": {
+                    "low": "4",
+                    "nominal": "5",
+                    "high": "6"
+                  },
+                  "cap": "6"
+                },
+                "sets": [
+                  {
+                    "ordinal": 1,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "20",
+                      "nominal": "20",
+                      "high": "20"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 90
+                  }
+                ]
+              },
+              {
+                "key": "primary",
+                "kind": "working",
+                "effort": {
+                  "scale": "set-rpe-0-10",
+                  "target": {
+                    "low": "6",
+                    "nominal": "7",
+                    "high": "8"
+                  },
+                  "cap": "8"
+                },
+                "sets": [
+                  {
+                    "ordinal": 1,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "40",
+                      "nominal": "40",
+                      "high": "40"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 90
+                  },
+                  {
+                    "ordinal": 2,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "40",
+                      "nominal": "40",
+                      "high": "40"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 90
+                  }
+                ]
+              },
+              {
+                "key": "backoff",
+                "kind": "working",
+                "effort": {
+                  "scale": "set-rpe-0-10",
+                  "target": {
+                    "low": "6",
+                    "nominal": "7",
+                    "high": "8"
+                  },
+                  "cap": "8"
+                },
+                "sets": [
+                  {
+                    "ordinal": 1,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "35",
+                      "nominal": "35",
+                      "high": "35"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 0
+                  }
+                ]
+              }
+            ],
+            "notes": ""
+          },
+          {
+            "movement": "squat",
+            "variation": "standing",
+            "equipment": "barbell",
+            "load_convention": "total-external-kg",
+            "load_step_kg": "2.5",
+            "transition_seconds": 120,
+            "groups": [
+              {
+                "key": "prepare",
+                "kind": "warmup",
+                "effort": {
+                  "scale": "set-rpe-0-10",
+                  "target": {
+                    "low": "4",
+                    "nominal": "5",
+                    "high": "6"
+                  },
+                  "cap": "6"
+                },
+                "sets": [
+                  {
+                    "ordinal": 1,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "20",
+                      "nominal": "20",
+                      "high": "20"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 90
+                  }
+                ]
+              },
+              {
+                "key": "primary",
+                "kind": "working",
+                "effort": {
+                  "scale": "set-rpe-0-10",
+                  "target": {
+                    "low": "6",
+                    "nominal": "7",
+                    "high": "8"
+                  },
+                  "cap": "8"
+                },
+                "sets": [
+                  {
+                    "ordinal": 1,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "50",
+                      "nominal": "50",
+                      "high": "50"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 90
+                  },
+                  {
+                    "ordinal": 2,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "50",
+                      "nominal": "50",
+                      "high": "50"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 90
+                  }
+                ]
+              },
+              {
+                "key": "backoff",
+                "kind": "working",
+                "effort": {
+                  "scale": "set-rpe-0-10",
+                  "target": {
+                    "low": "6",
+                    "nominal": "7",
+                    "high": "8"
+                  },
+                  "cap": "8"
+                },
+                "sets": [
+                  {
+                    "ordinal": 1,
+                    "reps": {
+                      "low": 5,
+                      "nominal": 5,
+                      "high": 5
+                    },
+                    "load": {
+                      "low": "45",
+                      "nominal": "45",
+                      "high": "45"
+                    },
+                    "execution_seconds": 60,
+                    "rest_after_seconds": 0
+                  }
+                ]
+              }
+            ],
+            "notes": ""
+          }
+        ],
+        "notes": ""
+      }
+    },
+    "local_start": "2027-01-04T18:00:00-05:00",
+    "prescription_sha256": "57833c71edd7faf7e92767f11a96441bab531054475522aac5d8150d0f659c78"
+  },
+  "classification": "usable-with-disclosed-limitations",
+  "limitations": [
+    "Read exercise notes for group order, effort ranges, caps and time allowances.",
+    "press/standing/barbell/total-external-kg: use the per-set rests in notes. Leave the shared timer unset.",
+    "squat/standing/barbell/total-external-kg: use the per-set rests in notes. Leave the shared timer unset."
+  ],
+  "policy": "hevy-routine-preview.v1",
+  "preview_arguments": {
+    "routine": {
+      "title": "gym-a · 2027-01-04",
+      "notes": "Fixture · synthetic-approved-fixture · 2027-01-04T18:00:00-05:00 (America/Toronto). Prepare 300 s. Calendar reservation 1560 s.",
+      "exercises": [
+        {
+          "exercise_template_id": "synthetic-press",
+          "notes": "press/standing/barbell/total-external-kg. Transition allowance 120 s.\nLoad increment 2.5 kg.\nprepare (warmup) · set-rpe-0-10 5 (permitted 4–6), cap 6.\nSet 1: 5 reps, allow 60 s, rest after 90 s.\nprimary (working) · set-rpe-0-10 7 (permitted 6–8), cap 8.\nSet 1: 5 reps, allow 60 s, rest after 90 s.\nSet 2: 5 reps, allow 60 s, rest after 90 s.\nbackoff (working) · set-rpe-0-10 7 (permitted 6–8), cap 8.\nSet 1: 5 reps, allow 60 s, rest after 0 s.",
+          "rest_seconds": null,
+          "sets": [
+            {
+              "type": "warmup",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 20.0
+            },
+            {
+              "type": "normal",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 40.0
+            },
+            {
+              "type": "normal",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 40.0
+            },
+            {
+              "type": "normal",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 35.0
+            }
+          ]
+        },
+        {
+          "exercise_template_id": "synthetic-squat",
+          "notes": "squat/standing/barbell/total-external-kg. Transition allowance 120 s.\nLoad increment 2.5 kg.\nprepare (warmup) · set-rpe-0-10 5 (permitted 4–6), cap 6.\nSet 1: 5 reps, allow 60 s, rest after 90 s.\nprimary (working) · set-rpe-0-10 7 (permitted 6–8), cap 8.\nSet 1: 5 reps, allow 60 s, rest after 90 s.\nSet 2: 5 reps, allow 60 s, rest after 90 s.\nbackoff (working) · set-rpe-0-10 7 (permitted 6–8), cap 8.\nSet 1: 5 reps, allow 60 s, rest after 0 s.",
+          "rest_seconds": null,
+          "sets": [
+            {
+              "type": "warmup",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 20.0
+            },
+            {
+              "type": "normal",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 50.0
+            },
+            {
+              "type": "normal",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 50.0
+            },
+            {
+              "type": "normal",
+              "reps": 5,
+              "rep_range": null,
+              "weight_kg": 45.0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "blockers": []
+}
