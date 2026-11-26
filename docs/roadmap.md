@@ -1,5 +1,7 @@
 # Roadmap
 
+For current milestone status, reviewed PR heads, session ownership and the next integration decisions, see the [orchestration checkpoint](orchestration/project-state.md).
+
 ## Implementation history
 
 | Milestone | Status and evidence |

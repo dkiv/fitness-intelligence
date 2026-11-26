@@ -17,3 +17,7 @@
   Run PostgreSQL tests against a disposable database when changing models or migrations.
 - Keep setup commands and product documentation current. Add dependencies only when used.
 - Future frontend: Next.js with strict TypeScript; Android bridge: Kotlin. Neither exists yet.
+
+For project orchestration, start with [the current checkpoint](docs/orchestration/project-state.md)
+and [the roadmap](docs/roadmap.md). Refresh the checkpoint at meaningful integration or decision
+changes using the maintenance instructions on that page.
