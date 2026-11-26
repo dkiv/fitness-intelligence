@@ -135,4 +135,68 @@ A Garmin outing identifies its exact owner/account/workout/reference and externa
 
 These are current accepted facts from one read transaction. Occurrence, upstream revision and latest retrieval have different meanings. A retrieval timestamp cannot reconstruct the first instant at which a corrected field was available. E4.2A implements manual execution against a named approved occurrence. Future imported-data attribution, field-level confirmation, decision-time freezing and transaction-consistent revalidation against inserts, edits, deletions and issues belong to E4.2. The consumer must retain the original evidence tier and separately establish prescription identity and decision eligibility. [Generalized execution contract](generalized-execution.md)
 
-**Proposed D1E scope.** Add descriptive comparisons for reviewed strength tasks and comparable running outings, plus individual sleep-duration and resting-HR reference windows. Expose qualifying and excluded observations, effective sample sizes, and breaks in comparability. Review predicates and thresholds using synthetic history before connecting them to planning.
+## D1E performance comparisons and individual references
+
+`analyze_performance(weekly, ...)` is a pure extension of the D1D weekly result. It returns the original report, source selections, provider and report dates, reference date, exact contributing facts and the policy version `comparable-performance-v1`. All inputs describe the latest accepted snapshot. Task reviews apply to exact set or outing facts from that snapshot. An out-of-scope, changed or deleted fact invalidates a supplied review. Supply new reviews only after inspecting the current evidence.
+
+```python
+from decimal import Decimal
+from fitness_intelligence.analytics.performance import (
+    Review, RunningTask, StrengthTask, analyze_performance,
+)
+from fitness_intelligence.analytics.references import RecoveryRegime
+from fitness_intelligence.domain.endurance import DailyMetric
+
+# The caller selects actual facts from weekly and supplies its reviewed context.
+squat = StrengthTask("squat", "high bar", "barbell", "external_kg", "primary", "paused")
+loop = RunningTask(Decimal("5000"), "park loop", "elapsed_s", "reported RPE 6",
+                   "dry and calm", "uninterrupted")
+regime = RecoveryRegime(weekly.daily_report.recovery_source, DailyMetric.RESTING_HR,
+                        weekly.period.start, weekly.period.stop,
+                        "same device and resting protocol", "synthetic device review")
+performance = analyze_performance(
+    weekly,
+    strength_reviews={fact: Review(squat, "synthetic set review") for fact in reviewed_sets},
+    running_reviews={fact: Review(loop, "synthetic outing log") for fact in reviewed_outings},
+    recovery_regimes=(regime,),
+)
+rep_changes = performance.fixed_work_comparisons("load")
+load_changes = performance.fixed_work_comparisons("repetitions")
+modeled_changes = performance.successive_estimates
+run_changes = performance.successive_runs
+recent_running = performance.running_references(comparison_monday)
+resting_hr = performance.recovery_reference(comparison_date, DailyMetric.RESTING_HR)
+```
+
+### Strength and running comparisons
+
+Strength points expose UTC workout start, exercise/set order, recorded kg and reps, optional achieved RPE, execution tier, template and mapping evidence. A comparison series requires the same owner/account, validated template, reviewed movement, variation, equipment, external-load convention, set kind, role, protocol and evidence tier. Set ordinal is matched by default. A review can explicitly declare ordinals interchangeable with `match_ordinal=False` for the workout's best eligible estimate. The automatic fixed-load and fixed-rep views still match canonical exercise and set positions. Display names supply no identity.
+
+Signed differences are later minus earlier. Reps require equal recorded load. Kilograms require equal recorded reps. The default effort basis requires equal, known achieved RPE. To compare a standardized task whose review independently establishes the protocol, use `effort_basis="reviewed_protocol"`. Such a difference describes recorded work, and missing RPE remains visible. At fixed reps and load, the report can show an achieved-RPE difference even when the effort mismatch withholds the performance difference. Use `compare_strength(earlier, later)` or `compare_running(earlier, later)` to inspect a specific pair, including the reasons a metric is unavailable.
+
+The existing strength selector computes Epley estimates on positive reviewed external kg for working sets of 1–10 reps with no positive time or distance. Its valid-RPE rules and optional inclusive `rpe_range` apply to estimates only. The original set retains its estimate even if the caller has supplied no comparison review. Within each reviewed workout/series, select the highest unrounded eligible estimate separately for confirmed and inferred execution, use the lowest set UUID on ties and report kg rounded half-even to 0.01. Each successive difference points to both winning sets. A modeled change in kg has no progression authority.
+
+Running points retain the original D1D outing and native-day coverage, including the three duration fields, average speed, derived pace, field receipts, revision and instruction issues. A signed time difference requires the same source, mapping, subtype, positive recorded and reviewed distance, reviewed course or protocol, timing field, effort, material conditions and restrictions or interruptions. The selected time must be present and positive on each outing. Activity holds and acquisition discrepancies withhold comparison. Partial enumeration alone can still support comparison of two individually verified outings. A running instruction supplies no achieved-interval or effort evidence.
+
+### Reference windows and consistency
+
+| Result | Window and eligibility | Returned evidence |
+| --- | --- | --- |
+| Representative running | For a requested Monday week, inspect exactly the four preceding Monday weeks. Each contribution requires seven requested, closed provider dates for the selected account, defensible enumeration and complete measurement support for that metric. Take the median of at least two qualifying weeks independently for sessions, metres, activity seconds, moving seconds and elapsed seconds. | Each candidate Monday retains its D1D observed value, supporting and missing workout IDs, and exclusion reasons. Outside-request and clipped weeks remain visible. Current positive enumeration stores counts without immutable membership. Only D1D's verified complete empty weeks can presently supply an exact total. Retrieval-only empties and lower bounds contribute no numeric sample. |
+| Individual sleep duration and resting HR | For provider date D, inspect `[max(request.start, D − 28 days), D)`. Require at least 14 distinct eligible dates **and** last date minus first date ≥ 14 days. Use a reviewed account/metric device-and-protocol interval covering D. Within it, use the latest continuous matching unit, method, field, mapping and writer. A change, even one followed by a return to the old mapping, breaks the series. | The result includes regime/evidence, effective n, contributing facts and dates, missing dates, and excluded cells with reasons. Return median/minimum/maximum only when both thresholds hold. D’s target cell supplies comparison provenance. Its value stays outside the sample. A missing D observation can still have a historical reference. HRV remains available as D1D source facts only. |
+| Observed strength consistency | Denominator is every fully requested, closed report-zone week for the selected Hevy account. Numerators count weeks containing any confirmed working set, and any confirmed **or** inferred working set, respectively. | Exact fractions, numerator/denominator Mondays and clipped/open exclusions. No denominator gives a null fraction. Historical daily acquisition remains unknown, including a week with zero recorded sets. |
+
+### Synthetic examples
+
+| Evidence | Supported result | Withheld result |
+| --- | --- | --- |
+| Primary squat at RPE 7 goes from 60 kg × 5 to 60 kg × 6, then 65 kg × 6 | +1 rep at 60 kg, then +5 kg at six reps. The first two confirmed estimates are 70.00 and 72.00 kg. | A same-workout inferred 70 kg × 5 gives 81.67 kg in its own tier. It cannot displace the confirmed best. A change of barbell to machine breaks the series. |
+| Repeat 60 kg × 6 at RPE 8 after an RPE 7 set | +1 recorded RPE at the same work | Default matched-effort difference is unavailable. An absent RPE also leaves effort unknown. |
+| Same reviewed 5 km loop, effort and conditions. Elapsed 1,700 → 1,640 s, moving 1,500 → 1,450 s, activity 1,600 → 1,610 s | Respective signed differences under separate timing reviews are −60 s, −50 s and +10 s. | Unknown course, effort, timing or material conditions leaves the outings visible without a directional comparison. |
+| Four preceding weeks contain two post-closure verified empty weeks, a partial week and a positive enumeration with matching counts | Reference is zero on two contributing weeks for each metric. | Replacing one verified week with a legacy empty receipt leaves one qualifying week and an unavailable median. |
+| Fourteen comparable resting-HR dates spanning 14 days, seven at 54 bpm and seven at 58 bpm | Median 56 bpm, range 54–58, n = 14. | Fourteen consecutive observed dates span only 13 days. A new measurement regime at D also withholds the old reference. |
+| Four fully requested closed Hevy weeks, one with confirmed work and another with inferred-only work | Confirmed observed consistency 1/4, confirmed-or-inferred consistency 2/4. | The remaining weeks have unknown acquisition completeness. The fraction measures recorded history, with no plan-adherence denominator. |
+
+E4.2B confirmations carry field-specific assertions. A D1E task review cannot promote an inferred set or attribute an outing to a prescription. E4.2C owns decision-time freezing and support revalidation. [Scoped confirmation contract](scoped-observation-confirmation.md)
+
+**Proposed D1F scope.** Add calendar-aligned views of the timing of lower-body strength work and running, retaining actual time gaps, execution evidence, context and reasons a pairing is unavailable. Keep interpretation descriptive.
