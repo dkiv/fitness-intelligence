@@ -14,7 +14,7 @@ B3.1 adds [private Garmin account verification, enrollment and bounded ingestion
 
 M3A adds internal [strength progression, weekly volume and activity metrics](docs/strength-analytics.md).
 
-D1 provides [daily and weekly training, recovery, intake, wearable expenditure and body-weight analytics](docs/longitudinal-analytics.md) with source coverage and reconciliation.
+D1 provides an [integrated longitudinal report](docs/longitudinal-analytics.md#d1f-integrated-report) with strength and running comparisons, session timing, recovery references, nutrition, body weight and inspectable source evidence.
 
 E1 adds an offline, deterministic strength and running planner for the first two weeks of
 the [synthetic press block](docs/training-plan-design.md#using-the-e1-domain-planner).

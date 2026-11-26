@@ -170,6 +170,7 @@ class Outing:
     instruction_positions: tuple[tuple[int, int], ...] | None
     activity_issues: tuple[Issue, ...]
     instruction_issues: tuple[Issue, ...]
+    ended_at: datetime | None = None
     # Ordered exactly as the corresponding positions. Instructions can change in place.
     split_content_digests: tuple[str, ...] = ()
     instruction_content_digests: tuple[str, ...] = ()
