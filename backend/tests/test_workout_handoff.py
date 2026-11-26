@@ -24,7 +24,12 @@ from fitness_intelligence.db.plan_models import (
     TrainingPlan,
 )
 from fitness_intelligence.handoff.garmin import garmin_worksheet
-from fitness_intelligence.handoff.hevy import HevyManifest, VerifiedTemplate, hevy_manifest
+from fitness_intelligence.handoff.hevy import (
+    HevyManifest,
+    PreviewArguments,
+    VerifiedTemplate,
+    hevy_manifest,
+)
 from fitness_intelligence.handoff.prescription import (
     PrescriptionExport,
     from_revision,
@@ -109,6 +114,66 @@ def test_hevy_order_receipt_free_and_serialization(gym: f.Strength) -> None:
     assert result.source.publication_authorized is False
     with pytest.raises(ValidationError):
         result.source.approval = "synthetic-approved-fixture"
+
+
+@pytest.mark.parametrize(
+    ("routine_length", "exercise_length"),
+    [
+        (10_000, 10_000),
+        (10_001, 10_000),
+        (10_000, 10_001),
+        (10_001, 10_001),
+    ],
+)
+def test_generated_hevy_note_limits(
+    gym: f.Strength, routine_length: int, exercise_length: int
+) -> None:
+    mappings = tuple(map(mapping, gym.exercises))
+    baseline = hevy_manifest(source(gym), mappings).preview_arguments.routine
+    # Both renderers add one newline when a free-text note is present.
+    routine_note = "é" * (routine_length - len(baseline.notes) - 1)
+    exercise_note = "é" * (exercise_length - len(baseline.exercises[1].notes) - 1)
+    press, squat = gym.exercises
+    prescription = gym.model_copy(
+        update={
+            "notes": routine_note,
+            "exercises": (press, squat.model_copy(update={"notes": exercise_note})),
+        }
+    )
+    origin = source(prescription)
+    result = hevy_manifest(origin, mappings)
+    assert result.source == origin
+    assert result.source.session.prescription == prescription
+    expected = tuple(
+        f"{field} exceeds Hevy's 10,000-character limit"
+        for field, length in (
+            ("routine.notes", routine_length),
+            ("routine.exercises.1.notes", exercise_length),
+        )
+        if length > 10_000
+    )
+    assert result.blockers == expected
+    if expected:
+        assert result.classification == "blocked" and result.preview_arguments is None
+    else:
+        assert result.classification == "usable-with-disclosed-limitations"
+        routine = result.preview_arguments.routine
+        assert routine.notes == baseline.notes + "\n" + routine_note
+        notes = routine.exercises[1].notes
+        assert len(notes) == exercise_length and exercise_note in notes
+        assert notes.replace(exercise_note + "\n", "", 1) == baseline.exercises[1].notes
+
+
+def test_hevy_preview_title_limit(gym: f.Strength) -> None:
+    # Canonical template keys are bounded to 64 characters. Exercise the provider boundary directly.
+    args = hevy_manifest(source(gym), tuple(map(mapping, gym.exercises))).preview_arguments
+    raw = args.model_dump()
+    raw["routine"]["title"] = "a" * 10_000
+    assert PreviewArguments.model_validate(raw).routine.title == raw["routine"]["title"]
+    raw["routine"]["title"] += "a"
+    with pytest.raises(ValidationError) as exc:
+        PreviewArguments.model_validate(raw)
+    assert exc.value.errors()[0]["loc"] == ("routine", "title")
 
 
 def test_missing_ambiguous_and_wrong_convention_block_whole_routine(gym: f.Strength) -> None:

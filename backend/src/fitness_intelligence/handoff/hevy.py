@@ -3,11 +3,14 @@
 from decimal import Decimal
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 from fitness_intelligence.planning import familiar as f
 
 from .prescription import Handoff, PrescriptionExport, effort_text, target_text
+
+MAX_PREVIEW_TEXT_LENGTH = 10_000
+type PreviewText = Annotated[str, Field(max_length=MAX_PREVIEW_TEXT_LENGTH)]
 
 
 class VerifiedTemplate(f.Record):
@@ -34,14 +37,14 @@ class HevySet(f.Record):
 
 class HevyExercise(f.Record):
     exercise_template_id: str
-    notes: str
+    notes: PreviewText
     rest_seconds: int | None
     sets: tuple[HevySet, ...]
 
 
 class Routine(f.Record):
-    title: str
-    notes: str
+    title: PreviewText
+    notes: PreviewText
     exercises: tuple[HevyExercise, ...]
 
 
@@ -63,7 +66,7 @@ def hevy_manifest(
         raise ValueError("Hevy routine requires a strength prescription")
     blockers: list[str] = []
     limits = ["Read exercise notes for group order, effort ranges, caps and time allowances."]
-    exercises: list[HevyExercise] = []
+    exercises: list[dict[str, object]] = []
     used_ids: set[str] = set()
     for ex in p.exercises:
         key = (ex.movement, ex.variation, ex.equipment, ex.load_convention)
@@ -122,29 +125,39 @@ def hevy_manifest(
         if len(rests) > 1:
             limits.append(f"{label}: use the per-set rests in notes. Leave the shared timer unset.")
         exercises.append(
-            HevyExercise(
-                exercise_template_id=template_id,
-                notes="\n".join(notes),
-                rest_seconds=next(iter(rests)) if len(rests) == 1 else None,
-                sets=tuple(sets),
-            )
+            {
+                "exercise_template_id": template_id,
+                "notes": "\n".join(notes),
+                "rest_seconds": next(iter(rests)) if len(rests) == 1 else None,
+                "sets": tuple(sets),
+            }
         )
     routine_notes = (
         f"Fixture · {source.approval} · {source.local_start} ({source.zone}). "
         f"Prepare {p.preparation_seconds} s. Calendar reservation {p.reserved_seconds} s."
     )
+    try:
+        arguments = PreviewArguments.model_validate(
+            {
+                "routine": {
+                    "title": f"{source.session.template} · {source.session.day}",
+                    "notes": "\n".join(filter(None, (routine_notes, p.notes))),
+                    "exercises": tuple(exercises),
+                }
+            }
+        )
+    except ValidationError as exc:
+        for error in exc.errors(include_input=False, include_url=False):
+            if error["type"] != "string_too_long":
+                raise
+            field = ".".join(map(str, error["loc"]))
+            blockers.append(f"{field} exceeds Hevy's {MAX_PREVIEW_TEXT_LENGTH:,}-character limit")
+        arguments = None
+
     return HevyManifest(
         source=source,
         classification="blocked" if blockers else "usable-with-disclosed-limitations",
         limitations=(*source.historical_limitations, *limits),
         blockers=tuple(blockers),
-        preview_arguments=None
-        if blockers
-        else PreviewArguments(
-            routine=Routine(
-                title=f"{source.session.template} · {source.session.day}",
-                notes="\n".join(filter(None, (routine_notes, p.notes))),
-                exercises=tuple(exercises),
-            )
-        ),
+        preview_arguments=None if blockers else arguments,
     )
