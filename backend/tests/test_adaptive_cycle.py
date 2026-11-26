@@ -218,7 +218,7 @@ def test_d2_late_run_and_corrected_feedback(db: Session, cycle: Cycle) -> None:
     for stmt in (
         update(SessionOutcome).values(week=2),
         delete(SessionOutcome),
-        text("TRUNCATE session_outcomes"),
+        text("TRUNCATE session_outcomes CASCADE"),
     ):
         with pytest.raises(IntegrityError), db.begin_nested():
             db.execute(stmt)

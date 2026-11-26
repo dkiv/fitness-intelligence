@@ -358,7 +358,7 @@ def test_sql_guards_for_sealed_rows_and_head(db: Session, cycle: Cycle) -> None:
         update(PlanRevision).values(base_id=None),
         text(
             "TRUNCATE athlete_contexts, training_plans, plan_revisions, "
-            "plan_decisions, session_outcomes"
+            "plan_decisions, session_outcomes CASCADE"
         ),
         update(PlanDecision).values(choice="approve"),
         delete(PlanDecision),

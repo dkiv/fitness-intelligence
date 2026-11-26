@@ -16,12 +16,14 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import Session
 
+from fitness_intelligence.db.confirmation_models import ConfirmationReceipt
 from fitness_intelligence.db.execution import OutcomeConflict
 from fitness_intelligence.db.familiar_snapshot import PREVIEW_OWNER
 from fitness_intelligence.db.models import User
 from fitness_intelligence.db.plan_commands import PlanCommands
 from fitness_intelligence.db.plan_models import SessionOutcome
 from fitness_intelligence.db.plan_snapshot import Generate, PlanningContext
+from fitness_intelligence.planning import confirmation as c
 from fitness_intelligence.planning import familiar as f
 from fitness_intelligence.planning import familiar_outcomes as fo
 from fitness_intelligence.planning.familiar_examples import example
@@ -458,7 +460,7 @@ def test_direct_sql_scope_immutability_and_downgrade(db: Session, cycle: Cycle) 
     for sql in (
         "UPDATE session_outcomes SET week=2",
         "DELETE FROM session_outcomes",
-        "TRUNCATE session_outcomes",
+        "TRUNCATE session_outcomes CASCADE",
     ):
         with pytest.raises(IntegrityError), db.begin_nested():
             db.execute(text(sql))
@@ -566,3 +568,241 @@ def test_correction_revalidates_changed_execution_instant(cycle: Cycle) -> None:
         cycle.record(
             "gym-a", corrected, occurred_at=at(9), command_id=recovery_key, supersedes_id=first
         )
+
+
+@pytest.fixture
+def imported_set(cycle: Cycle) -> c.StrengthFact:
+    return c.StrengthFact(
+        owner=PREVIEW_OWNER,
+        account=uuid4(),
+        workout=uuid4(),
+        exercise=uuid4(),
+        member=uuid4(),
+        reference=uuid4(),
+        occurred_at=cycle.session("gym-a").start_utc,
+        mapping="v1",
+        comparison="press-v1",
+        movement="press",
+        variation="standing",
+        equipment="barbell",
+        group="primary",
+        kind="working",
+        ordinal=1,
+        reps=5,
+        kg=Decimal(42),
+        load_convention="total-external-kg",
+        provenance="historically-inferred",
+    )
+
+
+def test_explicit_import_confirmation_link(cycle: Cycle, imported_set: c.StrengthFact) -> None:
+    cmd = cycle.cmd
+    gym = cycle.session("gym-a")
+    manual = cycle.record("gym-a", partial_strength())
+    fact = imported_set
+
+    def link(member: c.StrengthFact, outcome: UUID) -> c.Receipt:
+        display = cmd.preview_observations(member.account, (member,))
+        intent = c.Intent(
+            display=display,
+            displayed_digest=display.digest,
+            answers=(
+                c.Answer(
+                    member=member.member,
+                    disposition="confirm",
+                    fields=("completion", "reps"),
+                    outcome=outcome,
+                ),
+            ),
+        )
+        return cmd.confirm_observations(uuid4(), intent, current=(member,))
+
+    for changed in (
+        fact.model_copy(update={"ordinal": 99}),
+        fact.model_copy(update={"occurred_at": at(9)}),
+    ):
+        with pytest.raises(ValueError):
+            link(changed, manual)
+    with pytest.raises(ValueError):
+        link(fact, uuid4())
+    root = link(fact, manual)
+    (support,) = cmd.confirmation_review(root.command, current=(fact,))
+    attr = support.history[0].link
+    assert (
+        attr.outcome,
+        attr.cycle,
+        attr.origin_revision,
+        attr.effective_head,
+        attr.occurrence,
+        attr.occurred_at,
+        attr.current,
+    ) == (manual, cycle.plan, cycle.weeks[0], cycle.weeks[0], gym.occurrence, gym.start_utc, True)
+    with pytest.raises(ValueError, match="already linked"):
+        link(fact.model_copy(update={"member": uuid4(), "workout": uuid4()}), manual)
+    assert len(cmd.weekly_review(cycle.plan, 1).sessions[0].history) == 1
+    cycle.record("gym-a", fo.StrengthExecution(status="partial"), supersedes_id=manual)
+    (reviewed,) = cmd.confirmation_review(root.command, current=(fact,))
+    assert reviewed.state == "confirmed" and not reviewed.history[0].link.current
+    assert support.effective_link == attr and reviewed.effective_link is None
+    with pytest.raises(ValueError, match="current performed"):
+        link(fact.model_copy(update={"member": uuid4()}), manual)
+
+
+def test_prescribed_ordinals_across_confirmation_batches(
+    cycle: Cycle, imported_set: c.StrengthFact
+) -> None:
+    cmd = cycle.cmd
+    manual = cycle.record("gym-a", partial_strength())
+    first = imported_set
+    # The athlete repeated the press exercise in the same workout. Both first sets exist.
+    repeat = first.model_copy(update={"member": uuid4(), "exercise": uuid4()})
+    second = first.model_copy(update={"member": uuid4(), "ordinal": 2})
+    extra = first.model_copy(update={"member": uuid4(), "ordinal": 3})
+    facts = (first, repeat, second, extra)
+    display = cmd.preview_observations(first.account, facts)
+    root = cmd.confirm_observations(
+        uuid4(), c.prepare(display, ("completion", "reps")), current=facts
+    )
+
+    def change(*updates: tuple[c.StrengthFact, UUID, UUID | None]) -> c.Receipt:
+        sources = tuple(source for source, _, _ in updates)
+        batch = cmd.preview_observations(first.account, sources)
+        answers = tuple(
+            c.Answer(
+                member=source.member,
+                disposition="confirm",
+                fields=("completion", "reps"),
+                supersedes=parent,
+                outcome=outcome,
+            )
+            for source, parent, outcome in updates
+        )
+        return cmd.confirm_observations(
+            uuid4(), c.prepare(batch, (), exceptions=answers), current=sources
+        )
+
+    def review() -> dict[UUID, c.Support]:
+        return {s.member: s for s in cmd.confirmation_review(root.command, current=facts)}
+
+    unlinked = review()
+    assert all(s.effective_link is None and s.confirmed["reps"] == 5 for s in unlinked.values())
+    with pytest.raises(ValueError, match="prescribed set ordinal"):
+        change((first, root.command, manual), (repeat, root.command, manual))
+    assert review() == unlinked
+
+    distinct = change((first, root.command, manual), (second, root.command, manual))
+    linked = review()
+    assert all(linked[s.member].effective_link.outcome == manual for s in (first, second))
+    with pytest.raises(ValueError, match="prescribed set ordinal"):
+        change((repeat, root.command, manual))
+    with pytest.raises(ValueError, match="does not match"):
+        change((extra, root.command, manual))
+    assert review() == linked
+
+    # Release and reassign one ordinal atomically, without altering the other ordinal.
+    swap = change((repeat, root.command, manual), (first, distinct.command, None))
+    swapped = review()
+    assert swapped[repeat.member].effective_link.outcome == manual
+    assert swapped[first.member].effective_link is None
+    assert swapped[first.member].confirmed == unlinked[first.member].confirmed
+    assert swapped[first.member].history[-2].command == distinct.command
+    assert swapped[second.member] == linked[second.member]
+    withdrawal = c.Answer(member=repeat.member, disposition="withdraw", supersedes=swap.command)
+    batch = cmd.preview_observations(first.account, (repeat,))
+    cmd.confirm_observations(uuid4(), c.prepare(batch, (), exceptions=(withdrawal,)), current=())
+    change((first, swap.command, manual))
+    released = review()
+    assert released[first.member].effective_link.outcome == manual
+    assert released[repeat.member].state == "withdrawn"
+    assert released[extra.member] == unlinked[extra.member]
+    assert cmd.confirmation_receipt(root.command) == root
+    assert len(cmd.weekly_review(cycle.plan, 1).sessions[0].history) == 1
+
+    latest = cycle.record("gym-a", partial_strength(), supersedes_id=manual)
+    other = first.model_copy(update={"exercise": uuid4(), "member": uuid4()})
+    dbatch = cmd.preview_observations(first.account, (other,))
+    answer = c.Answer(
+        member=other.member, disposition="confirm", fields=("completion",), outcome=latest
+    )
+    new = cmd.confirm_observations(
+        uuid4(), c.prepare(dbatch, (), exceptions=(answer,)), current=(other,)
+    )
+    assert (
+        cmd.confirmation_review(new.command, current=(other,))[0].effective_link.outcome == latest
+    )
+    assert review()[first.member].effective_link is None
+    assert review()[second.member].confirmed == linked[second.member].confirmed
+    assert len(cmd.weekly_review(cycle.plan, 1).sessions[0].history) == 2
+
+
+def test_review_withholds_ambiguous_preexisting_links(
+    db: Session, cycle: Cycle, imported_set: c.StrengthFact
+) -> None:
+    manual = cycle.record("gym-a", partial_strength())
+    first = imported_set
+    repeat = first.model_copy(update={"exercise": uuid4(), "member": uuid4()})
+    receipts = []
+    # Reproduce two immutable, independently sealed receipts accepted by the prior E422 command.
+    for member in (first, repeat):
+        display = cycle.cmd.preview_observations(member.account, (member,))
+        answer = c.Answer(
+            member=member.member, disposition="confirm", fields=("completion",), outcome=manual
+        )
+        intent = c.prepare(display, (), exceptions=(answer,))
+        key = uuid4()
+        db.add(
+            ConfirmationReceipt(
+                user_id=PREVIEW_OWNER,
+                actor=PREVIEW_OWNER,
+                command=key,
+                recorded_at=cycle.now,
+                payload=intent.model_dump(mode="json"),
+                intent_digest=c.digest(intent),
+            )
+        )
+        db.flush()
+        receipts.append(cycle.cmd.confirmation_receipt(key))
+
+    for saved, member in zip(receipts, (first, repeat), strict=True):
+        (support,) = cycle.cmd.confirmation_review(saved.command, current=(member,))
+        assert support.confirmed == {"completion": True}
+        assert support.history[0].link.outcome == manual
+        assert support.ambiguous_set_link and support.effective_link is None
+
+    saved = receipts[1]
+    withdrawal = c.Answer(member=repeat.member, disposition="withdraw", supersedes=saved.command)
+    cycle.cmd.confirm_observations(
+        uuid4(), c.prepare(saved.intent.display, (), exceptions=(withdrawal,)), current=()
+    )
+    (remaining,) = cycle.cmd.confirmation_review(receipts[0].command, current=(first,))
+    assert remaining.effective_link.outcome == manual and not remaining.ambiguous_set_link
+    assert cycle.cmd.confirmation_receipt(saved.command) == saved
+
+
+def test_competing_links_for_one_prescribed_set(
+    db: Session, cycle: Cycle, imported_set: c.StrengthFact
+) -> None:
+    manual = cycle.record("gym-a", partial_strength())
+    db.commit()
+    engine = db.get_bind()
+    barrier = Barrier(2)
+
+    def link(source: c.StrengthFact) -> bool:
+        with Session(engine) as session, session.begin():
+            cmd = PlanCommands(session)
+            display = cmd.preview_observations(source.account, (source,))
+            answer = c.Answer(
+                member=source.member, disposition="confirm", fields=("completion",), outcome=manual
+            )
+            intent = c.prepare(display, (), exceptions=(answer,))
+            barrier.wait(timeout=10)
+            try:
+                cmd.confirm_observations(uuid4(), intent, current=(source,))
+            except ValueError as exc:
+                assert "prescribed set ordinal" in str(exc)
+                return False
+            return True
+
+    repeat = imported_set.model_copy(update={"exercise": uuid4(), "member": uuid4()})
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        assert sorted(pool.map(link, (imported_set, repeat))) == [False, True]
