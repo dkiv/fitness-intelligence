@@ -73,6 +73,17 @@ class Issue:
 
 
 @dataclass(frozen=True)
+class OpenIssue:
+    source: Source
+    category: str
+    provider_date: date
+    issue: Issue
+    evidence_digest: str
+    first_seen: datetime
+    last_seen: datetime
+
+
+@dataclass(frozen=True)
 class Coverage:
     source: Source
     account_status: str

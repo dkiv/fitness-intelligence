@@ -193,12 +193,16 @@ def _effective_dates(before: WeekPlan | None, after: WeekPlan, today: date) -> N
         raise StalePlan("a retained week's constraints changed")
 
 
+def trusted_owner() -> UUID:
+    binding = os.environ.get("FITNESS_PLANNING_OWNER_ID")
+    if not binding:
+        raise PermissionError("trusted local planning owner binding required")
+    return UUID(binding)
+
+
 class PlanCommands:
     def __init__(self, session: Session) -> None:
-        binding = os.environ.get("FITNESS_PLANNING_OWNER_ID")
-        if not binding:
-            raise PermissionError("trusted local planning owner binding required")
-        self._owner = UUID(binding)
+        self._owner = trusted_owner()
         self._db = session
 
     def _lock_owner(self) -> None:
