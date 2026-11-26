@@ -9,11 +9,14 @@ from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
 from typing import Literal
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from fitness_intelligence.planning import familiar as f
 from fitness_intelligence.planning import rationale
+from fitness_intelligence.planning.familiar_calendar import validate_retained
 from fitness_intelligence.planning.outcomes import Actual, WeeklyOutcomes
 from fitness_intelligence.planning.planner import (
     RULES,
@@ -29,6 +32,7 @@ from fitness_intelligence.planning.press_block import PressBlock
 from fitness_intelligence.planning.rationale import Rationale
 
 from . import execution
+from . import familiar_snapshot as v2
 from .models import User
 from .plan_models import AthleteContext, PlanDecision, PlanRevision, SessionOutcome, TrainingPlan
 from .plan_snapshot import (
@@ -60,9 +64,9 @@ class InfeasiblePlan(ValueError):
     def __init__(self, result: Conflicts) -> None:
         self.conflicts = result
         details = []
-        for f in result.findings:
-            facts = ", ".join(f"{key}={value}" for key, value in f.facts)
-            details.append(f"{f.rule} ({', '.join(f.slots)}) · {facts}")
+        for finding in result.findings:
+            facts = ", ".join(f"{key}={value}" for key, value in finding.facts)
+            details.append(f"{finding.rule} ({', '.join(finding.slots)}) · {facts}")
         super().__init__("\n".join(details))
 
 
@@ -99,6 +103,19 @@ class Preview:
     decision: Receipt | None
     rationale: Rationale | None
     evidence_alerts: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class FamiliarPreview:
+    revision_id: UUID
+    base_id: UUID | None
+    head_id: UUID | None
+    context_id: UUID
+    current_context_id: UUID
+    sealed_context: f.Context
+    block: f.Block
+    candidate: f.Candidate
+    decision: Receipt | None
 
 
 def _changes(before: WeekPlan | None, after: WeekPlan) -> tuple[SlotChange, ...]:
@@ -193,13 +210,25 @@ class PlanCommands:
             .limit(1)
         )
 
-    def capture_context(self, context: PlanningContext, *, expected_context: UUID | None) -> UUID:
+    def capture_context(
+        self, context: PlanningContext | f.Context, *, expected_context: UUID | None
+    ) -> UUID:
         self._lock_owner()
         old = self._context()
         if (old.id if old else None) != expected_context:
             raise StalePlan("context revision changed")
-        payload = snapshot(context)
-        read(CONTEXT, payload)
+        if isinstance(context, f.Context):
+            v2.require_preview_owner(self._owner)
+            payload = v2.snapshot(context)
+            sealed = v2.read(f.Context, payload)
+            today = self._now().astimezone(ZoneInfo(sealed.zone)).date()
+            if sealed.history_start + timedelta(days=7) > today:
+                raise ValueError("representative history week must be complete at capture")
+        else:
+            if self._owner == v2.PREVIEW_OWNER:
+                raise PermissionError("dedicated generalized preview owner")
+            payload = snapshot(context)
+            read(CONTEXT, payload)
         row = AthleteContext(
             user_id=self._owner, sequence=old.sequence + 1 if old else 1, snapshot=payload
         )
@@ -207,10 +236,17 @@ class PlanCommands:
         self._db.flush()
         return row.id
 
-    def create_cycle(self, block: PressBlock) -> UUID:
+    def create_cycle(self, block: PressBlock | f.Block) -> UUID:
         self._lock_owner()
-        payload = snapshot(block)
-        read(BLOCK, payload)
+        if isinstance(block, f.Block):
+            v2.require_preview_owner(self._owner)
+            payload = v2.snapshot(block)
+            v2.read(f.Block, payload)
+        else:
+            if self._owner == v2.PREVIEW_OWNER:
+                raise PermissionError("dedicated generalized preview owner")
+            payload = snapshot(block)
+            read(BLOCK, payload)
         row = TrainingPlan(user_id=self._owner, block=payload)
         self._db.add(row)
         self._db.flush()
@@ -222,7 +258,13 @@ class PlanCommands:
         )
         if lock:
             stmt = stmt.with_for_update()
-        return self._db.scalars(stmt.execution_options(populate_existing=True)).one()
+        plan = self._db.scalars(stmt.execution_options(populate_existing=True)).one()
+        version = plan.block.get("schema_version")
+        if type(version) is not int or version not in (1, 2):
+            raise InvalidSnapshot("unsupported cycle schema version")
+        if version == 2:
+            v2.require_preview_owner(self._owner)
+        return plan
 
     def _revision(self, plan_id: UUID, revision_id: UUID) -> PlanRevision:
         return self._db.scalars(
@@ -258,7 +300,9 @@ class PlanCommands:
         workout_id: UUID | None = None,
     ) -> UUID:
         self._lock_owner()
-        self._plan(plan_id, lock=True)
+        plan = self._plan(plan_id, lock=True)
+        if plan.block.get("schema_version") != 1:
+            raise ValueError("generalized execution attribution is unsupported")
         return execution.record(
             self._db,
             self._owner,
@@ -278,6 +322,8 @@ class PlanCommands:
         """Current observations across revisions, against the approved logical week."""
         self._lock_owner()
         plan = self._plan(plan_id, lock=True)
+        if plan.block.get("schema_version") != 1:
+            raise ValueError("generalized execution review is unsupported")
         current = self._base(plan_id, plan.head_id)
         if current and current.inputs.number != week:
             current = current.inputs.previous
@@ -333,11 +379,93 @@ class PlanCommands:
             if raw and Rationale.model_validate_json(json.dumps(raw)).cites_claim(claim_revision)
         )
 
+    def _familiar_candidate(
+        self,
+        plan: TrainingPlan,
+        base_id: UUID | None,
+        ctx: AthleteContext,
+        request: f.ProposeBlock | f.FamiliarWeek,
+        *,
+        today: date | None,
+        rule: f.FamiliarRule = f.RULE,
+    ) -> f.Candidate:
+        v2.require_preview_owner(self._owner)
+        block = v2.read(f.Block, plan.block)
+        context = v2.read(f.Context, ctx.snapshot)
+        block_revision = None
+        weeks: list[v2.ApprovedWeek] = []
+        if base_id is not None:
+            base = self._revision(plan.id, base_id)
+            head = v2.read(f.Candidate, base.snapshot)
+            block_revision = head.block_revision or base.id
+            opening = self._revision(plan.id, block_revision)
+            initial = self._familiar_context(opening.context_id)
+            if (initial.zone, initial.objectives, initial.history_start, initial.observations) != (
+                context.zone,
+                context.objectives,
+                context.history_start,
+                context.observations,
+            ):
+                raise StalePlan("block objectives, planning zone or initial baseline changed")
+            for ref in head.prior_weeks:
+                previous = self._revision(plan.id, ref.revision)
+                known = v2.read(f.Candidate, previous.snapshot)
+                weeks.append(v2.ApprovedWeek(ref, known.days))
+            if isinstance(head.request, f.FamiliarWeek):
+                weeks.append(
+                    v2.ApprovedWeek(
+                        f.WeekRef(number=head.request.number, revision=base.id), head.days
+                    )
+                )
+            if today is not None and base.context_id != ctx.id:
+                for week in weeks:
+                    try:
+                        validate_retained(
+                            plan.id, block, context, week.ref.number, week.days, today
+                        )
+                    except ValueError as exc:
+                        raise StalePlan(str(exc)) from exc
+        candidate = v2.build(
+            plan.id, block, context, request, block_revision, tuple(weeks), rule=rule
+        )
+        if today is not None:
+            try:
+                v2.check_dates(candidate, block, today)
+            except ValueError as exc:
+                raise StalePlan(str(exc)) from exc
+        return candidate
+
+    def replay_familiar(self, plan_id: UUID, revision_id: UUID) -> f.Candidate:
+        """Regenerate from the sealed context and original approved base."""
+        self._lock_owner()
+        plan = self._plan(plan_id, lock=False)
+        revision = self._revision(plan_id, revision_id)
+        saved = v2.read(f.Candidate, revision.snapshot)
+        ctx = self._db.scalars(
+            select(AthleteContext).where(
+                AthleteContext.id == revision.context_id, AthleteContext.user_id == self._owner
+            )
+        ).one()
+        replay = self._familiar_candidate(
+            plan, revision.base_id, ctx, saved.request, today=None, rule=saved.rules
+        )
+        if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
+            raise InvalidSnapshot("generalized historical replay mismatch")
+        return replay
+
+    def _familiar_context(self, context_id: UUID) -> f.Context:
+        row = self._db.scalars(
+            select(AthleteContext).where(
+                AthleteContext.user_id == self._owner, AthleteContext.id == context_id
+            )
+        ).one()
+        return v2.read(f.Context, row.snapshot)
+
     def submit(
         self,
         plan_id: UUID,
         expected_head: UUID | None,
-        request: Generate | Move,
+        request: Generate | Move | f.ProposeBlock | f.FamiliarWeek,
         *,
         evidence: tuple[EvidenceRef, ...] = (),
     ) -> UUID:
@@ -348,28 +476,43 @@ class PlanCommands:
         ctx = self._context()
         if ctx is None:
             raise ValueError("capture the planning context first")
-        context = read(CONTEXT, ctx.snapshot)
-        base = self._base(plan.id, expected_head)
         if evidence:
             raise ValueError("scientific references must come from catalog retrieval")
-        as_of = self._now()
-        outcomes = self._outcomes(plan_id, request, base, as_of)
-        context = self._review_context(context, outcomes, base)
-        explanation = Rationale.retrieve(outcomes, rationale.current_catalog())
-        selection = explanation.selection
-        evidence = tuple(EvidenceRef(selection.release_id, key) for key in explanation.claim_keys)
-        week = _generate(request, context, read(BLOCK, plan.block), base)
-        self._check_recorded_slots(plan_id, base, week)
-        _effective_dates(base, week, self._today(context))
-        payload = snapshot(Candidate(request, week, evidence))
-        read(CANDIDATE, payload)
+        if plan.block.get("schema_version") == 2:
+            if not isinstance(request, (f.ProposeBlock, f.FamiliarWeek)):
+                raise ValueError("unsupported generalized planning request")
+            context_v2 = v2.read(f.Context, ctx.snapshot)
+            today = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
+            candidate = self._familiar_candidate(plan, expected_head, ctx, request, today=today)
+            payload = v2.snapshot(candidate)
+            v2.read(f.Candidate, payload)
+            why = None
+        else:
+            if not isinstance(request, (Generate, Move)):
+                raise ValueError("unsupported legacy planning request")
+            context = read(CONTEXT, ctx.snapshot)
+            base = self._base(plan.id, expected_head)
+            as_of = self._now()
+            outcomes = self._outcomes(plan_id, request, base, as_of)
+            context = self._review_context(context, outcomes, base)
+            explanation = Rationale.retrieve(outcomes, rationale.current_catalog())
+            selection = explanation.selection
+            evidence = tuple(
+                EvidenceRef(selection.release_id, key) for key in explanation.claim_keys
+            )
+            week = _generate(request, context, read(BLOCK, plan.block), base)
+            self._check_recorded_slots(plan_id, base, week)
+            _effective_dates(base, week, self._today(context))
+            payload = snapshot(Candidate(request, week, evidence))
+            read(CANDIDATE, payload)
+            why = explanation.model_dump(mode="json")
         revision = PlanRevision(
             user_id=self._owner,
             plan_id=plan.id,
             base_id=expected_head,
             context_id=ctx.id,
             snapshot=payload,
-            rationale=explanation.model_dump(mode="json"),
+            rationale=why,
         )
         self._db.add(revision)
         self._db.flush()
@@ -390,12 +533,28 @@ class PlanCommands:
             row.revision_id, row.choice, row.command_id, row.decided_at.astimezone(UTC), row.reason
         )
 
-    def preview(self, plan_id: UUID, revision_id: UUID) -> Preview:
+    def preview(self, plan_id: UUID, revision_id: UUID) -> Preview | FamiliarPreview:
         self._lock_owner()
         return self._preview(self._plan(plan_id, lock=False), revision_id)
 
-    def _preview(self, plan: TrainingPlan, revision_id: UUID) -> Preview:
+    def _preview(self, plan: TrainingPlan, revision_id: UUID) -> Preview | FamiliarPreview:
         revision = self._revision(plan.id, revision_id)
+        if plan.block.get("schema_version") == 2:
+            v2.require_preview_owner(self._owner)
+            ctx = self._context()
+            assert ctx is not None
+            decision = self._decision(plan.id, revision.id)
+            return FamiliarPreview(
+                revision.id,
+                revision.base_id,
+                plan.head_id,
+                revision.context_id,
+                ctx.id,
+                self._familiar_context(revision.context_id),
+                v2.read(f.Block, plan.block),
+                v2.read(f.Candidate, revision.snapshot),
+                self._receipt(decision) if decision else None,
+            )
         candidate = read(CANDIDATE, revision.snapshot)
         ctx = self._context()
         assert ctx is not None
@@ -421,7 +580,7 @@ class PlanCommands:
             return None
         return Rationale.model_validate_json(json.dumps(revision.rationale))
 
-    def current(self, plan_id: UUID) -> Preview | None:
+    def current(self, plan_id: UUID) -> Preview | FamiliarPreview | None:
         self._lock_owner()
         plan = self._plan(plan_id, lock=False)
         return self._preview(plan, plan.head_id) if plan.head_id else None
@@ -464,37 +623,25 @@ class PlanCommands:
             ctx = self._context()
             if ctx is None or ctx.id != revision.context_id:
                 raise StalePlan("planning context changed")
-            context = read(CONTEXT, ctx.snapshot)
-            base = self._base(plan_id, expected_head)
-            candidate = read(CANDIDATE, revision.snapshot)
-            if candidate.week.rule_version != RULES:
-                raise StalePlan("planner rule version changed")
-            why = self._rationale(revision)
-            if why is None:
-                if candidate.week.inputs.number == 2 or candidate.evidence:
-                    raise StalePlan(
-                        "legacy proposal requires a fresh execution and evidence review"
-                    )
+            if plan.block.get("schema_version") == 2:
+                candidate_v2 = v2.read(f.Candidate, revision.snapshot)
+                if candidate_v2.rules != f.RULE:
+                    raise StalePlan("familiar effort rule changed; submit a fresh proposal")
+                context_v2 = v2.read(f.Context, ctx.snapshot)
+                today = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
+                replay = self._familiar_candidate(
+                    plan, expected_head, ctx, candidate_v2.request, today=today
+                )
+                decision_day = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
+                if decision_day != today:
+                    try:
+                        v2.check_dates(replay, v2.read(f.Block, plan.block), decision_day)
+                    except ValueError as exc:
+                        raise StalePlan(str(exc)) from exc
+                if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
+                    raise InvalidSnapshot("stored generalized prescription differs from replay")
             else:
-                if not why.verify_selection():
-                    raise StalePlan("pinned scientific selection cannot be reproduced")
-                refs = tuple(EvidenceRef(why.selection.release_id, key) for key in why.claim_keys)
-                if refs != candidate.evidence:
-                    raise StalePlan("scientific reference differs from retrieval")
-                if alerts := why.eligibility():
-                    raise StalePlan("Ineligible rationale reference · " + " / ".join(alerts))
-                as_of = why.outcomes.as_of if why.outcomes else self._now()
-                outcomes = self._outcomes(plan_id, candidate.request, base, as_of)
-                if outcomes != why.outcomes:
-                    raise StalePlan("execution review changed; submit a fresh proposal")
-                context = self._review_context(context, outcomes, base)
-            week = _generate(candidate.request, context, read(BLOCK, plan.block), base)
-            self._check_recorded_slots(plan_id, base, week)
-            if canonical(
-                snapshot(Candidate(candidate.request, week, candidate.evidence))
-            ) != canonical(revision.snapshot):
-                raise InvalidSnapshot("stored prescription differs from planner output")
-            _effective_dates(base, week, self._today(context))
+                self._approve_legacy(plan, revision, ctx)
         row = PlanDecision(
             user_id=self._owner,
             plan_id=plan.id,
@@ -508,3 +655,37 @@ class PlanCommands:
         self._db.flush()  # PostgreSQL advances the approved head in this statement.
         self._db.expire(plan)
         return self._receipt(row)
+
+    def _approve_legacy(
+        self, plan: TrainingPlan, revision: PlanRevision, ctx: AthleteContext
+    ) -> None:
+        plan_id, expected_head = plan.id, revision.base_id
+        context = read(CONTEXT, ctx.snapshot)
+        base = self._base(plan_id, expected_head)
+        candidate = read(CANDIDATE, revision.snapshot)
+        if candidate.week.rule_version != RULES:
+            raise StalePlan("planner rule version changed")
+        why = self._rationale(revision)
+        if why is None:
+            if candidate.week.inputs.number == 2 or candidate.evidence:
+                raise StalePlan("legacy proposal requires a fresh execution and evidence review")
+        else:
+            if not why.verify_selection():
+                raise StalePlan("pinned scientific selection cannot be reproduced")
+            refs = tuple(EvidenceRef(why.selection.release_id, key) for key in why.claim_keys)
+            if refs != candidate.evidence:
+                raise StalePlan("scientific reference differs from retrieval")
+            if alerts := why.eligibility():
+                raise StalePlan("Ineligible rationale reference · " + " / ".join(alerts))
+            as_of = why.outcomes.as_of if why.outcomes else self._now()
+            outcomes = self._outcomes(plan_id, candidate.request, base, as_of)
+            if outcomes != why.outcomes:
+                raise StalePlan("execution review changed; submit a fresh proposal")
+            context = self._review_context(context, outcomes, base)
+        week = _generate(candidate.request, context, read(BLOCK, plan.block), base)
+        self._check_recorded_slots(plan_id, base, week)
+        if canonical(snapshot(Candidate(candidate.request, week, candidate.evidence))) != canonical(
+            revision.snapshot
+        ):
+            raise InvalidSnapshot("stored prescription differs from planner output")
+        _effective_dates(base, week, self._today(context))

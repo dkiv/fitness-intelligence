@@ -1,12 +1,15 @@
 """Deterministic manual review of a sealed E1 prescription and E3 rationale."""
 
+from zoneinfo import ZoneInfo
+
 from fitness_intelligence.evidence.retrieval import Evidence
+from fitness_intelligence.planning import familiar
 from fitness_intelligence.planning.outcomes import WeeklyOutcomes
 from fitness_intelligence.planning.planner import Session, Slot, WeekPlan
 from fitness_intelligence.planning.prescriptions import Intervals, RunStep, StrengthSession, Target
 from fitness_intelligence.planning.rationale import Rationale
 
-from .plan_commands import Preview
+from .plan_commands import FamiliarPreview, Preview
 
 
 def _target(t: Target) -> str:
@@ -129,7 +132,81 @@ def _science(why: Rationale, alerts: tuple[str, ...]) -> list[str]:
     return lines
 
 
-def render_review(preview: Preview) -> str:
+def _familiar_session(p: familiar.Prescription) -> list[str]:
+    lines = [f"{p.role} · prepare {p.preparation_seconds}s · reserve {p.reserved_seconds}s"]
+    if isinstance(p, familiar.Strength):
+        for exercise in p.exercises:
+            lines.append(
+                f"{exercise.movement}/{exercise.variation} ({exercise.equipment}, "
+                f"{exercise.load_convention}) · transition {exercise.transition_seconds}s"
+            )
+            for group in exercise.groups:
+                lines.append(
+                    f"{group.key} ({group.kind}) · set RPE {_target(group.effort.target)}, "
+                    f"cap {group.effort.cap}"
+                )
+                for target in group.sets:
+                    lines.append(
+                        f"  {target.ordinal}. {_target(target.reps)} reps at "
+                        f"{_target(target.load)} kg · allow {target.execution_seconds}s, "
+                        f"rest after {target.rest_after_seconds}s"
+                    )
+            if exercise.notes:
+                lines.append(exercise.notes)
+    else:
+        lines.append(f"Elapsed duration {_target(p.duration)}s")
+        for index, step in enumerate(p.steps, 1):
+            lines.append(
+                f"  {index}. {step.purpose} {_target(step.seconds)}s · "
+                f"step RPE {_target(step.effort.target)}, cap {step.effort.cap}"
+            )
+    if p.notes:
+        lines.append(p.notes)
+    return lines
+
+
+def _familiar_review(preview: FamiliarPreview) -> str:
+    ctx, block, candidate = preview.sealed_context, preview.block, preview.candidate
+    state = preview.decision.choice if preview.decision else "proposed"
+    lines = [
+        f"Synthetic research preview · {state} · revision {preview.revision_id}",
+        f"{ctx.emphasis} · {block.key} · {ctx.zone} · starts {block.start}",
+        f"Rule {candidate.rules} · confirmed support {', '.join(candidate.supports)}",
+    ]
+    if preview.current_context_id != preview.context_id:
+        lines.append("The planning context has changed since this proposal.")
+    for objective in sorted(ctx.objectives, key=lambda obj: obj.rank):
+        lines.append(f"Priority {objective.rank} · {objective.sport} · {objective.outcome}")
+    for goal in block.protections:
+        lines.append(f"Protect {goal.task} · {goal.desired_direction} · {goal.protocol}")
+    for floor in block.commitments:
+        unit = "working sets" if floor.sport == "strength" else "elapsed seconds"
+        lines.append(
+            f"Preserve {floor.sessions} × {floor.role}, each ≥ {floor.minimum_per_session} {unit}"
+        )
+    if isinstance(candidate.request, familiar.ProposeBlock):
+        for n, phase in enumerate(block.phases, 1):
+            lines.append(f"Week {n} intent · {phase}")
+        for template in block.templates:
+            lines.append(f"Familiar template · {template.key}")
+            lines.extend(_familiar_session(template.prescription))
+    else:
+        n = candidate.request.number
+        lines.append(
+            f"Week {n} · {block.phases[n - 1]} · approved block {candidate.block_revision}"
+        )
+        for day in candidate.days:
+            lines.append(str(day.day) if day.sessions else f"{day.day} · no prescribed sessions")
+            for session in day.sessions:
+                local = session.start_utc.astimezone(ZoneInfo(ctx.zone))
+                lines.append(f"{local:%H:%M %z} · {session.template} · {session.occurrence}")
+                lines.extend(_familiar_session(session.prescription))
+    return "\n".join(lines)
+
+
+def render_review(preview: Preview | FamiliarPreview) -> str:
+    if isinstance(preview, FamiliarPreview):
+        return _familiar_review(preview)
     week = preview.candidate.week
     prior = week.inputs.previous
     block = week.inputs.block

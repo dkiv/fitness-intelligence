@@ -95,7 +95,7 @@ same inputs and rules. An infeasible schedule must surface the conflicting const
 Preserve the original prescription and each approved revision, link completed sessions to
 the applicable version, and distinguish missed sessions from unknown completion in adherence.
 
-**E4.0 · Generalized planner design.** The J3I.1 candidate is ready for design review. Before freezing the contract, review the initial profile and action-specific evidence requirements, resolve re-entry and joint progression bounds, specify scoped execution confirmation, and pin synthetic fixtures and versioned requests/snapshots. Inspect existing migrations, trusted approval commands and E1/E3 replay tests before proposing persistence changes. Keep research previews, operational rule authorization and approval of a specific plan separate. E4.1–E4.5 are proposed follow-on milestones. Synthetic strength-and-running implementation can proceed independently of nutrition/fueling and additional recovery methodology. [E4.0 review decisions](research/curation/README.md#decisions-for-e40-review) · [Proposed milestone sequence](research/curation/j3i-001-integrated-hybrid-methodology.md#102-incremental-e4-sequence-proposal-not-implementation-authorization)
+E4.0 specifies the versioned block, prescription and authorization contracts. E4.1 implements the synthetic familiar-week slice using the existing trusted approval path. E4.2 will add generalized execution attribution and scoped observation confirmation. [E4.0 design](generalized-hybrid-planner-design.md) · [E4.1 usage and conformance](generalized-familiar-week.md)
 
 ### F · Adaptive coaching MVP
 
