@@ -3,7 +3,7 @@
 import re
 from collections import Counter, defaultdict
 from collections.abc import Mapping
-from datetime import date
+from datetime import date, datetime
 from decimal import localcontext
 from typing import Literal
 from uuid import UUID
@@ -13,12 +13,18 @@ from sqlalchemy import Engine, select, text
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import ColumnElement
 
+from fitness_intelligence.adapters.hevy.analytics import HevyHistoryProfile, read_hevy_facts
+from fitness_intelligence.analytics.exposure import (
+    RECOVERY_CATEGORIES,
+    ActivityDay,
+    EnduranceExposure,
+    StrengthExposure,
+)
 from fitness_intelligence.analytics.longitudinal import (
     Coverage,
     DailyExpenditure,
     DailyIntake,
     DailyWeight,
-    ExpenditureObservation,
     IntakeObservation,
     Issue,
     LongitudinalReport,
@@ -32,6 +38,7 @@ from fitness_intelligence.analytics.longitudinal import (
 from fitness_intelligence.analytics.strength import DAY, Period
 from fitness_intelligence.analytics.weight import partition_weigh_ins
 from fitness_intelligence.db.endurance_models import DailyRecoveryObservation
+from fitness_intelligence.db.exposure import read_outings, recovery_day, recovery_fact
 from fitness_intelligence.db.history_models import GarminCoverage, GarminIssue
 from fitness_intelligence.db.models import SourceAccount
 from fitness_intelligence.db.nutrition_models import BodyWeightObservation, DailyIntakeObservation
@@ -43,6 +50,20 @@ from fitness_intelligence.nutrition.weight import WeightDay, select_weight_day
 GARMIN_NUTRITION_V1 = "garmin-personal-b3.2-v1"
 FOOD_FIELD = "DailyNutritionSummaryDTO.dailyNutritionContent.calories"
 type DayKey = tuple[UUID, str, date]
+
+
+def _empty_scan_start(row: GarminCoverage | None) -> datetime | None:
+    if row is None or row.status != "empty":
+        return None
+    receipt = row.receipts.get("empty_activity_scan")
+    stamp = receipt.get("started_at") if isinstance(receipt, dict) else None
+    if not isinstance(stamp, str):
+        return None
+    try:
+        start = datetime.fromisoformat(stamp)
+    except ValueError:
+        return None
+    return start if start.tzinfo is not None else None
 
 
 def _coverage(
@@ -290,31 +311,13 @@ def _expenditure_day(
             reasons.update(("no_component_observation", coverage.status))
             status = "missing"
         else:
-            identity = ObservationId(coverage.source, "daily_recovery", row.id)
-            facts.append(
-                ExpenditureObservation(
-                    identity=identity,
-                    provider_date=day,
-                    report_date=report_date,
-                    occurred_at=None,
-                    retrieved_at=row.retrieved_at,
-                    recorded_at=None,
-                    value=row.value,
-                    unit=row.unit,
-                    method=row.method,
-                    source_field=row.source_field,
-                    mapping_version=row.mapping_version,
-                    upstream_writer=None,
-                    component=component,
-                    window_start=row.window_start,
-                    window_end=row.window_end,
-                )
-            )
+            fact = recovery_fact(row, coverage.source, aligned)
+            facts.append(fact)
             if (row.method, row.unit) != ("wearable_estimate", "kcal"):
                 reasons.add("ineligible_method_or_unit")
             status = "withheld" if reasons else "observed"
             if not reasons:
-                supporting = (identity,)
+                supporting = (fact.identity,)
         metrics.append(
             Metric(
                 "account_day",
@@ -338,6 +341,9 @@ def _read(
     account: UUID,
     zones: Mapping[UUID, ZoneInfo],
     expenditure_account: UUID | None,
+    hevy_profile: HevyHistoryProfile | None,
+    endurance_account: UUID | None,
+    recovery_account: UUID | None,
 ) -> LongitudinalReport:
     accounts = {
         a.id: a
@@ -347,12 +353,18 @@ def _read(
             .order_by(SourceAccount.id)
         )
     }
-    selected = [account] if expenditure_account is None else [account, expenditure_account]
+    requested = [
+        (i, "garmin")
+        for i in (account, expenditure_account, endurance_account, recovery_account)
+        if i is not None
+    ]
+    if hevy_profile is not None:
+        requested.append((hevy_profile.source_account_id, "hevy"))
     if zones.keys() - accounts.keys() or any(
         i not in accounts
-        or accounts[i].provider != "garmin"
+        or accounts[i].provider != provider
         or accounts[i].status == "legacy_unresolved"
-        for i in selected
+        for i, provider in requested
     ):
         raise ValueError("invalid source account for report")
     sources = {i: Source(owner, a.provider, i) for i, a in accounts.items()}
@@ -398,17 +410,24 @@ def _read(
         )
     }
 
-    energy: dict[date, dict[str, DailyRecoveryObservation]] = defaultdict(dict)
-    if expenditure_account is not None:
-        for row in db.scalars(
-            select(DailyRecoveryObservation).where(
-                *in_range(DailyRecoveryObservation),
-                DailyRecoveryObservation.provider == "garmin",
-                DailyRecoveryObservation.source_account_id == expenditure_account,
-                DailyRecoveryObservation.metric.in_(ENERGY),
-            )
-        ):
-            energy[row.local_date][row.metric] = row
+    def recovery_rows(
+        i: UUID | None, metrics: tuple[DailyMetric, ...]
+    ) -> dict[date, dict[str, DailyRecoveryObservation]]:
+        rows: dict[date, dict[str, DailyRecoveryObservation]] = defaultdict(dict)
+        if i is not None:
+            for row in db.scalars(
+                select(DailyRecoveryObservation).where(
+                    *in_range(DailyRecoveryObservation),
+                    DailyRecoveryObservation.provider == "garmin",
+                    DailyRecoveryObservation.source_account_id == i,
+                    DailyRecoveryObservation.metric.in_(metrics),
+                )
+            ):
+                rows[row.local_date][row.metric] = row
+        return rows
+
+    energy = recovery_rows(expenditure_account, ENERGY)
+    recovery = recovery_rows(recovery_account, tuple(RECOVERY_CATEGORIES))
 
     def categories(model: type[GarminCoverage | GarminIssue]) -> ColumnElement[bool]:
         selected_categories = (model.category == "intake") | (
@@ -418,6 +437,14 @@ def _read(
         if expenditure_account is not None:
             selected_categories |= (model.category == "expenditure") & (
                 model.source_account_id == expenditure_account
+            )
+        if endurance_account is not None:
+            selected_categories |= model.category.in_(("activities", "running_steps")) & (
+                model.source_account_id == endurance_account
+            )
+        if recovery_account is not None:
+            selected_categories |= model.category.in_(set(RECOVERY_CATEGORIES.values())) & (
+                model.source_account_id == recovery_account
             )
         return selected_categories
 
@@ -449,6 +476,19 @@ def _read(
             retained,
         )
 
+    hevy_days = defaultdict(list)
+    if hevy_profile is not None:
+        for fact in read_hevy_facts(db, owner_id=owner, period=period, profile=hevy_profile):
+            hevy_days[fact.report_date].append(fact)
+    outings = (
+        read_outings(db, sources[endurance_account], period, issues)
+        if endurance_account is not None
+        else {}
+    )
+
+    def aligned(i: UUID) -> bool:
+        return i in zones and zones[i].key == period.zone.key
+
     days = []
     for offset in range((period.stop - period.start).days):
         day = period.start + DAY * offset
@@ -459,6 +499,42 @@ def _read(
         )
         selected = select_daily_intake(db, owner, day)
         weight = select_weight_day(db, sources[account], day)
+        strength_view = None
+        if hevy_profile is not None:
+            i = hevy_profile.source_account_id
+            strength_view = StrengthExposure(
+                sources[i], accounts[i].status, (day,), tuple(hevy_days[day])
+            )
+        endurance_view = None
+        if endurance_account is not None:
+            activities = tuple(outings.get(day, ()))
+            native = ActivityDay(
+                coverage(endurance_account, "activities", day, len(activities)),
+                coverage(
+                    endurance_account,
+                    "running_steps",
+                    day,
+                    sum(f.instruction_rows or 0 for f in activities if f.sport == "running"),
+                ),
+                activities,
+                aligned(endurance_account) and all(f.report_date == day for f in activities),
+                provider_zone=zones.get(endurance_account),
+                scan_started_at=_empty_scan_start(
+                    ledger.get((endurance_account, "activities", day))
+                ),
+            )
+            endurance_view = EnduranceExposure((native,))
+        recovery_view = None
+        if recovery_account is not None:
+            recovery_counts = Counter(RECOVERY_CATEGORIES[m] for m in recovery[day])
+            recovery_view = recovery_day(
+                recovery[day],
+                {
+                    c: coverage(recovery_account, c, day, recovery_counts[c])
+                    for c in sorted(set(RECOVERY_CATEGORIES.values()))
+                },
+                aligned(recovery_account),
+            )
         days.append(
             ReportDay(
                 day,
@@ -478,6 +554,9 @@ def _read(
                 )
                 if expenditure_account is not None
                 else None,
+                strength=strength_view,
+                endurance=endurance_view,
+                recovery=recovery_view,
             )
         )
     return LongitudinalReport(
@@ -486,6 +565,9 @@ def _read(
         period,
         tuple(sorted((i, z.key) for i, z in zones.items())),
         tuple(days),
+        hevy_profile=hevy_profile,
+        endurance_source=sources.get(endurance_account),
+        recovery_source=sources.get(recovery_account),
         expenditure_source=sources[expenditure_account]
         if expenditure_account is not None
         else None,
@@ -500,6 +582,9 @@ def query_longitudinal(
     weight_account_id: UUID,
     source_zones: Mapping[UUID, ZoneInfo] | None = None,
     expenditure_account_id: UUID | None = None,
+    hevy_profile: HevyHistoryProfile | None = None,
+    endurance_account_id: UUID | None = None,
+    recovery_account_id: UUID | None = None,
 ) -> LongitudinalReport:
     """Own a fresh read-only snapshot. Source zones describe verified calendars for this period."""
     if not isinstance(engine, Engine) or engine.dialect.name != "postgresql":
@@ -522,4 +607,14 @@ def query_longitudinal(
             if tuple(settings) != ("repeatable read", "on"):
                 raise ValueError("unsuitable report transaction")
             with Session(conn, autoflush=False) as db:
-                return _read(db, owner_id, period, weight_account_id, zones, expenditure_account_id)
+                return _read(
+                    db,
+                    owner_id,
+                    period,
+                    weight_account_id,
+                    zones,
+                    expenditure_account_id,
+                    hevy_profile,
+                    endurance_account_id,
+                    recovery_account_id,
+                )

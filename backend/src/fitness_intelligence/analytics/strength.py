@@ -9,6 +9,8 @@ from zoneinfo import ZoneInfo
 
 import polars as pl
 
+from fitness_intelligence.domain.endurance import Source
+
 
 @dataclass(frozen=True)
 class Period:
@@ -27,6 +29,7 @@ class ExerciseSeries:
 
     key: str
     external_load: bool = False
+    template_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -47,6 +50,8 @@ class Observation:
     duration_seconds: Decimal | None = None
     completed_at: datetime | None = None
     deleted: bool = False
+    exercise_position: int | None = None
+    set_position: int | None = None
 
 
 @dataclass(frozen=True)
@@ -86,6 +91,59 @@ def positive(value: Decimal | None) -> bool:
     return value is not None and value.is_finite() and value > 0
 
 
+def completion_evidence(row: Observation, *, infer_completion: bool) -> str:
+    if row.set_id is None:
+        return "not_applicable"
+    if row.completed_at is not None:
+        return "confirmed"
+    if (
+        infer_completion
+        and row.ended_at is not None
+        and (
+            (row.repetitions is not None and row.repetitions > 0)
+            or positive(row.distance_m)
+            or positive(row.duration_seconds)
+        )
+    ):
+        return "inferred"
+    return "unsupported"
+
+
+def movement_key(exercise_id: UUID, movement: ExerciseSeries | None) -> str:
+    return f"series:{movement.key}" if movement else f"occurrence:{exercise_id}"
+
+
+@dataclass(frozen=True)
+class StrengthFact:
+    """One current, active, solely supported workout/exercise/set row (including placeholders)."""
+
+    source: Source
+    report_date: date
+    row: Observation
+    series: ExerciseSeries | None
+    reference_id: UUID
+    external_id: str
+    retrieved_at: datetime
+    source_updated_at: datetime | None
+    mapping_version: str | None
+    content_hash: str | None
+    hash_contract: str | None
+    lower_body: bool | None
+    source_support: str = "active_sole_reference"
+
+    @property
+    def execution(self) -> str:
+        return completion_evidence(self.row, infer_completion=True)
+
+    @property
+    def load_convention(self) -> str:
+        return "external_kg" if self.series and self.series.external_load else "unclassified"
+
+    @property
+    def movement(self) -> str | None:
+        return movement_key(self.row.exercise_id, self.series) if self.row.exercise_id else None
+
+
 def measured_sum(column: str) -> pl.Expr:
     return pl.when(pl.col(column).count() > 0).then(pl.col(column).sum()).alias(column)
 
@@ -121,14 +179,10 @@ def analyze_strength(
             raise ValueError("duplicate canonical set")
         seen.add(row.set_id)
         reps = row.repetitions
-        rep_set = reps is not None and reps > 0
-        timed = positive(row.distance_m) or positive(row.duration_seconds)
-        if row.completed_at is None and not (
-            infer_completion and row.ended_at is not None and (rep_set or timed)
-        ):
+        if completion_evidence(row, infer_completion=infer_completion) == "unsupported":
             continue
         movement = (series or {}).get(row.exercise_id)
-        key = f"series:{movement.key}" if movement else f"occurrence:{row.exercise_id}"
+        key = movement_key(row.exercise_id, movement)
         category = CATEGORIES.get(row.kind, "unknown")
         weight = row.weight_kg
         known_reps = reps is not None and reps >= 0

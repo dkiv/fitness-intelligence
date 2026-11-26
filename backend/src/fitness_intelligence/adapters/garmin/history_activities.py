@@ -71,11 +71,13 @@ def activity_window(run: "HistoryRun", first: date, last: date) -> None:
                 dict(row.receipts) if row and row.pass_key == str(run.scope.pass_id) else {}
             )
             receipts[d].pop("unavailable", None)
+            receipts[d].pop("empty_activity_scan", None)
     signatures: dict[int, str] = {}
     totals: Counter[date] = Counter()
     step_counts: Counter[date] = Counter()
     first_scan_finished = False
     attempts = run.client.requests
+    scan_started_at = datetime.now(UTC)
     try:
         for ident, day, signature, row in listing(run, first, last):
             signatures[ident] = signature
@@ -194,4 +196,10 @@ def activity_window(run: "HistoryRun", first: date, last: date) -> None:
         for d in days(first, last):
             for c in cats:
                 n = (totals if c == Category.ACTIVITIES else step_counts)[d]
-                run.mark(c, d, "observed" if n else "empty", n)
+                # Keep the start of this converged listing, including on a resumed pass.
+                receipt = (
+                    {"empty_activity_scan": {"started_at": scan_started_at.isoformat()}}
+                    if c == Category.ACTIVITIES and n == 0
+                    else None
+                )
+                run.mark(c, d, "observed" if n else "empty", n, receipts=receipt)

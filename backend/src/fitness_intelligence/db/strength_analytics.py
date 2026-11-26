@@ -37,6 +37,8 @@ def active_strength_statement(owner_id: UUID, period: Period) -> Select:
             Workout.ended_at,
             WorkoutExercise.id.label("exercise_id"),
             WorkoutExercise.name,
+            WorkoutExercise.position.label("exercise_position"),
+            ExerciseSet.position.label("set_position"),
             ExerciseSet.id.label("set_id"),
             ExerciseSet.kind,
             ExerciseSet.repetitions,
