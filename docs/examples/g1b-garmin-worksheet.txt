@@ -1,0 +1,18 @@
+Garmin Connect · Run · cruise (controlled)
+synthetic-approved-fixture · usable-with-disclosed-limitations · local worksheet only
+Week 1 · 2027-01-06T18:00:00-05:00 (America/Toronto)
+Cycle 10ac84e1-50e5-4bce-a754-0dbe0d2250f0 · revision ae9e1617-c18a-4374-9015-ae83ff106ec5 · occurrence 83d01bba-cb52-58ee-b71c-3f550ae5d029
+Prescription SHA-256 a26913bea81f27c39492aef8ee820d57aa2385c2d63040fa0132fd949f182dea
+garmin-connect-worksheet.v1 · export SHA-256 498669c6945ced5bef956688d62202a9f16aba04a28788308160db13fe9cba62
+Elapsed workout 1860 s · prepare separately 180 s · reserve 2040 s
+Steps 2–6: 3 work bouts, 2 between-bout recoveries, no final recovery.
+Expanded steps · use open intensity and copy each effort cue
+1. warmup · 600 s · run-step-rpe-0-10 3 (permitted 2–4), cap 4
+2. work · 240 s · run-step-rpe-0-10 6 (permitted 5–7), cap 7
+3. recovery · 120 s · run-step-rpe-0-10 2 (permitted 1–3), cap 3
+4. work · 240 s · run-step-rpe-0-10 6 (permitted 5–7), cap 7
+5. recovery · 120 s · run-step-rpe-0-10 2 (permitted 1–3), cap 3
+6. work · 240 s · run-step-rpe-0-10 6 (permitted 5–7), cap 7
+7. cooldown · 300 s · run-step-rpe-0-10 3 (permitted 2–4), cap 4
+Interpret step RPE and caps manually. No pace or heart-rate target is prescribed.
+In Connect, create a Run workout and check the expanded sequence above. Add to Calendar on the displayed local date. Sync and compare the watch calendar entry, step order, timing and visible cues before starting.

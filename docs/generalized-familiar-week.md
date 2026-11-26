@@ -116,3 +116,5 @@ The columns use the original case numbers from [M01](research/curation/j3b-001-s
 | 30 | — | — | I · existing fixture replay | — |
 
 E4.2 needs generalized in-force execution attribution, scoped batch confirmation and correction, support withdrawal, source-aware as-of projection, and writer coordination with D1 sport views. Until then both generalized execution commands reject. Adaptation, rule authorization, successor-block transitions and provider delivery each have a separate decision boundary. [Focused integration cases](../backend/tests/test_familiar.py)
+
+For local Hevy manifests and manual Garmin worksheets derived from sealed occurrences, see [G1B workout handoff](workout-handoff.md).
