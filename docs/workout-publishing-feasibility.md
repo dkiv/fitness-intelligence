@@ -65,6 +65,59 @@ The current canonical run records a step purpose, low/nominal/high seconds and R
 
 If a required target, range, cue or safety limit cannot reach the athlete when needed, mark the translation **blocked** and keep the approved manual prescription available. A display-only cue needs explicit acceptance where it changes execution. A changed training target needs a newly approved canonical revision. The supported manual and partner paths can deliver step-guided runs in principle. End-to-end equivalence for a particular prescription requires device verification. [955 manual][send] · [FIT workout steps][fit] · [Garmin builder][builder]
 
+## G1C.2A · Open-source planned running workouts
+
+**Decision, 25 November 2026.** The released Python models can express the two G1A rehearsal runs. Keep the G1B worksheet and manual Garmin Connect delivery for now. Google Calendar can reserve the athlete's local time, including preparation. A Google event supplies no Garmin calendar placement or watch receipt. Garmin's public terms and programs do not establish permission for FI to automate consumer Connect writes. The official Personal API importer retains its existing acquisition role. [G1B worksheet](workout-handoff.md#entering-the-garmin-worksheet) · [Personal API][gp] · [Training API][gt]
+
+### Source and lifecycle evidence
+
+Both default-branch heads matched the supplied revisions. hevy2garmin `main` was `b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21`, 282 commits beyond its latest tag, v0.12.0 (PyPI, 11 September). The tagged Python package already has planned create, schedule, unschedule and delete functions. The Python and TypeScript builders on main translate **Hevy strength routines**. That path creates a reusable workout definition and books it on a date. Completed-activity FIT upload is a separate operation. The web application is outside the Python wheel. [Python builder][h2routine] · [Python operations][h2ops] · [Web builder][h2builder] · [Release and provenance][h2release]
+
+python-garminconnect `master` was `82bc11073b597d20f8b080b7aeaac8d4cef4fc3e`. PyPI's latest `garminconnect` was 0.3.20 (23 October), tag commit `3eee7a4db6c2242967aae1780b8839599ea7dcbb`. The four subsequent commits changed README and CI files. The installed wheel matched the inspected source byte-for-byte for the workout models and operations, device operations, SSO, token storage and transport. “Live” below means upstream reports using a real account. FI exercised only the local models. [PyPI release][gcrelease] · [Workout methods][gcops] · [Upstream endpoint verification table][gctable]
+
+| Operation | Implementation | What the evidence establishes |
+| --- | --- | --- |
+| Create and read a definition | `upload_running_workout` serializes a typed `RunningWorkout`. Library paging, ID-specific readback and FIT download exist. | Upstream marks filtered library reads and workout type metadata live. Contributors report successful upload with a suitable payload. hevy2garmin's author checked strength mappings against an actual export, and a user reported deleting a synced routine in Connect. None verifies FI's running payload round trip. [Upload discussion][gcupload] · [Original strength PR][h2pr] · [User report][h2issue] |
+| Schedule and read an occurrence | Schedule a definition ID for a local ISO date. Read by schedule ID, month or date range. | hevy2garmin reports duplicate entries on repeated booking and calls out uncertainty about the response ID key. The Python endpoint table marks the period read live **with an empty result**. A populated FI occurrence and its association with the intended definition remain untested. [Scheduling review][h2schedule] · [Endpoint table][gctable] |
+| Update a definition | Full replacement addressed by workout ID. The Python wrapper forces the body's ID to match. | The author says the ID and existing schedules survive. Mocked tests verify request construction and validation. No paired before/after provider IDs were established in the reviewed update evidence. Re-read the definition and every affected occurrence before claiming continuity. [Update PR][gcupdate] · [Unit tests][gctests] |
+| Move an occurrence | `reschedule_workout` reads the occurrence, submits its existing schedule ID and new calendar date, and references the associated workout ID. | Upstream marks this call **live verified**. The published evidence does not demonstrate both IDs and content before and after, absence from the old date, or absence of a duplicate. A successful request alone cannot settle those questions. [Implementation][gcops] · [Endpoint table][gctable] |
+| Deliver to a device | One method queues a workout message for a device, with defaults for the last device and workout. Another sends scheduled workouts to the user's devices. | The bulk send is explicitly **unverified** upstream. The single-device contribution and request construction establish no on-watch receipt. Require explicit device and workout selection and independent calendar/step inspection after sync on the 955. [Device methods][gcdev] · [Device PR][gcpush] · [Endpoint table][gctable] |
+| Remove | Separate methods unschedule by occurrence ID and delete a library definition by workout ID. | hevy2garmin's sync assumes deleting a definition removes linked placements. Tests and reported manual removal do not establish the cascade, remaining calendar entries or device cleanup for a scheduled run. Verify each separately. [Web sync][h2sync] · [User report][h2issue] |
+
+**Lifecycle risks in hevy2garmin.** On changed content the web sync deletes tracked or name-and-marker-matched definitions before creating a replacement, then rebooks future dates. Failure can strand a calendar entry, lose the old workout or duplicate a successful but unacknowledged write. The web path can record success with a null workout ID and substitute a local clock value for a missing schedule ID. The Python schedule wrapper can return `None`. The web library lookup uses one bounded, filtered request (default limit 999), and reconciliation treats absence from that list as missing. Rejecting malformed responses helps, but a valid partial list still proves nothing about deletion. FI should require provider-issued IDs, compare exact owned objects and reconcile ambiguous outcomes before another write. [Sync and fallback ID][h2sync] · [Library listing and deletion candidates][h2lib] · [Python wrappers][h2ops]
+
+### Offline proof using G1B prescriptions
+
+In a disposable Python 3.12.13 environment, the proof used the released `garminconnect[workout]==0.3.20` with Pydantic 2.14.4. FI constructed synthetic `Running`, `Step` and `Repeat` objects and passed them through the G1B worksheet. The proof mapped its expanded rows, in order, to one typed running segment, serialized with `RunningWorkout.to_dict()`, read the JSON back, revalidated the workout and compared each row with the expected sequence. Flat steps make between-bout versus final recovery explicit, including when the two recoveries have different prescriptions. The upstream repeat helper also supports `skipLastRestStep`, with serialization coverage. Its effect on this watch remains unverified. [FI expansion](../backend/src/fitness_intelligence/planning/familiar.py) · [G1B worksheet](../backend/src/fitness_intelligence/handoff/garmin.py) · [Typed models][gcmodel] · [Running example][gcsample] · [Repeat test evidence][gcrepeat]
+
+| Synthetic case | Serialized steps in order | Verified result |
+| --- | --- | --- |
+| G1A baseline | Warm-up 300 s, work 120, walk 60, work 120, walk 60, work 120, cool-down 240 | 7 steps, 2 recoveries, **1,020 s (17 min)** |
+| G1A explicit final recovery | Same first six steps, then walk 60 and cool-down 240 | 8 steps, 3 recoveries, **1,080 s (18 min)** |
+| Continuous easy | One 900 s work step with an open target | **15 min**. The workout name retains the easy role. |
+| Continuous long with a duration range | One lap-button work step, time cue 1,800 s with permitted 1,500–2,100 s | Nominal **30 min**, athlete chooses **25–35 min**. The JSON omitted a fixed end value. Neither endpoint is enforced. |
+
+For example, baseline step 2 serialized as `ExecutableStepDTO`, order 2, type `interval`, end condition `time`, value `120.0`, target `no.target`. Its description was `work · 120 s · run-step-rpe-0-10 6 (permitted 5–7), cap 7`. The walking recoveries carried an explicit walk cue. Every step retained its effort target, range and cap in text. No pace or heart-rate bounds were generated. FI computed the duration from expanded steps and excluded the synthetic 180 s preparation. The upstream sample illustrates why this matters: its declared 1,800 s estimate differs from its 1,140 s of expanded steps. [Step builders and serializer][gcmodel] · [Upstream sample][gcsample]
+
+The separate, unsent schedule value was `{"date":"2027-01-06"}` for a fixture starting at 01:00 UTC on January 7, still January 6 in Toronto. The date field carries no time of day, IANA zone or reservation. FI retains those, the canonical revision and occurrence identity, repeat structure and execution constraints. The JSON preserves instructions for manual interpretation. Server acceptance, cue length and visibility, lap behavior, and enforcement or display of effort caps on the 955 still need verification.
+
+### Reuse, permission and rehearsal decision
+
+| Option | Decision |
+| --- | --- |
+| Pinned Python package behind a narrow adapter | Preferred candidate for further **offline** model work. Use the workout extra and lock the resolved versions and hashes. It brings a full transport stack, including native curl bindings, requests and user-agent generation. Permissive model fields can accept ignored or unsupported provider values. Re-run field and arithmetic checks on upgrades. [Package metadata][gcmeta] · [Models][gcmodel] |
+| Select MIT-licensed source | Copying a small serializer is possible with copyright and permission notices retained. FI would own schema drift, tests and fixes. There is no running-specific advantage in the hevy2garmin strength builder. Avoid importing its auth, database, web application or reconciliation logic. Retaining upstream code also requires tracking its original revision and reviewing later fixes. Both projects' MIT grants cover software reuse. [Python license][gclicense] · [hevy2garmin license][h2license] |
+| Manual Connect and Google Calendar | Use the worksheet for structured entry and Garmin calendar placement, sync and check the watch. Use Google Calendar separately for the time reservation. This is the recommended delivery path today. [Garmin calendar][calendar] · [955 calendar][watch] |
+| Official Training API | Preferred future automated route if Garmin confirms eligibility and grants FI the required authorizations. Garmin documents workout and plan publication and compatible-device sync. Obtain the approved lifecycle contract before selecting transport or assuming the consumer DTO is compatible. [Training API][gt] · [Starter eligibility][form] |
+
+**Authority and security.** The consumer library uses a separate Garmin Connect SSO session, MFA when required and renewable authentication tokens. Its token store can contain a long-lived refresh token. Restricted file permissions reduce exposure but do not confer a narrowly scoped publishing grant. Its login strategies can continue after anti-automation responses, and the transport can replay a request after certain authentication failures. That behavior conflicts with a single authorized write and stopping on restrictions. FI's official Personal API key obtains a short-lived token for supported personal data access. Keep these trust boundaries separate. [SSO implementation][gcsso] · [Token storage][gctokens] · [Transport][gctransport] · [Personal API FAQ][gp]
+
+Garmin's published US site terms, effective 1 April 2026, restrict access through methods Garmin did not intentionally make available, disguising a message's origin, and allow account suspension. The developer program agreement separately limits licensees to authorized uses and restricts interference with access controls. Neither text supplies FI a grant to drive private Connect web operations using a consumer session. The account holder's permission and a successful upstream call cannot cure that gap. Confirm the terms applicable to the account's region and obtain written Garmin authorization for the exact integration or approved Training access before any automated live rehearsal. [Site conduct and enforcement](https://www.garmin.com/en-US/legal/terms-of-use/#section1) · [Developer agreement][agreement] · [Training API][gt]
+
+**Proposed boundary.** A pure translator could take one owner-bound G1B running export and return a typed preview, the intended local date, and explicit manual cues or blockers. A separately authorized delivery component would take the reviewed revision, account, operation and target IDs. Treat definition creation/readback, dated placement, edit, move, watch verification, unschedule and definition removal as distinct outcomes. If the device cannot show a required duration choice or effort cap, classify that prescription as blocked for watch-only use. Missing IDs, conflicting edits, partial listings and ambiguous responses stop further writes. A timeout does not authorize a second create or a destructive replacement.
+
+**Before a live rehearsal**, establish the permitted interface and its test environment, approved permissions, account, local date/zone, compatible watch and firmware. Obtain independent scope review and athlete authorization for the synthetic object and each proposed mutation. Baseline the library and dates, retain genuine definition and occurrence IDs, verify the 17-minute sequence in Connect and on the watch, then check both IDs, both dates and the 18-minute revision after any authorized change. Verify cleanup separately in the calendar, library and on the synced device. If authorization or lifecycle evidence remains unavailable, keep delivery manual. This investigation used public sources and offline synthetic data only.
+
 ## Hevy publishing surfaces
 
 ### What MCP can save and what FI can verify
@@ -184,3 +237,30 @@ For an approved weekly revision, compare each future occurrence with the last de
 [model]: ../backend/src/fitness_intelligence/db/plan_models.py
 [commands]: ../backend/src/fitness_intelligence/db/plan_commands.py
 [design]: training-plan-design.md
+
+[gcmodel]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/garminconnect/workout.py
+[gcsample]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/test_data/sample_running_workout.py
+[gcops]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/garminconnect/api/workouts.py
+[gcdev]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/garminconnect/api/devices.py
+[gctable]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/docs/API_ENDPOINTS.md
+[gctests]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/tests/test_garmin_unit.py
+[gcmeta]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/pyproject.toml
+[gclicense]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/LICENSE
+[gcsso]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/garminconnect/client/sso.py
+[gctokens]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/garminconnect/client/tokens.py
+[gctransport]: https://github.com/cyberjunky/python-garminconnect/blob/82bc11073b597d20f8b080b7aeaac8d4cef4fc3e/garminconnect/client/transport.py
+[h2routine]: https://github.com/drkostas/hevy2garmin/blob/b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21/src/hevy2garmin/routine.py
+[h2ops]: https://github.com/drkostas/hevy2garmin/blob/b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21/src/hevy2garmin/garmin.py
+[h2sync]: https://github.com/drkostas/hevy2garmin/blob/b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21/web/lib/garmin-routine-sync.ts
+[h2builder]: https://github.com/drkostas/hevy2garmin/blob/b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21/web/lib/garmin-workout.ts
+[h2lib]: https://github.com/drkostas/hevy2garmin/blob/b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21/web/lib/garmin-workout-library.ts
+[h2license]: https://github.com/drkostas/hevy2garmin/blob/b44bdc7c3a34a40fac77c5ec5dd18209f02f6d21/LICENSE
+[gcrelease]: https://pypi.org/project/garminconnect/0.3.20/
+[h2release]: https://pypi.org/project/hevy2garmin/0.12.0/
+[gcupload]: https://github.com/cyberjunky/python-garminconnect/issues/185
+[gcrepeat]: https://github.com/cyberjunky/python-garminconnect/pull/452
+[gcupdate]: https://github.com/cyberjunky/python-garminconnect/pull/381
+[gcpush]: https://github.com/cyberjunky/python-garminconnect/pull/388
+[h2pr]: https://github.com/drkostas/hevy2garmin/pull/236
+[h2schedule]: https://github.com/drkostas/hevy2garmin/pull/254
+[h2issue]: https://github.com/drkostas/hevy2garmin/issues/729
