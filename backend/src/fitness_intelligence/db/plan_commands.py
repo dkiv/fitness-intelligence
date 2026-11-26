@@ -15,6 +15,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.planning import familiar as f
+from fitness_intelligence.planning import familiar_outcomes as fo
 from fitness_intelligence.planning import rationale
 from fitness_intelligence.planning.familiar_calendar import validate_retained
 from fitness_intelligence.planning.outcomes import Actual, WeeklyOutcomes
@@ -291,8 +292,8 @@ class PlanCommands:
         plan_id: UUID,
         revision_id: UUID,
         week: int,
-        slot: Slot,
-        actual: Actual,
+        slot: Slot | UUID,
+        actual: Actual | fo.Execution,
         *,
         occurred_at: datetime,
         command_id: UUID,
@@ -301,8 +302,18 @@ class PlanCommands:
     ) -> UUID:
         self._lock_owner()
         plan = self._plan(plan_id, lock=True)
-        if plan.block.get("schema_version") != 1:
-            raise ValueError("generalized execution attribution is unsupported")
+        if plan.block["schema_version"] == 2:
+            if not isinstance(slot, UUID) or not isinstance(
+                actual, (fo.StrengthExecution, fo.RunExecution)
+            ):
+                raise ValueError(
+                    "unsupported generalized execution: supply occurrence UUID and typed actual"
+                )
+            if workout_id is not None:
+                raise ValueError("generalized imported workout links are deferred")
+        else:
+            slot = Slot(slot)
+            actual = Actual.model_validate(actual)
         return execution.record(
             self._db,
             self._owner,
@@ -318,12 +329,21 @@ class PlanCommands:
             workout_id,
         )
 
-    def weekly_review(self, plan_id: UUID, week: int) -> WeeklyOutcomes:
+    def weekly_review(
+        self, plan_id: UUID, week: int, *, as_of: datetime | None = None
+    ) -> WeeklyOutcomes | fo.WeekExecution:
         """Current observations across revisions, against the approved logical week."""
+        if self._plan(plan_id, lock=False).block["schema_version"] == 2:
+            now = self._now()
+            if as_of is not None and (as_of.utcoffset() is None or as_of > now):
+                raise ValueError("review cutoff must be aware and no later than now")
+            return execution.familiar_week_outcomes(
+                self._db, self._owner, plan_id, week, (as_of or now).astimezone(UTC)
+            )
+        if as_of is not None:
+            raise ValueError("historical manual outcome cutoff requires a generalized cycle")
         self._lock_owner()
         plan = self._plan(plan_id, lock=True)
-        if plan.block.get("schema_version") != 1:
-            raise ValueError("generalized execution review is unsupported")
         current = self._base(plan_id, plan.head_id)
         if current and current.inputs.number != week:
             current = current.inputs.previous

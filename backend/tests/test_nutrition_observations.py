@@ -93,13 +93,14 @@ def test_account_fk_and_populated_downgrade_guard(db: Session, factory) -> None:
     db.add(good)
     db.commit()
     ident = good.id
+    before = db.scalar(text("SELECT version_num FROM alembic_version"))
     db.rollback()  # Release the read transaction before the external Alembic connection locks.
     config = Config(str(Path(__file__).parents[1] / "alembic.ini"))
     with pytest.raises(RuntimeError, match="preserve intake and body weight"):
         command.downgrade(config, "b302")
     db.expire_all()
     assert db.get(type(good), ident) is not None
-    assert db.scalar(text("SELECT version_num FROM alembic_version")) == "b330"
+    assert db.scalar(text("SELECT version_num FROM alembic_version")) == before
     db.delete(good)
     db.commit()
     command.downgrade(config, "b302")
