@@ -35,6 +35,14 @@ print(garmin_worksheet(running).render())
 
 The immutable source includes the fixture owner, cycle, block and week revision, rule, occurrence, UTC instant, local date/time with offset, IANA zone and typed prescription. The prescription SHA-256 covers the canonical prescription JSON. Identical content in two slots can share this digest. Use the owner, cycle, revision and occurrence to identify the scheduled prescription. The full export digest (`handoff.digest()`) covers the canonical UTF-8 JSON including identity, approval state, translation policy, instructions, warnings and mapped IDs. Re-exporting the same inputs yields the same bytes. A new receipt changes the export digest while preserving the prescription digest. For pre-correction v1 fixtures the handoff also flags the older effort-validation rule.
 
+## Hevy integration decision
+
+Fitness Intelligence owns the canonical prescription, its revision history and its progression constraints. A Hevy routine is a delivery copy. An athlete saving or editing it supplies no evidence of workout completion or authority to advance a load.
+
+The backend uses its existing deterministic Hevy REST importer for reproducible historical acquisition and analytics. [Hevy importer](hevy-importer.md)
+
+Hevy MCP is the preferred interactive integration for the conversational coaching agent. Use its connected tools for exercise discovery, routine preview, athlete-initiated save, separately authorized updates by routine ID, and delivery reconciliation. If a required capability is unavailable, document the limit and stop that operation. A custom REST publishing adapter is deferred unless a demonstrated MCP limitation warrants a separate design decision.
+
 ## How the coach can use the Hevy manifest
 
 1. Use FI’s own export or compare the received manifest with its independently retained export digest. Read the classification, blockers and limitations. A blocked manifest has `preview_arguments=null`. Supply independently verified destination-template mappings for the exact movement, variation, equipment and weight-entry convention. Missing, conflicting or reused IDs block the whole routine. Name similarity supplies no mapping.
@@ -56,7 +64,13 @@ In a single authorized Codex rehearsal, account preferences and template search 
 
 For this handoff, retain the G1B translation. Compare both the set table and the notes when fixed and ranged sets share an exercise. After athlete confirmation, identify a unique saved object by content and provider ID, verify structured fields and ask the athlete to check routine notes in the app. Stop on ambiguity before another submission.
 
-Update and cleanup were outside the initial save authorization. The connected update tool takes a routine ID and a routine body. A future update needs separate consent, the original routine notes, and a visual check of those notes after readback. The connected toolset exposed no routine deletion. For separately authorized manual cleanup, the athlete can delete the verified test routine in Hevy and FI can then check that its ID is absent from the routine list.
+## G1C.1B · Controlled update and cleanup
+
+Before the write, the agent rechecked the destination account and paginated the routine list. The saved ID, original timestamp, exercise markers, template order and comparable prescription fields matched the previously verified object. Under separate athlete authorization, the agent submitted one `update_hevy_routine` call for that ID. It built the routine body from the original validated manifest, including both levels of notes, changing the squat working-set load from 30 to 32.5 kg. For fixed-rep sets the update schema accepts an omitted optional range.
+
+An independent, paginated `get_user_routines` readback returned the same routine ID. A comparison of every returned field found changes only to the intended weight and Hevy's update timestamp. The six-rep target, all other sets, template mappings, exercise notes and timers matched. The complete set of routine IDs was identical before and after the update. The update response and routine list both omitted routine-level notes. In the athlete’s post-update view, the notes still displayed the fixture status, scheduled time and zone, 60-second preparation, 405-second reservation, test marker and inspection-only instruction. The squat working row showed 71.65 lb × 6, consistent with the 32.5 kg readback.
+
+The athlete manually deleted the test routine in Hevy after checking the notes. The connected MCP tools exposed no routine deletion. After the athlete confirmed deletion, the agent rechecked the destination account and read every page of its routine list. The previously verified provider ID was absent. No listed routine had the exact test title or the rehearsal marker in its exercise notes. [Hevy manual cleanup](https://help.hevyapp.com/hc/en-us/articles/38030200802583-How-to-Delete-Comments-Sets-Workouts-Routines-Your-Hevy-Account)
 
 ## Entering the Garmin worksheet
 
