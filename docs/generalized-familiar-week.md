@@ -28,7 +28,7 @@ A context ranks outcomes, declares an IANA zone, equipped weekday windows, optio
 
 An optional observed RPE describes the effort actually reported for that set or step. It cannot establish the familiar target or stop cap. A reported effort above the cap blocks a repeat for that task under this rule. Manageability supplies tolerance feedback. If either the numeric instruction or its cap lacks support, the planner identifies the affected set or step and rejects the numeric proposal. Qualitative-only effort prescriptions remain deferred.
 
-A block pins its key, start, phase per week, protected outcome protocols, exposure floors, optional elapsed start-to-start spacing and exact baseline templates. Count working sets and elapsed running seconds at the minimum permitted endpoints when testing floors. Strength targets include discrete load convention/increment, per-set maximum execution-time allowance, rest after each ordinal, preparation and transition allowances. Running reservations sum the maximum expanded step durations and preparation. Session and exercise notes remain on the canonical prescription. The program records protected opportunities. Outcome-direction measurement belongs to E4.2 and later review.
+A block pins its key, start, phase per week, protected outcome protocols, exposure floors, optional elapsed start-to-start spacing and exact baseline templates. Count working sets and elapsed running seconds at the minimum permitted endpoints when testing floors. Strength targets include discrete load convention/increment, per-set maximum execution-time allowance, rest after each ordinal, preparation and transition allowances. Running reservations sum the maximum expanded step durations and preparation. Session and exercise notes remain on the canonical prescription. The program records protected opportunities. E4.2A reports completed work and deviations. Comparable outcome direction remains deferred.
 
 Placement considers a five-minute local grid plus exact fixed starts. It resolves windows to UTC, places higher-ranked disciplines first, tries preferred and habitual weekdays, checks fixed events, equipment, restrictions, overlaps and declared elapsed spacing, and backtracks when necessary. It checks approved previous weeks and fixed future occurrences. Gaps in the spring clock change and ambiguous unqualified starts are ineligible. A fixed start in a repeated hour can supply its fold. Ambiguous window boundaries require an unambiguous replacement window. The default search stops after 20,000 examined placement options. A feasible result carries exact starts. A `PlacementFailure` reports the domain, examined count, limit, reasons and whether search was incomplete. A proved contradiction or exhausted finite domain can establish infeasibility within those constraints.
 
@@ -68,7 +68,7 @@ with session.begin():
 
 Each eligible next week requires its own sealed proposal and simulated receipt, even if the targets repeat exactly. Generate contiguous weeks through the block’s final week. The command rejects started local weeks, holes, replacements and successor blocks. Historical `preview` reads the original payload and receipt. `replay_familiar` regenerates against the original context and approved base. The latest candidate stores references to earlier originating week revisions, plus the new week detail. Session occurrence UUIDs derive from cycle, block, week and stable template key. Load an earlier reference with `preview(cycle, ref.revision)` to recover its exact originating prescription.
 
-The v2 discriminator uses the existing immutable JSONB context/block/revision columns. Approval rechecks current head/context, retained future conditions, date and exact replay under the existing owner-then-cycle locks. The original receipt, decline and rollback semantics apply. V1 decoding, E1 rules, E2 approval and E3 attribution stay on their original path. The schema needs no migration. Generalized requests on other principals are rejected. A request cannot select operational mode. Approval on the reserved synthetic principal simulates approval only. Explicitly adding reviewed operational rule authorization is future work.
+The v2 discriminator uses the existing immutable JSONB context/block/revision columns. Approval rechecks current head/context, retained future conditions, date and exact replay under the existing owner-then-cycle locks. The original receipt, decline and rollback semantics apply. V1 decoding, E1 rules, E2 approval and E3 attribution stay on their original path. E4.1 required no migration. E4.2A adds versioned manual execution through migration `e421`. Generalized requests on other principals are rejected. A request cannot select operational mode. Approval on the reserved synthetic principal simulates approval only. Explicitly adding reviewed operational rule authorization is future work. [Execution and correction guide](generalized-execution.md)
 
 **Rule and replay compatibility.** New proposals pin `synthetic.familiar.hold.v2`. A sealed proposal under `synthetic.familiar.hold.v1` can reproduce its original dose-only result. Its pending approval requires a fresh proposal with the corrected rule and supported effort. An already approved block with missing effort support keeps its sealed baseline. Continuing with newly confirmed instructions requires a new synthetic cycle because E4.1 has no block-revision command. An exact retry of an existing receipt returns its original result. The schema and the separate E1/E2/E3 fixture path are unchanged.
 
@@ -80,41 +80,41 @@ Later slices must restrict executable detail to the upcoming review window, keep
 
 ## Archived conformance cases
 
-The columns use the original case numbers from [M01](research/curation/j3b-001-strength-progression-methodology.md), [M02](research/curation/j3b-002-hybrid-block-methodology.md), [M03](research/curation/j3b-003-running-methodology.md) and [J3I](research/curation/j3i-001-integrated-hybrid-methodology.md). **I** identifies an implemented behavior. **D** marks a deferred case, including partial coverage where specified. **X** marks a disabled operator or authorization. Of the 94 archived cases, 15 have an implemented behavior, 49 remain deferred or partial, and 30 involve disabled operators. Rejection of an unsupported command does not exercise a later operator’s eligibility test.
+The columns use the original case numbers from [M01](research/curation/j3b-001-strength-progression-methodology.md), [M02](research/curation/j3b-002-hybrid-block-methodology.md), [M03](research/curation/j3b-003-running-methodology.md) and [J3I](research/curation/j3i-001-integrated-hybrid-methodology.md). **I** identifies an implemented behavior. **P** marks a partially implemented case. **D** marks a deferred case. **X** marks a disabled operator or authorization. With E4.2A, the 94 archived cases have 17 implemented, 24 partial, 23 deferred and 30 disabled dispositions. Rejection of an unsupported command does not exercise a later operator’s eligibility test.
 
 | Number | M01 T | M02 B-T | M03 T | J3I I |
 | --- | --- | --- | --- | --- |
-| 01 | I · familiar hold with confirmed group/ordinal effort and cap | I · balanced familiar week | I · familiar hold with confirmed effort and cap on each expanded step | D · balanced hold works, comparable outcome review deferred |
-| 02 | D · top/backoff response | I · strength emphasis with protected running | I · reject stale or absent running history | X · upper rep increase |
-| 03 | D · partial set execution | D · outcome comparability | D · run/walk ledger | X · increase controlled work |
-| 04 | D · missed attribution | D · decline in protected performance | X · weekly duration increase | X · upper plus easy increase |
-| 05 | D · inference rejected, batch confirmation deferred | X · set trial | X · long extension | X · optional joint exception |
+| 01 | I · familiar hold with confirmed group/ordinal effort and cap | I · balanced familiar week | I · familiar hold with confirmed effort and cap on each expanded step | P · balanced hold works, comparable outcome review deferred |
+| 02 | P · top/backoff deviations scoped by ordinal, response deferred | I · strength emphasis with protected running | I · reject stale or absent running history | X · upper rep increase |
+| 03 | P · partial sets and actual reps reported, fallback programming deferred | D · outcome comparability | D · run/walk ledger | X · increase controlled work |
+| 04 | P · explicit misses distinguished from unknown, rescheduling deferred | D · decline in protected performance | X · weekly duration increase | X · upper plus easy increase |
+| 05 | P · inference rejected, batch confirmation deferred | X · set trial | X · long extension | X · optional joint exception |
 | 06 | I · require matching equipment and load convention | X · load progression | D · distance novelty review | X · combined quality and lower increase |
-| 07 | D · recent baseline enforced, restoration deferred | X · cumulative load change | X · work rep or duration change | X · aggregate set trial |
-| 08 | X · low-count set trial | X · joint increase | D · exact recoveries implemented, additional rep operator disabled | D · adverse squat review |
-| 09 | X · simultaneous set/load increase | I · reserved time grants no extra work | D · actual step sequence required, imported summary attribution deferred | X · Q0 entry |
-| 10 | D · imported running summary | D · fixed versus movable placement works, post-approval moves deferred | X · quality-duration progression | D · imported instructions versus confirmed interval actuals |
-| 11 | D · restriction stales preview, source correction deferred | I · adjacent elapsed spacing | X · easy-duration progression | D · scoped batch confirmation |
-| 12 | X · RPE-free progression | D · inferred history rejected, descriptive imports deferred | D · HR/conditions | D · re-entry after travel |
-| 13 | D · decline and conflict supported, moves deferred | D · closure conflict supported, execution deferred | D · pace comparability | I · restriction invalidates proposal and blocks affected work |
-| 14 | D · frozen replay supported, withdrawal deferred | D · interrupted baseline | D · partial/tolerance review | D · outcome direction |
+| 07 | P · recent baseline enforced, restoration deferred | X · cumulative load change | X · work rep or duration change | X · aggregate set trial |
+| 08 | X · low-count set trial | X · joint increase | P · exact recoveries implemented, additional rep operator disabled | D · adverse squat review |
+| 09 | X · simultaneous set/load increase | I · reserved time grants no extra work | P · actual step sequence required, imported summary attribution deferred | X · Q0 entry |
+| 10 | D · imported running summary | P · fixed versus movable placement works, post-approval moves deferred | X · quality-duration progression | P · explicit interval actuals separate from instructions, imports deferred |
+| 11 | P · restriction stales preview, source correction deferred | I · adjacent elapsed spacing | X · easy-duration progression | D · scoped batch confirmation |
+| 12 | X · RPE-free progression | P · inferred history rejected, descriptive imports deferred | D · HR/conditions | D · re-entry after travel |
+| 13 | P · decline and conflict supported, moves deferred | P · closure conflict and immutable execution supported, block revision deferred | D · pace comparability | I · restriction invalidates proposal and blocks affected work |
+| 14 | P · frozen replay supported, withdrawal deferred | D · interrupted baseline | P · manual partial work and tolerance visible, adaptive review deferred | P · adherence/exposure visible, comparable outcome direction deferred |
 | 15 | X · stall-driven set trial | I · reject stale context/restricted session | D · subsequent lower-body tolerance | I · finite exhaustion versus incomplete search |
-| 16 | D · explicit exclusions enforced, symptom intake deferred | D · successor block | X · joint load/quality rise | D · goal revision and successor |
+| 16 | P · explicit exclusions enforced, symptom intake deferred | D · successor block | X · joint load/quality rise | D · goal revision and successor |
 | 17 | — | D · context change stales approval, block amendment deferred | X · optional lower/easy rise | D · source correction |
 | 18 | — | D · late source changes | X · frequency redistribution | D · operational evidence withdrawal |
 | 19 | — | D · preference tradeoff alternatives | X · first quality entry | I · legacy E1/E2/E3 regression |
-| 20 | — | D · decline works, withdrawal deferred | X · uncertain Q0 entry | X · discrete load rise |
-| 21 | — | D · outcome denominators | D · protected performance review | X · adaptive review budgets |
-| 22 | — | D · block revision | D · adherence versus outcome report | X · run/walk fraction change |
-| 23 | — | — | I · new restriction blocks approval | D · final/between arithmetic implemented, increasing rep count disabled |
-| 24 | — | — | D · correction/deletion of provider support | D · scoped effort repeat checked, local versus shared difficulty review deferred |
+| 20 | — | P · decline works, withdrawal deferred | X · uncertain Q0 entry | X · discrete load rise |
+| 21 | — | I · elapsed coverage and known completion denominators | P · actual deviations available, comparable protected outcome review deferred | X · adaptive review budgets |
+| 22 | — | D · block revision | I · adherence reported, comparable outcome remains unknown | X · run/walk fraction change |
+| 23 | — | — | I · new restriction blocks approval | P · final/between arithmetic implemented, increasing rep count disabled |
+| 24 | — | — | D · correction/deletion of provider support | P · scoped effort repeat checked, local versus shared difficulty review deferred |
 | 25 | — | — | D · interruption/resumption | X · frequency redistribution |
-| 26 | — | — | I · fixed start versus protected floor/window conflict | D · partial actual versus predecessor |
+| 26 | — | — | I · fixed start versus protected floor/window conflict | P · partial actual kept separate from approved target, adaptive review deferred |
 | 27 | — | — | D · alternative proposals across competing goals | — |
 | 28 | — | — | X · cumulative progression | — |
-| 29 | — | — | D · upper duration/time checked, adaptive weekly ceiling deferred | — |
+| 29 | — | — | P · upper duration/time checked, adaptive weekly ceiling deferred | — |
 | 30 | — | — | I · existing fixture replay | — |
 
-E4.2 needs generalized in-force execution attribution, scoped batch confirmation and correction, support withdrawal, source-aware as-of projection, and writer coordination with D1 sport views. Until then both generalized execution commands reject. Adaptation, rule authorization, successor-block transitions and provider delivery each have a separate decision boundary. [Focused integration cases](../backend/tests/test_familiar.py)
+E4.2A implements generalized in-force attribution, append-only manual corrections and descriptive weekly review. E4.2B owns scoped imported-observation confirmation and correction. E4.2C owns D1 projection, decision-time inputs and writer coordination. [Execution guide](generalized-execution.md) · [Planning regressions](../backend/tests/test_familiar.py)
 
 For local Hevy manifests and manual Garmin worksheets derived from sealed occurrences, see [G1B workout handoff](workout-handoff.md).

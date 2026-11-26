@@ -2,16 +2,21 @@
 
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
+from pydantic import TypeAdapter
 from sqlalchemy import Select, func, or_, select
 from sqlalchemy.orm import Session, aliased
 
+from fitness_intelligence.planning import familiar as f
+from fitness_intelligence.planning import familiar_outcomes as fo
 from fitness_intelligence.planning.outcomes import Actual, SlotOutcome, WeeklyOutcomes
 from fitness_intelligence.planning.planner import Slot, WeekPlan
 
+from . import familiar_snapshot as v2
 from .models import ExternalReference, Workout
-from .plan_models import PlanRevision, SessionOutcome
-from .plan_snapshot import CANDIDATE, calendar, read
+from .plan_models import AthleteContext, PlanRevision, SessionOutcome
+from .plan_snapshot import CANDIDATE, calendar, canonical, read
 
 
 class OutcomeConflict(ValueError):
@@ -47,7 +52,7 @@ def _workout(db: Session, owner: UUID, workout_id: UUID, occurred: datetime) -> 
     )
 
 
-def record(
+def _legacy_attribution(
     db: Session,
     owner: UUID,
     plan: UUID,
@@ -56,37 +61,7 @@ def record(
     slot: Slot,
     actual: Actual,
     occurred: datetime,
-    now: datetime,
-    command: UUID,
-    supersedes: UUID | None,
-    workout: UUID | None,
-) -> UUID:
-    if occurred.utcoffset() is None or occurred > now:
-        raise ValueError("observation requires an elapsed aware instant")
-    actual = Actual.model_validate(actual)
-    payload = actual.model_dump(mode="json")
-    existing = db.scalar(
-        select(SessionOutcome).where(
-            SessionOutcome.user_id == owner, SessionOutcome.command_id == command
-        )
-    )
-    if existing:
-        if (
-            existing.plan_id,
-            existing.revision_id,
-            existing.week,
-            existing.slot,
-            existing.actual,
-            existing.occurred_at,
-            existing.supersedes_id,
-            existing.workout_id,
-        ) != (plan, revision, week, slot, payload, occurred, supersedes, workout):
-            raise OutcomeConflict("outcome command already used for different intent")
-        return existing.id
-
-    effective = db.scalar(select(func.e3_effective_revision(owner, plan, occurred)))
-    if effective != revision:
-        raise OutcomeConflict("prescription was not in force at the observation instant")
+) -> None:
     raw = db.scalars(
         select(PlanRevision.snapshot).where(
             PlanRevision.user_id == owner, PlanRevision.plan_id == plan, PlanRevision.id == revision
@@ -105,9 +80,134 @@ def record(
     ):
         raise ValueError("use the scheduled instant for an unperformed slot")
     actual.validate_slot(session)
+
+
+def _familiar_week(
+    db: Session, owner: UUID, plan: UUID, head: UUID, number: int
+) -> tuple[UUID, f.Candidate, ZoneInfo]:
+    """Resolve the originating revision from the effective head's sealed, flat calendar."""
+
+    def revision(key: UUID) -> PlanRevision:
+        return db.scalars(
+            select(PlanRevision).where(
+                PlanRevision.user_id == owner, PlanRevision.plan_id == plan, PlanRevision.id == key
+            )
+        ).one()
+
+    row = revision(head)
+    effective = v2.read(f.Candidate, row.snapshot)
+    if not isinstance(effective.request, f.FamiliarWeek):
+        raise OutcomeConflict("week has no approved prescription in the effective calendar")
+    candidate = effective
+    if effective.request.number != number:
+        ref = next((r for r in effective.prior_weeks if r.number == number), None)
+        if ref is None:
+            raise OutcomeConflict("week has no approved prescription in the effective calendar")
+        row = revision(ref.revision)
+        candidate = v2.read(f.Candidate, row.snapshot)
+    if (
+        candidate.cycle != plan
+        or candidate.block_revision != effective.block_revision
+        or candidate.block_revision is None
+        or candidate.block_key != effective.block_key
+        or not isinstance(candidate.request, f.FamiliarWeek)
+        or candidate.request.number != number
+    ):
+        raise OutcomeConflict("invalid originating prescription reference")
+    raw = db.scalars(
+        select(AthleteContext.snapshot).where(
+            AthleteContext.user_id == owner, AthleteContext.id == row.context_id
+        )
+    ).one()
+    return row.id, candidate, ZoneInfo(v2.read(f.Context, raw).zone)
+
+
+def _familiar_attribution(
+    db: Session,
+    owner: UUID,
+    plan: UUID,
+    effective: UUID,
+    origin: UUID,
+    week: int,
+    occurrence: UUID,
+    actual: fo.Execution,
+    occurred: datetime,
+) -> None:
+    resolved, candidate, zone = _familiar_week(db, owner, plan, effective, week)
+    if resolved != origin:
+        raise OutcomeConflict("originating week revision differs from the effective calendar")
+    session = next(
+        (s for d in candidate.days for s in d.sessions if s.occurrence == occurrence), None
+    )
+    if session is None:
+        raise OutcomeConflict("unknown logical occurrence in originating week")
+    if not candidate.days[0].day <= occurred.astimezone(zone).date() <= candidate.days[-1].day:
+        raise ValueError("execution must be attributed within its planning week")
+    if not actual.performed and occurred != session.start_utc:
+        raise ValueError("use the scheduled instant for an unperformed occurrence")
+    actual.differences(session)  # Validate identity while accepting performed work outside targets.
+
+
+def record(
+    db: Session,
+    owner: UUID,
+    plan: UUID,
+    revision: UUID,
+    week: int,
+    slot: Slot | UUID,
+    actual: Actual | fo.Execution,
+    occurred: datetime,
+    now: datetime,
+    command: UUID,
+    supersedes: UUID | None,
+    workout: UUID | None,
+) -> UUID:
+    if occurred.utcoffset() is None:
+        raise ValueError("observation requires an elapsed aware instant")
+    occurred = occurred.astimezone(UTC)
+    if occurred > now:
+        raise ValueError("observation requires an elapsed aware instant")
+    if type(week) is not int or week < 1:
+        raise ValueError("expected a positive week number")
+    actual = type(actual).model_validate(actual)
+    generalized = isinstance(slot, UUID)
+    slot_key = str(slot)
+    payload = actual.model_dump(mode="json")
+    existing = db.scalar(
+        select(SessionOutcome).where(
+            SessionOutcome.user_id == owner, SessionOutcome.command_id == command
+        )
+    )
+    if existing:
+        if (
+            existing.plan_id,
+            existing.origin_revision_id if generalized else existing.revision_id,
+            existing.week,
+            existing.slot,
+            existing.actual,
+            existing.occurred_at,
+            existing.supersedes_id,
+            existing.workout_id,
+        ) != (plan, revision, week, slot_key, payload, occurred, supersedes, workout):
+            raise OutcomeConflict("outcome command already used for different intent")
+        return existing.id
+
+    effective = db.scalar(select(func.e3_effective_revision(owner, plan, occurred)))
+    if effective is None:
+        raise OutcomeConflict("prescription was not in force at the observation instant")
+    if isinstance(slot, UUID) and isinstance(actual, (fo.StrengthExecution, fo.RunExecution)):
+        _familiar_attribution(db, owner, plan, effective, revision, week, slot, actual, occurred)
+    elif isinstance(slot, Slot) and isinstance(actual, Actual):
+        if effective != revision:
+            raise OutcomeConflict("prescription was not in force at the observation instant")
+        _legacy_attribution(db, owner, plan, revision, week, slot, actual, occurred)
+    else:
+        raise ValueError("execution family differs from slot type")
     current = db.scalar(
         _latest(owner).where(
-            SessionOutcome.plan_id == plan, SessionOutcome.week == week, SessionOutcome.slot == slot
+            SessionOutcome.plan_id == plan,
+            SessionOutcome.week == week,
+            SessionOutcome.slot == slot_key,
         )
     )
     if (current.id if current else None) != supersedes:
@@ -133,9 +233,11 @@ def record(
     row = SessionOutcome(
         user_id=owner,
         plan_id=plan,
-        revision_id=revision,
+        revision_id=effective,
+        outcome_version=2 if generalized else 1,
+        origin_revision_id=revision if generalized else None,
         week=week,
-        slot=slot,
+        slot=slot_key,
         occurred_at=occurred,
         recorded_at=now,
         command_id=command,
@@ -194,3 +296,64 @@ def week_outcomes(
             )
         )
     return WeeklyOutcomes(as_of=as_of, slots=tuple(slots))
+
+
+def familiar_week_outcomes(
+    db: Session, owner: UUID, plan: UUID, week: int, as_of: datetime
+) -> fo.WeekExecution:
+    head = db.scalar(select(func.e3_effective_revision(owner, plan, as_of)))
+    if head is None or type(week) is not int or week < 1:
+        raise OutcomeConflict("week has no approved prescription at review time")
+    origin, candidate, _ = _familiar_week(db, owner, plan, head, week)
+    rows = db.scalars(
+        select(SessionOutcome).where(
+            SessionOutcome.user_id == owner,
+            SessionOutcome.plan_id == plan,
+            SessionOutcome.outcome_version == 2,
+            SessionOutcome.origin_revision_id == origin,
+            SessionOutcome.week == week,
+            SessionOutcome.recorded_at <= as_of,
+        )
+    )
+    # Follow explicit successors. Recording instants can tie during a rehearsal.
+    chains: dict[str, dict[UUID | None, fo.Assertion]] = {}
+    adapter = TypeAdapter(fo.Execution)
+    for row in rows:
+        assertion = fo.Assertion(
+            id=row.id,
+            command_id=row.command_id,
+            supersedes_id=row.supersedes_id,
+            occurred_at=row.occurred_at.astimezone(UTC),
+            recorded_at=row.recorded_at.astimezone(UTC),
+            effective_head=row.revision_id,
+            actual=adapter.validate_json(canonical(row.actual)),
+        )
+        chains.setdefault(row.slot, {})[row.supersedes_id] = assertion
+    sessions = []
+    for day in candidate.days:
+        for session in day.sessions:
+            chain = chains.get(str(session.occurrence), {})
+            history = []
+            assertion = chain.get(None)
+            while assertion is not None:
+                history.append(assertion)
+                assertion = chain.get(assertion.id)
+            sessions.append(
+                fo.OccurrenceReview(
+                    prescribed=session,
+                    elapsed=bool(history) or session.start_utc <= as_of,
+                    history=tuple(history),
+                )
+            )
+    assert candidate.block_revision is not None
+    return fo.WeekExecution(
+        owner=owner,
+        cycle=plan,
+        block_key=candidate.block_key,
+        block_revision=candidate.block_revision,
+        week=week,
+        origin_revision=origin,
+        calendar_head=head,
+        as_of=as_of,
+        sessions=tuple(sessions),
+    )
