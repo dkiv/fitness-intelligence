@@ -4,6 +4,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
+from typing import Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -158,6 +159,37 @@ def analyze_strength(
     top_only: bool = True,
 ) -> StrengthReport:
     """Analyze unique canonical set rows. Effort and top selection affect progression only."""
+    sets, workouts = _normalized_sets(rows, period, series, infer_completion, rpe_range)
+    return StrengthReport(
+        _weekly_activity(sets, workouts, period),
+        _weekly_volume(sets),
+        _progression(sets, top_only),
+    )
+
+
+def ranked_estimates(
+    facts: Iterable[StrengthFact],
+    period: Period,
+    *,
+    execution: Literal["confirmed", "inferred"],
+    rpe_range: tuple[Decimal, Decimal] | None = None,
+) -> pl.DataFrame:
+    """All eligible sets of one tier in the original unrounded workout/series ranking."""
+    selected = [f for f in facts if f.execution == execution]
+    series = {f.row.exercise_id: f.series for f in selected if f.series is not None}
+    sets, _ = _normalized_sets(
+        (f.row for f in selected), period, series, execution == "inferred", rpe_range
+    )
+    return _progression(sets, top_only=False)
+
+
+def _normalized_sets(
+    rows: Iterable[Observation],
+    period: Period,
+    series: Mapping[UUID, ExerciseSeries] | None,
+    infer_completion: bool,
+    rpe_range: tuple[Decimal, Decimal] | None,
+) -> tuple[pl.DataFrame, dict[UUID, date]]:
     if rpe_range is not None and not (
         all(v.is_finite() for v in rpe_range) and 0 <= rpe_range[0] <= rpe_range[1] <= 10
     ):
@@ -229,12 +261,7 @@ def analyze_strength(
                     weight * (30 + reps) if estimate else None,
                 )
             )
-    sets = pl.DataFrame(records, schema=SET_SCHEMA, orient="row")
-    return StrengthReport(
-        _weekly_activity(sets, workouts, period),
-        _weekly_volume(sets),
-        _progression(sets, top_only),
-    )
+    return pl.DataFrame(records, schema=SET_SCHEMA, orient="row"), workouts
 
 
 def _weekly_volume(sets: pl.DataFrame) -> pl.DataFrame:
