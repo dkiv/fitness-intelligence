@@ -13,7 +13,9 @@ from sqlalchemy.orm import Session
 
 from fitness_intelligence.analytics.longitudinal import LongitudinalReport, daily_median
 from fitness_intelligence.analytics.strength import DAY, Period
+from fitness_intelligence.analytics.weekly import aggregate_weeks
 from fitness_intelligence.db import longitudinal
+from fitness_intelligence.db.endurance_models import DailyRecoveryObservation
 from fitness_intelligence.db.history_models import GarminCoverage, GarminIssue
 from fitness_intelligence.db.models import SourceAccount, User
 from fitness_intelligence.db.nutrition_models import BodyWeightObservation, DailyIntakeObservation
@@ -23,6 +25,7 @@ from fitness_intelligence.db.plan_models import (
     SessionOutcome,
     TrainingPlan,
 )
+from fitness_intelligence.domain.endurance import DailyMetric
 from fitness_intelligence.nutrition.intake import IntakeSelection
 from fitness_intelligence.planning.outcomes import Actual
 from fitness_intelligence.planning.planner import Slot
@@ -116,6 +119,27 @@ def coverage(
     )
 
 
+def energy(
+    src: SourceAccount, n: int, metric: DailyMetric, kcal: int, method: str = "wearable_estimate"
+) -> DailyRecoveryObservation:
+    day = START + n * DAY
+    return DailyRecoveryObservation(
+        user_id=src.user_id,
+        source_account_id=src.id,
+        provider=src.provider,
+        local_date=day,
+        metric=metric,
+        value=kcal,
+        method=method,
+        unit="kcal",
+        source_field=f"SyntheticDaily.{metric}",
+        mapping_version="synthetic-v1",
+        retrieved_at=NOW,
+        window_start=datetime.combine(day, time(2), UTC),
+        window_end=datetime.combine(day, time(23), UTC),
+    )
+
+
 def issue(src: SourceAccount, n: int, category: str, reason: str) -> GarminIssue:
     return GarminIssue(
         user_id=src.user_id,
@@ -132,7 +156,11 @@ def issue(src: SourceAccount, n: int, category: str, reason: str) -> GarminIssue
 
 
 def report(
-    db: Session, src: SourceAccount, zones: dict[UUID, ZoneInfo] | None = None
+    db: Session,
+    src: SourceAccount,
+    zones: dict[UUID, ZoneInfo] | None = None,
+    *,
+    expenditure_account_id: UUID | None = None,
 ) -> LongitudinalReport:
     return longitudinal.query_longitudinal(
         db.get_bind(),
@@ -140,6 +168,7 @@ def report(
         period=PERIOD,
         weight_account_id=src.id,
         source_zones=zones,
+        expenditure_account_id=expenditure_account_id,
     )
 
 
@@ -167,6 +196,16 @@ def test_seven_provider_days(db: Session) -> None:
         [
             a,
             b,
+            energy(src, 0, DailyMetric.TOTAL_ENERGY, 2400),
+            energy(src, 0, DailyMetric.ACTIVE_ENERGY, 600),
+            energy(src, 0, DailyMetric.BASAL_ENERGY, 1800),
+            energy(src, 1, DailyMetric.ACTIVE_ENERGY, 400),
+            energy(src, 1, DailyMetric.BASAL_ENERGY, 1700),
+            energy(src, 4, DailyMetric.ACTIVE_ENERGY, 200),
+            energy(src, 5, DailyMetric.TOTAL_ENERGY, 2200),
+            coverage(src, 0, "expenditure", "observed", 3),
+            coverage(src, 1, "expenditure", "observed", 2),
+            coverage(src, 5, "expenditure", "failed", 1),
             intake(src, 1, 0, presence=True),
             intake(src, 2, 0, "UserDailySummaryV2DTO.calories.consumedValue"),
             intake(src, 4, 1800),
@@ -198,8 +237,46 @@ def test_seven_provider_days(db: Session) -> None:
         ]
     )
     db.commit()
-    result = report(db, src, {src.id: ZONE})
-    assert result == report(db, src, {src.id: ZONE})
+    result = report(db, src, {src.id: ZONE}, expenditure_account_id=src.id)
+    assert result == report(db, src, {src.id: ZONE}, expenditure_account_id=src.id)
+    (week,) = aggregate_weeks(result, reference_date=PERIOD.stop).weeks
+    assert week.fully_requested and week.closed
+    assert week.intake.calories.observed_subtotal_kcal == 2100
+    assert week.intake.calories.mean_per_eligible_date_kcal == 700
+    assert week.intake.calories.subtotal_status == "incomplete_subtotal"
+    assert len(week.intake.calories.sample.eligible_dates) == 3
+    assert week.intake.explicit_zero_dates == (START + DAY, START + 6 * DAY)
+    assert week.intake.logging_completeness_counts == (("unknown", 3),)
+    assert week.intake.calories.sample.dates_with_status("conflict") == (
+        START + 4 * DAY,
+        START + 5 * DAY,
+    )
+    assert len(week.intake.calories.sample.supporting) == 4
+    assert dict(week.intake.coverage[0].acquisition_counts)["partial"] == 1
+    assert week.intake.coverage[0].unresolved_dates == (START + 5 * DAY,)
+    assert week.weight.sample.report_calendar_aligned is False
+    assert week.weight.sample.retained_count == 8 and len(week.weight.sample.supporting) == 5
+    assert week.weight.sample.dates_with_status("withheld") == (START + 2 * DAY, START + 4 * DAY)
+    assert [s.median_kg for s in week.weight.series] == [73, Decimal("70.4")]
+    assert week.expenditure is not None
+    total, active, basal = week.expenditure.total, week.expenditure.active, week.expenditure.basal
+    assert (total.observed_subtotal_kcal, total.mean_per_eligible_date_kcal) == (4600, 2300)
+    assert (active.observed_subtotal_kcal, basal.observed_subtotal_kcal) == (1200, 3500)
+    assert total.sample.eligible_dates == (START, START + 5 * DAY)
+    assert active.sample.eligible_dates == (START, START + DAY, START + 4 * DAY)
+    assert basal.sample.eligible_dates == (START, START + DAY)
+    assert active.mean_per_eligible_date_kcal == 400
+    assert result.days[1].expenditure.total.value is None
+    fact = result.days[0].expenditure.facts[0]
+    assert (fact.unit, fact.method, fact.source_field, fact.mapping_version, fact.retrieved_at) == (
+        "kcal",
+        "wearable_estimate",
+        "SyntheticDaily.total_expenditure",
+        "synthetic-v1",
+        NOW,
+    )
+    assert fact.window_start.hour == 2 and fact.window_end.hour == 23
+    assert fact.identity in total.sample.supporting
     assert [d.provider_date for d in result.days] == [START + DAY * i for i in range(7)]
     assert [d.intake.metric.value for d in result.days] == [2100, 0, None, None, None, None, 0]
     assert [d.intake.metric.status for d in result.days] == [
@@ -335,12 +412,16 @@ def test_repeatable_read_during_concurrent_repair(
 ) -> None:
     src = account(db)
     original = intake(src, 0, 1800)
-    db.add_all([original, weight(src, 0, "70000"), coverage(src, 0, "weight", "observed", 1)])
+    energy_row = energy(src, 0, DailyMetric.TOTAL_ENERGY, 2200)
+    db.add_all(
+        [energy_row, original, weight(src, 0, "70000"), coverage(src, 0, "weight", "observed", 1)]
+    )
     db.commit()
     selector = longitudinal.select_daily_intake
 
     def repair(reader: Session, owner: UUID, day: date) -> IntakeSelection:
         if day == START:
+            energy_row.value = 2300
             original.reported_kcal = 1900
             original.retrieved_at = NOW + DAY
             db.add(issue(src, 0, "weight", "ambiguous_correction"))
@@ -349,8 +430,9 @@ def test_repeatable_read_during_concurrent_repair(
 
     with monkeypatch.context() as patch:
         patch.setattr(longitudinal, "select_daily_intake", repair)
-        before = report(db, src).days[0]
-    after = report(db, src).days[0]
+        before = report(db, src, expenditure_account_id=src.id).days[0]
+    after = report(db, src, expenditure_account_id=src.id).days[0]
+    assert (before.expenditure.total.value, after.expenditure.total.value) == (2200, 2300)
     assert before.intake.metric.value == before.intake.facts[0].value == 1800
     assert (
         before.weight.metric.value == 70
@@ -383,6 +465,7 @@ def test_report_preserves_records(db: Session, approved_cycle: adaptive.Cycle) -
     approved_cycle.record(Slot.SHORT_RUN, 5, Actual(status="completed", run_seconds=1200))
     db.add_all(
         [
+            energy(src, 0, DailyMetric.TOTAL_ENERGY, 2100),
             weight(src, 0, "71000"),
             intake(src, 1, 1950),
             coverage(src, 0, "weight", "observed", 1),
@@ -394,6 +477,7 @@ def test_report_preserves_records(db: Session, approved_cycle: adaptive.Cycle) -
     def fingerprint() -> tuple:
         result = []
         for model in (
+            DailyRecoveryObservation,
             TrainingPlan,
             PlanRevision,
             PlanDecision,
@@ -410,7 +494,8 @@ def test_report_preserves_records(db: Session, approved_cycle: adaptive.Cycle) -
         return tuple(result)
 
     before = fingerprint()
-    report(db, src)
+    daily = report(db, src, expenditure_account_id=src.id)
+    aggregate_weeks(daily, reference_date=PERIOD.stop)
     assert fingerprint() == before
 
 
