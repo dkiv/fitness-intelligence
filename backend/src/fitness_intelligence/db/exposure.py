@@ -59,6 +59,7 @@ def read_outings(
         select(
             activity,
             Workout.started_at,
+            Workout.ended_at,
             ref.id,
             ref.external_id,
             ref.last_synced_at,
@@ -95,7 +96,9 @@ def read_outings(
         .order_by(activity.local_date, Workout.started_at, activity.workout_id)
     )
     result = defaultdict(list)
-    for a, start, ident, external, retrieved, revision, metadata, splits, steps in db.execute(stmt):
+    for a, start, end, ident, external, retrieved, revision, metadata, splits, steps in db.execute(
+        stmt
+    ):
         meta = metadata or {}
         fields = meta.get("fields", {})
 
@@ -110,6 +113,7 @@ def read_outings(
                 reference_id=ident,
                 external_id=external,
                 started_at=start,
+                ended_at=end,
                 provider_date=a.local_date,
                 report_date=start.astimezone(period.zone).date(),
                 sport=a.sport,

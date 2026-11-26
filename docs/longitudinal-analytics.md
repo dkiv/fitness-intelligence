@@ -199,4 +199,91 @@ Running points retain the original D1D outing and native-day coverage, including
 
 E4.2B confirmations carry field-specific assertions. A D1E task review cannot promote an inferred set or attribute an outing to a prescription. E4.2C owns decision-time freezing and support revalidation. [Scoped confirmation contract](scoped-observation-confirmation.md)
 
-**Proposed D1F scope.** Add calendar-aligned views of the timing of lower-body strength work and running, retaining actual time gaps, execution evidence, context and reasons a pairing is unavailable. Keep interpretation descriptive.
+## D1F integrated report
+
+`integrate(performance)` takes an existing D1E result. The returned `IntegratedReport` holds that result and its cross-domain pairs in memory. A consumer can read one focus week, follow an evidence identity and discard the report. All views use the same owner-scoped, read-only D1 snapshot.
+
+```python
+from fitness_intelligence.analytics.integrated import integrate, report_json
+
+report = integrate(performance)
+summary = report.summary()                   # Week of the last requested date
+text = report.render(focus_date)             # Short human-readable view
+payload = report.to_json(focus_date)         # Deterministic summary
+day = report.inspect_day(focus_date)         # Exact daily cells and coverage
+for pair in report.summary(focus_date)["proximity"]["pairs"]:
+    evidence = report.inspect_pair(pair.strength_workout_id, pair.running_workout_id)
+    pair_payload = report_json(evidence)     # Only this pair and its supporting observations
+```
+
+The versioned summary includes the half-open reporting period, zone, reference and focus dates, all requested Mondays, selected accounts, policy versions and observation state. Its week uses the requested dates in that Monday week. Changing the focus selects another week and the target date for recovery references. The reference date evaluates closure. The snapshot represents the latest accepted evidence, so choosing a past focus date does not reconstruct what a decision-maker knew then.
+
+The summary retains per-category acquisition counts and issue dates, workout and comparison identities, field-specific measurement denominators, evidence tiers and exclusions. Recovery, endurance, strength and expenditure are optional selections. JSON encodes an unavailable value as `null`, an eligible count as an integer, decimals as exact strings, dates as ISO dates and instants in UTC. A supported zero survives serialization. The following lookups resolve evidence from the same in-memory result.
+
+| Inspection | Evidence returned |
+| --- | --- |
+| `inspect_day(date)` | Original daily cells and accepted observations, including intake logging evidence, weight identities, acquisition, reconciliation holds and source-only HRV. |
+| `inspect_workout(id)` | A selected canonical workout, its sets or outing, source and revision evidence, review and comparison exclusions. Strength evidence includes actual set completion and achieved RPE where recorded. |
+| `inspect_pair(strength_id, running_id)` | Both canonical workout IDs, the exact qualifying lower-body sets, the running outing, independent duration fields, instruction issues, reviewed effort, conditions and restrictions. Tolerance stays unknown without evidence. |
+| `inspect_running_reference(monday, metric)` | Four candidate weeks with their native-date acquisitions, supporting and missing workout IDs, independent metric values and reasons for exclusion. |
+| `inspect_recovery_reference(date, metric)` | Target cell, reviewed regime, contributing observation identities and values, excluded cells and reasons. |
+
+### Calendar proximity and elapsed time
+
+Strength membership comes from the selected account’s explicitly reviewed lower-body templates and D1D’s eligible working sets. Each selected running outing can pair once with each eligible strength workout whose aligned report date is the same or one calendar day away in either direction. Multiple qualifying exercises or sets contribute their own identities and repetitions to that one pair. Missing repetition measurements have no numeric contribution. An inferred-only workout yields a tentative pair. Mixed workouts retain separate confirmed and inferred lists.
+
+Strength dates use the recorded start in the report zone. The selected provider calendar must be verified and aligned, and the running outing’s provider date must agree with its start in that zone. An activity hold or acquisition discrepancy withholds the flag and preserves the outing, its dates and reason. A partial activity enumeration can still support an individual outing. An instruction issue remains visible independently. The search covers the whole requested period, including adjacent Monday weeks. Each pair appears in the focus week of its run. Unrequested dates supply no pairing evidence.
+
+The timing record gives start order, absolute start-to-start seconds, and signed later start minus earlier recorded workout end. A positive gap measures the observed interval between sessions. Zero denotes touching endpoints. A negative gap puts the later start inside the earlier session. Two recorded positive spans establish overlap. If the later end is missing, the report can still say that it started during the earlier session. An unknown earlier end leaves the interval null. Simultaneous starts have zero start separation and no ordered end-to-start interval. All subtraction uses UTC instants, including across DST. A set completion time marks that set alone. Moving time, elapsed time, scheduled reservations and individual set timestamps supply no workout end.
+
+The view describes recorded scheduling. A missing workout leaves rest and exposure unknown. Proximity supplies no basis for attributing a performance change, estimating fatigue or choosing a recovery duration.
+
+### Five-week synthetic example
+
+The database-backed fixture selects one synthetic owner, a Hevy account and a Garmin account. Both calendars use `America/Toronto`. The request covers February 10 through March 16, 2025 inclusive, with March 17 as the reference date. The focus is March 16. Extra workouts sharing external IDs on other accounts and under another owner provide isolation checks.
+
+| Monday | Recorded strength and running | Evidence used for the March 10 running reference | Pairs attributed to the run week |
+| --- | --- | --- | ---: |
+| Feb 10 | No recorded lift. Verified complete empty scans on seven closed provider dates. | Exact zero | 0 |
+| Feb 17 | No recorded lift. Seven more verified complete empty dates. | Exact zero | 0 |
+| Feb 24 | Feb 25 inferred squat, seven reps. Feb 26 recorded 5 km run. | Partial enumeration. One observed session and 5,000 m. | 1 |
+| Mar 3 | Mar 8 recorded 3 km run. Mar 9 confirmed squat, 60 kg × 5. | Positive enumeration lacks immutable membership. One observed session and 3,000 m. | 1 |
+| Mar 10 | Three strength visits. Three eligible runs over 9 km, one additional held outing and one squash session. | Target week | 3 |
+
+| Strength / run dates | Start separation | Signed end-to-start | Supporting evidence |
+| --- | ---: | ---: | --- |
+| Feb 25 / Feb 26 | 24 h, strength first | +23 h 30 min | Inferred-only lower-body execution. |
+| Mar 9 / Mar 8 | 23 h, run first | Unknown | Both start at local noon across the spring clock change. The Saturday run has no recorded end. |
+| Mar 9 / Mar 10 | 24 h, strength first | +23 h | Sunday’s workout ends at 13:00 EDT. Monday’s run starts at noon. |
+| Mar 10 / Mar 10 | 15 min, strength first | −20 min | Strength 15:45–16:20 UTC, run 16:00–16:30 UTC. The recorded sessions overlap. |
+| Mar 13 / Mar 13 | 1 h, strength first | Unknown | The strength set has a completion timestamp. The session end is unknown. |
+
+An excerpt from `report.render()` shows both the sampled reference and the exposure left outside it.
+
+```text
+Observed strength weeks · 2/5 confirmed, 3/5 confirmed or inferred
+Running · at least 3 sessions, at least 9000 m
+Squash · at least 1 session, distance unavailable
+Reviewed run · elapsed time change -60 s
+Sampled running sessions/week · median 0 from 2/4 preceding weeks. Habitual exposure unknown.
+Excluded weeks, observed sessions · 2025-02-24 1 (lower bound), 2025-03-03 1 (lower bound)
+Aligned strength/run pairs · 3, including 0 tentative · 2 outings withheld (1 with an activity reconciliation hold, 1 with conflicting provider and report dates)
+```
+
+The focus week has the following supporting results.
+
+- **Strength.** Three visits have five confirmed working sets and one inferred working set. Recorded consistency across the five closed weeks is 2/5 with confirmed work and 3/5 with confirmed or inferred work. The reviewed high-bar squat at achieved RPE 7 changes from five to six reps at 60 kg, with estimated 1RM from 70.00 to 72.00 kg. The unclassified exercise contributes to recorded strength exposure only.
+- **Running and squash.** Three eligible running outings supply at least 9,000 m. Activity time totals 2,830 s from 3/3 outings, moving time 2,020 s from 2/3 and elapsed time 2,910 s from 3/3. Squash supplies one session and 900 activity seconds. Its distance is unavailable. The reviewed 5 km loop at recorded RPE 6 in dry, uninterrupted conditions changes from 1,700 to 1,640 elapsed seconds, a difference of −60 s. Outings without comparable task evidence retain their observations.
+- **Running reference.** For each of sessions, metres, activity seconds, moving seconds and elapsed seconds, the sampled median is zero on 2/4 qualifying weeks. The two excluded weeks contain a recorded 5 km and 3 km run. Habitual training exposure remains unknown.
+- **Recovery.** Sleep duration is 24,000 s on five eligible focus-week dates, with one missing date and one held date. Its March 16 prior reference has median 24,000 s on 26 dates. Resting HR is 59 bpm in the new reviewed regime. Six preceding dates in that regime leave the reference unavailable. Overnight HRV and trailing weekly HRV each have one source-only observation.
+- **Intake, expenditure and weight.** Eligible reported intake of 2,100 and zero kcal yields 2,100 kcal total and 1,050 kcal per eligible date. Wearable expenditure on one date is 2,300 total and 500 active kcal. Basal expenditure is unavailable. The eligible weight median is 71 kg on three dates, up 1 kg from 70 kg on three dates in the preceding week. A separate held measurement stays inspectable.
+
+For an evidence lookup, select the March 10 same-date pair from the summary and call `inspect_pair` with its two IDs. The result identifies the squat and lunge exercise IDs, two confirmed sets (six and four reps), and one inferred drop set (five reps). This accounts for all 15 recorded lower-body reps. The unclassified 20-rep set belongs to the workout and is visible through `inspect_workout`. The run records 5,000 m, 1,610 activity seconds, 1,450 moving seconds and 1,640 elapsed seconds. Partial acquisition and an instruction issue remain visible with the accepted outing. Tolerance is null. The March 12 provider-date outing starts on March 11 in Toronto, so its 2 km contributes to native-date exposure with a withheld proximity flag. A March 14 activity hold excludes a retained 9 km outing from both the eligible subtotal and proximity. Its original measurement and issue are available by workout ID.
+
+### D1V proposal for separate operator authorization
+
+1. Before any private read, the operator approves **one owner**, the exact Hevy account and each Garmin account selected for the requested metrics, the owner-day intake source scope, calendar evidence, report recipient and retention period. Enter real identifiers locally. Choose a recent representative six-week interval within the requested four-to-eight-week range. Record its inclusive Monday start, exclusive Monday stop and reference date after the last requested date has closed in each known calendar.
+2. Record the report IANA zone and independently verified provider zone for each selected account. Record travel, device and timezone changes. Split the validation into reviewed intervals or leave the relevant alignment unknown. Review Hevy template IDs, movement, variation, equipment, load interpretation, lower-body membership, set role, ordinal and achieved effort. Review run distance, course or protocol, timing field, effort, conditions and interruptions. Record sleep and resting-HR regime intervals, measurement units and weight writer evidence. Leave unsupported attributes unknown.
+3. Use local read-only access to an approved stable database snapshot and the existing repeatable-read report selector. Independently count owner/account-scoped active workout references, unique workouts, exercises and sets by evidence tier, native-date outings by sport, eligible/missing observations by metric and day, and category/date activity receipts and open reconciliation issues. Record those expected counts locally before comparing the report. Include any additional same-owner intake contributors in the approved scope. Resolve a scope mismatch before reading further.
+4. Reconcile canonical identities, native and report dates and per-field denominators against those counts. Inspect one selected pair of each available evidence tier, an unmatched workout, and available held, partial or empty dates. Check the UTC start order and signed gap against recorded endpoints. Check that a complete zero has a verified post-closure scan, excluded positive weeks retain their recorded runs, and missing or held values stay unavailable. Reconcile comparison keys, recovery-regime boundaries, weight series and confirmed/inferred consistency denominators. Record a limitation if the interval contains no example of a case.
+5. Keep report output, evidence identities and review inputs local with operator-approved access and encrypted storage. Display only the evidence required for each check. Share aggregate pass/fail counts and non-identifying limitations only with the approved recipient. Exclude payloads, account IDs, credentials, connection strings and personal measurements from logs, source control and PRs. Remove any retained private output at the agreed deadline. D1V authorizes no acquisition, reconciliation writes, migrations or coaching actions.

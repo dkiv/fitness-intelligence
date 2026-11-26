@@ -170,6 +170,7 @@ class Outing:
     instruction_positions: tuple[tuple[int, int], ...] | None
     activity_issues: tuple[Issue, ...]
     instruction_issues: tuple[Issue, ...]
+    ended_at: datetime | None = None
 
     @property
     def split_summary_rows(self) -> int | None:
