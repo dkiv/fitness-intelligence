@@ -95,7 +95,7 @@ same inputs and rules. An infeasible schedule must surface the conflicting const
 Preserve the original prescription and each approved revision, link completed sessions to
 the applicable version, and distinguish missed sessions from unknown completion in adherence.
 
-E4.0 specifies the versioned block, prescription and authorization contracts. E4.1 implements the synthetic familiar-week slice using the existing trusted approval path. E4.2A adds generalized manual execution attribution and descriptive weekly review. E4.2B and E4.2C will address imported confirmation and D1 projection. [E4.2A execution](generalized-execution.md) [E4.0 design](generalized-hybrid-planner-design.md) · [E4.1 usage and conformance](generalized-familiar-week.md)
+E4.0 specifies the versioned block, prescription and authorization contracts. E4.1 implements the synthetic familiar-week slice using the existing trusted approval path. E4.2A adds generalized manual execution attribution and descriptive weekly review. E4.2B adds field-scoped confirmation of supplied synthetic observations. E4.2C will address D1 projection and approval-time writer coordination. [E4.2B confirmation](scoped-observation-confirmation.md) · [E4.2A execution](generalized-execution.md) [E4.0 design](generalized-hybrid-planner-design.md) · [E4.1 usage and conformance](generalized-familiar-week.md)
 
 ### F · Adaptive coaching MVP
 

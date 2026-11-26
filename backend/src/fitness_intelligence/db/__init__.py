@@ -1,5 +1,6 @@
 """Register all tables on the shared declarative metadata."""
 
+from . import confirmation_models as confirmation_models
 from . import endurance_models as endurance_models
 from . import history_models as history_models
 from . import nutrition_models as nutrition_models

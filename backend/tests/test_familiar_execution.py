@@ -22,6 +22,7 @@ from fitness_intelligence.db.models import User
 from fitness_intelligence.db.plan_commands import PlanCommands
 from fitness_intelligence.db.plan_models import SessionOutcome
 from fitness_intelligence.db.plan_snapshot import Generate, PlanningContext
+from fitness_intelligence.planning import confirmation as c
 from fitness_intelligence.planning import familiar as f
 from fitness_intelligence.planning import familiar_outcomes as fo
 from fitness_intelligence.planning.familiar_examples import example
@@ -458,7 +459,7 @@ def test_direct_sql_scope_immutability_and_downgrade(db: Session, cycle: Cycle) 
     for sql in (
         "UPDATE session_outcomes SET week=2",
         "DELETE FROM session_outcomes",
-        "TRUNCATE session_outcomes",
+        "TRUNCATE session_outcomes CASCADE",
     ):
         with pytest.raises(IntegrityError), db.begin_nested():
             db.execute(text(sql))
@@ -566,3 +567,76 @@ def test_correction_revalidates_changed_execution_instant(cycle: Cycle) -> None:
         cycle.record(
             "gym-a", corrected, occurred_at=at(9), command_id=recovery_key, supersedes_id=first
         )
+
+
+def test_explicit_import_confirmation_link(db: Session, cycle: Cycle) -> None:
+    cmd = cycle.cmd
+    gym = cycle.session("gym-a")
+    manual = cycle.record("gym-a", partial_strength())
+    fact = c.StrengthFact(
+        owner=PREVIEW_OWNER,
+        account=uuid4(),
+        workout=uuid4(),
+        exercise=uuid4(),
+        member=uuid4(),
+        reference=uuid4(),
+        occurred_at=gym.start_utc,
+        mapping="v1",
+        comparison="press-v1",
+        movement="press",
+        variation="standing",
+        equipment="barbell",
+        group="primary",
+        kind="working",
+        ordinal=1,
+        reps=5,
+        kg=Decimal(42),
+        load_convention="total-external-kg",
+        provenance="historically-inferred",
+    )
+
+    def link(member: c.StrengthFact, outcome: UUID) -> c.Receipt:
+        display = cmd.preview_observations(member.account, (member,))
+        intent = c.Intent(
+            display=display,
+            displayed_digest=display.digest,
+            answers=(
+                c.Answer(
+                    member=member.member,
+                    disposition="confirm",
+                    fields=("completion", "reps"),
+                    outcome=outcome,
+                ),
+            ),
+        )
+        return cmd.confirm_observations(uuid4(), intent, current=(member,))
+
+    for changed in (
+        fact.model_copy(update={"ordinal": 99}),
+        fact.model_copy(update={"occurred_at": at(9)}),
+    ):
+        with pytest.raises(ValueError):
+            link(changed, manual)
+    with pytest.raises(ValueError):
+        link(fact, uuid4())
+    root = link(fact, manual)
+    (support,) = cmd.confirmation_review(root.command, current=(fact,))
+    attr = support.history[0].link
+    assert (
+        attr.outcome,
+        attr.cycle,
+        attr.origin_revision,
+        attr.effective_head,
+        attr.occurrence,
+        attr.occurred_at,
+        attr.current,
+    ) == (manual, cycle.plan, cycle.weeks[0], cycle.weeks[0], gym.occurrence, gym.start_utc, True)
+    with pytest.raises(ValueError, match="already linked"):
+        link(fact.model_copy(update={"member": uuid4(), "workout": uuid4()}), manual)
+    assert len(cmd.weekly_review(cycle.plan, 1).sessions[0].history) == 1
+    cycle.record("gym-a", fo.StrengthExecution(status="partial"), supersedes_id=manual)
+    (reviewed,) = cmd.confirmation_review(root.command, current=(fact,))
+    assert reviewed.state == "confirmed" and not reviewed.history[0].link.current
+    assert support.effective_link == attr and reviewed.effective_link is None
+    with pytest.raises(ValueError, match="current performed"):
+        link(fact.model_copy(update={"member": uuid4()}), manual)

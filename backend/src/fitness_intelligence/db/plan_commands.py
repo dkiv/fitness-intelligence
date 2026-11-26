@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from fitness_intelligence.planning import confirmation as cf
 from fitness_intelligence.planning import familiar as f
 from fitness_intelligence.planning import familiar_outcomes as fo
 from fitness_intelligence.planning import rationale
@@ -32,7 +33,7 @@ from fitness_intelligence.planning.planner import Session as PlannedSession
 from fitness_intelligence.planning.press_block import PressBlock
 from fitness_intelligence.planning.rationale import Rationale
 
-from . import execution
+from . import confirmations, execution
 from . import familiar_snapshot as v2
 from .models import User
 from .plan_models import AthleteContext, PlanDecision, PlanRevision, SessionOutcome, TrainingPlan
@@ -286,6 +287,27 @@ class PlanCommands:
 
     def _today(self, context: PlanningContext) -> date:
         return self._now().astimezone(context.availability.zone).date()
+
+    def preview_observations(self, account: UUID, facts: tuple[cf.Fact, ...]) -> cf.Display:
+        v2.require_preview_owner(self._owner)
+        return cf.preview(self._owner, account, facts)
+
+    def confirm_observations(
+        self, command_id: UUID, intent: cf.Intent, *, current: tuple[cf.Fact, ...]
+    ) -> cf.Receipt:
+        v2.require_preview_owner(self._owner)
+        self._lock_owner()
+        return confirmations.record(self._db, self._owner, command_id, intent, current, self._now())
+
+    def confirmation_receipt(self, command_id: UUID) -> cf.Receipt:
+        v2.require_preview_owner(self._owner)
+        return confirmations.receipt(self._db, self._owner, command_id)
+
+    def confirmation_review(
+        self, command_id: UUID, *, current: tuple[cf.Fact, ...]
+    ) -> tuple[cf.Support, ...]:
+        v2.require_preview_owner(self._owner)
+        return confirmations.review(self._db, self._owner, command_id, current)
 
     def record_outcome(
         self,
