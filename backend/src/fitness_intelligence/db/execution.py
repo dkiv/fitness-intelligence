@@ -298,6 +298,21 @@ def week_outcomes(
     return WeeklyOutcomes(as_of=as_of, slots=tuple(slots))
 
 
+_EXECUTION = TypeAdapter(fo.Execution)
+
+
+def familiar_assertion(row: SessionOutcome) -> fo.Assertion:
+    return fo.Assertion(
+        id=row.id,
+        command_id=row.command_id,
+        supersedes_id=row.supersedes_id,
+        occurred_at=row.occurred_at.astimezone(UTC),
+        recorded_at=row.recorded_at.astimezone(UTC),
+        effective_head=row.revision_id,
+        actual=_EXECUTION.validate_json(canonical(row.actual)),
+    )
+
+
 def familiar_week_outcomes(
     db: Session, owner: UUID, plan: UUID, week: int, as_of: datetime
 ) -> fo.WeekExecution:
@@ -317,17 +332,8 @@ def familiar_week_outcomes(
     )
     # Follow explicit successors. Recording instants can tie during a rehearsal.
     chains: dict[str, dict[UUID | None, fo.Assertion]] = {}
-    adapter = TypeAdapter(fo.Execution)
     for row in rows:
-        assertion = fo.Assertion(
-            id=row.id,
-            command_id=row.command_id,
-            supersedes_id=row.supersedes_id,
-            occurred_at=row.occurred_at.astimezone(UTC),
-            recorded_at=row.recorded_at.astimezone(UTC),
-            effective_head=row.revision_id,
-            actual=adapter.validate_json(canonical(row.actual)),
-        )
+        assertion = familiar_assertion(row)
         chains.setdefault(row.slot, {})[row.supersedes_id] = assertion
     sessions = []
     for day in candidate.days:

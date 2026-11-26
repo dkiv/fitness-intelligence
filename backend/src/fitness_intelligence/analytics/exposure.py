@@ -171,6 +171,9 @@ class Outing:
     activity_issues: tuple[Issue, ...]
     instruction_issues: tuple[Issue, ...]
     ended_at: datetime | None = None
+    # Ordered exactly as the corresponding positions. Instructions can change in place.
+    split_content_digests: tuple[str, ...] = ()
+    instruction_content_digests: tuple[str, ...] = ()
 
     @property
     def split_summary_rows(self) -> int | None:

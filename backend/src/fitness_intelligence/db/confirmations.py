@@ -252,12 +252,17 @@ def review(
     db: Session, owner: UUID, command: UUID, current: tuple[c.Fact, ...]
 ) -> tuple[c.Support, ...]:
     scope = receipt(db, owner, command).intent.display
-    facts = c.index_facts(owner, scope.account, current)
-    members = {m.member for m in scope.members}
+    return review_members(db, owner, scope.account, tuple(m.member for m in scope.members), current)
+
+
+def review_members(
+    db: Session, owner: UUID, account: UUID, members: tuple[UUID, ...], current: tuple[c.Fact, ...]
+) -> tuple[c.Support, ...]:
+    facts = c.index_facts(owner, account, current)
     rows = db.scalars(
         select(Stored)
         .join(Member, (Member.user_id == Stored.user_id) & (Member.command == Stored.command))
-        .where(Stored.user_id == owner, Member.member.in_(members))
+        .where(Stored.user_id == owner, Member.account == account, Member.member.in_(members))
     ).unique()
     chains: dict[UUID, dict[UUID | None, c.Assertion]] = {m: {} for m in members}
     for row in rows:
@@ -282,8 +287,8 @@ def review(
     }
     occupied = _linked_sets(db, owner, outcomes, replacing=set())
     result = []
-    for displayed in scope.members:
-        chain = chains[displayed.member]
+    for member in members:
+        chain = chains[member]
         history = [chain[None]]
         while history[-1].command in chain:
             history.append(chain[history[-1].command])

@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import Text, and_, func, select
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import ColumnElement
@@ -43,12 +43,15 @@ def read_outings(
 ) -> dict[date, list[Outing]]:
     activity, ref = EnduranceActivity, ExternalReference
 
-    def child_positions(
+    def child_evidence(
         model: type[ActivitySplit | ActivityStep], key: ColumnElement, *order: ColumnElement
     ) -> ScalarSelect:
         # Aggregate each collection independently to avoid multiplying split and step rows.
+        content = func.to_jsonb(model.__table__.table_valued()).cast(Text)
+        digest = func.encode(func.sha256(func.convert_to(content, "UTF8")), "hex")
+        row = func.jsonb_build_array(key, digest)
         return (
-            select(func.jsonb_agg(aggregate_order_by(key, *order)))
+            select(func.jsonb_agg(aggregate_order_by(row, *order)))
             .select_from(model)
             .where(model.user_id == source.owner_id, model.workout_id == activity.workout_id)
             .correlate(activity)
@@ -65,8 +68,8 @@ def read_outings(
             ref.last_synced_at,
             ref.source_updated_at,
             ref.sync_metadata,
-            child_positions(ActivitySplit, ActivitySplit.position, ActivitySplit.position),
-            child_positions(
+            child_evidence(ActivitySplit, ActivitySplit.position, ActivitySplit.position),
+            child_evidence(
                 ActivityStep,
                 func.jsonb_build_array(ActivityStep.workout_index, ActivityStep.step_index),
                 ActivityStep.workout_index,
@@ -133,8 +136,12 @@ def read_outings(
                     for k, v in sorted(fields.items())
                     if isinstance(v, dict)
                 ),
-                split_positions=tuple(splits or ()) if splits or "splits" in fields else None,
-                instruction_positions=tuple(tuple(key) for key in (steps or ()))
+                split_positions=tuple(key for key, _ in splits or ())
+                if splits or "splits" in fields
+                else None,
+                split_content_digests=tuple(digest for _, digest in splits or ()),
+                instruction_content_digests=tuple(digest for _, digest in steps or ()),
+                instruction_positions=tuple(tuple(key) for key, _ in (steps or ()))
                 if steps or "steps" in fields
                 else None,
                 activity_issues=applicable("activities"),
