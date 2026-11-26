@@ -51,14 +51,20 @@ Workout creation and first import of the external reference have their own times
 
 | Evidence view | Required inputs | What can remain unknown |
 | --- | --- | --- |
-| Descriptive exposure | Retained observation or performed manual report | Completion, exact identity for comparison, dose or effort. Field status still applies. |
-| Confirmed execution | Direct source evidence of execution (timestamp or retained outing) or scoped athlete evidence of completed/partial work | Dose, intensity and task comparison. An inferred completion alone is insufficient. Conflicting execution, unresolved activity support and potential double counting limit this view. |
-| Comparable strength | Execution, supported movement/variation, equipment, load convention, group and ordinal, independent reps and kg | Achieved set RPE is optional. A kg value with a different convention stays separately labeled. |
-| Comparable running | Execution, supported running task/role, independent elapsed duration. Intervals also require actual work count and aligned durations for the prescribed work steps. | Session RPE and pace are optional. Partial coverage limits whole-period conclusions even if a single task is comparable. |
+| Descriptive exposure | Retained observation or performed manual report. For a reported strength set, its own completed or partial status establishes performed set exposure. | Completion, exact identity for comparison, dose or effort. Field status still applies. |
+| Confirmed execution | Direct source evidence of execution (timestamp or retained outing) or scoped athlete evidence of completed/partial work | Dose, intensity and task comparison. An inferred completion alone is insufficient. Conflicting execution, unresolved activity support and potential double counting limit this view. A native-day enumeration discrepancy excludes execution supported solely by the import. An explicit outing confirmation or performed manual report can independently support that outing. |
+| Comparable strength | Execution, individually supported movement, variation, equipment, load convention, group and ordinal, independent reps and kg | Achieved set RPE is optional. A kg value with a different convention stays separately labeled. |
+| Comparable running | Execution, supported running task and known role, independent elapsed duration. Intervals require a reported work count and aligned achieved durations covering the prescribed work steps and every reported completed work repetition. | Session RPE and pace are optional. Partial coverage limits whole-period conclusions even if a single task is comparable. |
 | Familiar-dose input | Comparable actual dose, completed task, explicit positive manageability | Optional achieved RPE stays unknown. A single eligible task is one input to a later baseline review. |
 | Progression-review input | Comparable actual dose and an independent tolerance report | Negative tolerance is eligible information for review. It grants no increase. |
 
-Every qualification exposes required, optional, missing and excluded inputs. Unresolved attribution, stale support or contradictory actuals can withhold task comparison while leaving the original observations available. These views assess individual task evidence. Selecting representative history, determining outcomes, allocating a new dose and authorizing changes require later reviews.
+Every qualification exposes required, optional, missing and excluded inputs. A reviewed display can contain an unknown role or strength dimension. The missing dimension appears by name while confirmed execution, dose and tolerance retain their original support. A report of four work repetitions with three aligned timings retains all four repetitions and all three timings. Comparison, familiar-dose and progression review identify the timing shortfall.
+
+The outing carries its native day's enumeration discrepancies separately from its receipt content. A partial acquisition permits individual outing review. A retained outing after an empty scan remains descriptive with a day count labeled `observed_only`. If execution relies on that import, the dependent qualifications carry `retained_after_empty`. The athlete's elapsed-time mask and tolerance statement remain visible. An explicit confirmation of the outing supplies independent execution evidence for that task while the day discrepancy remains open.
+
+A partial strength session can contain completed, partial, explicitly unperformed and unknown sets. Each reported ordinal keeps its status and assertion identity. Only a completed or partial ordinal qualifies as performed set exposure.
+
+Each view applies at task scope. Unresolved attribution, stale support or contradictory actuals can withhold task comparison while leaving the original observations available. Selecting representative history, determining outcomes, allocating a new dose and authorizing changes require later reviews.
 
 ## Synthetic hybrid week
 

@@ -92,6 +92,7 @@ class NativeMember(f.Record):
     context: Context | None
     display: c.Fact | None
     limitation: str | None
+    activity_discrepancies: tuple[str, ...] = ()
     pending_deletion: PendingDeletion | None = None
     workout_created_at: datetime | None = None
     reference_first_imported_at: datetime | None = None
@@ -101,7 +102,9 @@ class NativeMember(f.Record):
 _NATIVE = TypeAdapter(Native)
 
 
-def bridge(fact: Native, context: Context | None) -> NativeMember:
+def bridge(
+    fact: Native, context: Context | None, *, activity_discrepancies: tuple[str, ...] = ()
+) -> NativeMember:
     # A later identical retrieval does not change content. Keep its clock on the raw fact.
     raw = _NATIVE.dump_python(fact, mode="json")
     raw.pop("report_date")
@@ -184,7 +187,12 @@ def bridge(fact: Native, context: Context | None) -> NativeMember:
         else:
             limitation = "context does not match source sport or identity"
     return NativeMember(
-        fact=fact, digest=digest, context=context, display=display, limitation=limitation
+        fact=fact,
+        digest=digest,
+        context=context,
+        display=display,
+        limitation=limitation,
+        activity_discrepancies=activity_discrepancies,
     )
 
 

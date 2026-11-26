@@ -15,6 +15,7 @@ from test_training_exposure import lift, outing, recovery
 from fitness_intelligence.db.confirmation_models import ConfirmationReceipt
 from fitness_intelligence.db.endurance_models import ActivitySplit, ActivityStep
 from fitness_intelligence.db.familiar_snapshot import PREVIEW_OWNER
+from fitness_intelligence.db.history_models import GarminCoverage
 from fitness_intelligence.db.models import ExerciseSet, User, Workout, WorkoutTombstone
 from fitness_intelligence.db.plan_commands import PlanCommands
 from fitness_intelligence.db.plan_models import SessionOutcome
@@ -501,3 +502,222 @@ def test_one_snapshot_across_source_and_athlete_writers(
         latest.confirmations[0].state == "withdrawn"
         and field(latest.performances[0].tasks[0], "reps").value == 9
     )
+
+
+def confirmed_run(
+    db: Session, plans: PlanCommands, role: str, fields: tuple[c.Name, ...]
+) -> tuple[e.Scope, c.Receipt]:
+    src = account(db, PREVIEW_OWNER)
+    run = outing(db, src, 0, "101", "running", "running", 2300, 1200, 1150, 1250)
+    db.add(coverage(src, 0, "activities", "partial", None))
+    scope = e.Scope(start=PERIOD.start, stop=PERIOD.stop, endurance_account=src.id)
+    db.commit()
+    member = query_planning_evidence(db.get_bind(), scope).performances[0].members[0]
+    ctx = e.RunContext(
+        account=src.id,
+        member=run.workout_id,
+        source_digest=member.digest,
+        version="review-1",
+        comparison="course-a",
+        basis="athlete reviewed outing",
+        authority="athlete-context",
+        role=role,
+        structure="continuous",
+    )
+    scope = scope.model_copy(update={"contexts": (ctx,)})
+    fact = query_planning_evidence(db.get_bind(), scope).performances[0].members[0].display
+    display = plans.preview_observations(src.id, (fact,))
+    answer = c.Answer(
+        member=fact.member,
+        disposition="confirm",
+        fields=fields,
+        reported=c.AthleteReport(tolerance="comfortable"),
+    )
+    receipt = plans.confirm_observations(
+        uuid4(), c.prepare(display, (), exceptions=(answer,)), current=(fact,)
+    )
+    db.commit()
+    return scope, receipt
+
+
+@pytest.mark.parametrize("role,eligible", [("unknown", False), ("easy", True)])
+def test_review_running_role(db: Session, plans: PlanCommands, role: str, eligible: bool) -> None:
+    scope, receipt = confirmed_run(db, plans, role, ("outing", "elapsed_seconds"))
+    report = query_planning_evidence(db.get_bind(), scope)
+    (p,) = report.performances
+    (t,) = p.tasks
+    assert p.members[0].display.role == role
+    assert field(t, "outing").value is True and qual(t, "confirmed-execution").eligible
+    assert field(t, "elapsed_seconds").value == 1250
+    assert field(t, "elapsed_seconds").claims[-1].tier == "confirmed-display"
+    assert field(t, "tolerance").value == "comfortable"
+    assert report.confirmations[0].history[-1].command == receipt.command
+    for purpose in ("comparable-running", "progression-review-input"):
+        q = qual(t, purpose)
+        assert q.eligible == eligible
+        assert q.missing == (() if eligible else ("running-role",))
+        assert q.exclusions == ()
+
+
+@pytest.mark.parametrize("dimension", ["movement", "variation", "equipment", "group", None])
+def test_review_strength_dimensions(
+    db: Session, plans: PlanCommands, dimension: str | None
+) -> None:
+    src = account(db, PREVIEW_OWNER, "hevy")
+    lift(db, src, 0, "press", [("press", [("normal", 5, True)])])
+    db.commit()
+    scope = e.Scope(start=PERIOD.start, stop=PERIOD.stop, strength_account=src.id)
+    member = query_planning_evidence(db.get_bind(), scope).performances[0].members[0]
+    ctx = context(member)
+    if dimension:
+        ctx = ctx.model_copy(update={dimension: "unknown"})
+    scope = scope.model_copy(update={"contexts": (ctx,)})
+    fact = query_planning_evidence(db.get_bind(), scope).performances[0].members[0].display
+    display = plans.preview_observations(src.id, (fact,))
+    plans.confirm_observations(uuid4(), c.prepare(display, ("reps", "kg")), current=(fact,))
+    db.commit()
+    t = query_planning_evidence(db.get_bind(), scope).performances[0].tasks[0]
+    assert field(t, "reps").value == 5 and field(t, "kg").value == 60
+    assert qual(t, "confirmed-execution").eligible
+    q = qual(t, "comparable-strength")
+    assert q.eligible == (dimension is None)
+    assert q.missing == ((dimension,) if dimension else ()) and q.exclusions == ()
+
+
+@pytest.mark.parametrize("count", [4, 3])
+def test_review_interval_duration_coverage(db: Session, cycle: Cycle, count: int) -> None:
+    steps = tuple(
+        actual.StepExecution(index=i, purpose="work", status="completed", elapsed_seconds=240)
+        for i in (2, 4, 6)
+    )
+    outcome = cycle.record(
+        "cruise",
+        actual.RunExecution(
+            role="controlled",
+            status="completed",
+            confirmed_outing=True,
+            elapsed_seconds=2100,
+            manageable=True,
+            completed_work_repetitions=count,
+            steps=steps,
+        ),
+    )
+    db.commit()
+    day = cycle.session("cruise").day
+    report = query_planning_evidence(
+        db.get_bind(), e.Scope(start=day, stop=day + timedelta(days=1))
+    )
+    (p,) = report.performances
+    (t,) = p.tasks
+    assert p.manual.history[-1].id == outcome and p.manual.history[-1].actual.steps == steps
+    assert field(t, "completed_work_repetitions").value == count
+    assert (
+        field(t, "elapsed_seconds").value == 2100 and field(t, "session_manageable").value is True
+    )
+    assert [
+        f.value
+        for f in t.fields
+        if f.name.startswith("step.") and f.name.endswith(".elapsed_seconds")
+    ] == [240] * 3
+    assert qual(t, "confirmed-execution").eligible
+    for purpose in ("comparable-running", "familiar-dose-input", "progression-review-input"):
+        q = qual(t, purpose)
+        assert q.eligible == (count == 3)
+        assert q.missing == (() if count == 3 else ("aligned-work-durations",))
+        assert q.exclusions == (
+            ()
+            if count == 3
+            else ("3 of 4 reported work repetitions have aligned achieved durations",)
+        )
+
+
+def test_review_outing_enumeration(db: Session, plans: PlanCommands) -> None:
+    scope, receipt = confirmed_run(db, plans, "easy", ("elapsed_seconds",))
+    ledger = db.scalars(
+        select(GarminCoverage).where(GarminCoverage.source_account_id == scope.endurance_account)
+    ).one()
+    for status in ("partial", "empty"):
+        if status == "empty":
+            ledger.status, ledger.eligible_count, ledger.last_success = (
+                "empty",
+                0,
+                ledger.attempted_at,
+            )
+            db.commit()
+        report = query_planning_evidence(db.get_bind(), scope)
+        day = report.days[0]
+        task = report.performances[0].tasks[0]
+        reasons = () if status == "partial" else ("retained_after_empty",)
+        assert day.discrepancies == reasons
+        assert day.running_count_status == (
+            "lower_bound" if status == "partial" else "observed_only"
+        )
+        assert day.running_count == 1 and qual(task, "descriptive-exposure").eligible
+        assert field(task, "outing").state == "source-only" and field(task, "outing").value is True
+        assert (
+            field(task, "elapsed_seconds").value == 1250
+            and field(task, "tolerance").value == "comfortable"
+        )
+        assert report.confirmations[0].confirmed == (("elapsed_seconds", 1250),)
+        assert plans.confirmation_receipt(receipt.command) == receipt
+        for purpose in ("confirmed-execution", "comparable-running", "progression-review-input"):
+            q = qual(task, purpose)
+            assert q.eligible == (status == "partial")
+            assert q.exclusions == reasons
+
+    # A separate assertion about the outing itself supplies the disputed execution input.
+    fact = report.performances[0].members[0].display
+    display = plans.preview_observations(scope.endurance_account, (fact,))
+    answer = c.Answer(
+        member=fact.member,
+        disposition="confirm",
+        fields=("outing", "elapsed_seconds"),
+        reported=c.AthleteReport(tolerance="comfortable"),
+        supersedes=receipt.command,
+    )
+    plans.confirm_observations(
+        uuid4(), c.prepare(display, (), exceptions=(answer,)), current=(fact,)
+    )
+    db.commit()
+    affirmed = query_planning_evidence(db.get_bind(), scope)
+    assert affirmed.days[0].discrepancies == ("retained_after_empty",)
+    assert affirmed.days[0].running_count_status == "observed_only"
+    assert affirmed.confirmations[0].history[0].command == receipt.command
+    task = affirmed.performances[0].tasks[0]
+    assert field(task, "outing").state == "actual" and field(task, "outing").value is True
+    for purpose in ("confirmed-execution", "comparable-running", "progression-review-input"):
+        q = qual(task, purpose)
+        assert q.eligible and q.exclusions == ()
+
+
+def test_review_manual_set_exposure(db: Session, cycle: Cycle) -> None:
+    done = partial_strength().sets[1]
+    skipped = done.model_copy(
+        update={
+            "ordinal": 2,
+            "status": "not-performed",
+            "reps": None,
+            "kg": None,
+            "achieved_rpe": None,
+        }
+    )
+    session = actual.StrengthExecution(status="partial", sets=(done, skipped))
+    outcome = cycle.record("gym-a", session)
+    db.commit()
+    day = cycle.session("gym-a").day
+    (p,) = query_planning_evidence(
+        db.get_bind(), e.Scope(start=day, stop=day + timedelta(days=1))
+    ).performances
+    assert p.execution_state == "partial" and p.manual.history[-1].id == outcome
+    assert p.manual.history[-1].actual == session
+    assert [t.manual_set for t in p.tasks] == [done, skipped]
+    for task in p.tasks:
+        performed = task.manual_set == done
+        assert field(task, "status").value == ("completed" if performed else "not-performed")
+        assert field(task, "status").claims[-1].support == outcome
+        assert field(task, "reps").value == (5 if performed else None)
+        assert field(task, "session_status").value == "partial"
+        q = qual(task, "descriptive-exposure")
+        assert q.eligible == performed
+        assert q.missing == (() if performed else ("performed-set",))
+        assert q.exclusions == ()

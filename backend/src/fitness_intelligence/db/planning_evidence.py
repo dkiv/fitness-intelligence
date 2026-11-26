@@ -262,7 +262,13 @@ def query_planning_evidence(engine: Engine, scope: e.Scope) -> e.Projection:
             ):
                 member = fact.row.set_id if isinstance(fact, StrengthFact) else fact.workout_id
                 members.append(
-                    e.bridge(fact, contexts.get((fact.source.source_account_id, member)))
+                    e.bridge(
+                        fact,
+                        contexts.get((fact.source.source_account_id, member)),
+                        activity_discrepancies=activity.discrepancies
+                        if activity and not isinstance(fact, StrengthFact)
+                        else (),
+                    )
                 )
 
         members = _current_members(db, owner, set(accounts), members)

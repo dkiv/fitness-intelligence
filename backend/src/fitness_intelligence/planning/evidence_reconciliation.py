@@ -5,6 +5,7 @@ from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from ..analytics.exposure import Outing
+from ..analytics.references import known_context
 from ..analytics.strength import StrengthFact
 from . import confirmation as c
 from . import evidence as e
@@ -28,6 +29,20 @@ def set_key(display: c.StrengthFact) -> tuple:
     )
 
 
+def _strength_dimensions(
+    task: c.StrengthFact | actual.SetExecution, convention: f.LoadConvention
+) -> set[str]:
+    labels = {
+        "movement": task.movement,
+        "variation": task.variation,
+        "equipment": task.equipment,
+        "load-convention": convention,
+        "group": task.group,
+    }
+    # Both contracts require a positive ordinal.
+    return {"ordinal"} | {name for name, value in labels.items() if known_context(value)}
+
+
 def _task(
     sport: str,
     member: e.NativeMember | None,
@@ -43,7 +58,14 @@ def _task(
             claims[name].append(e.Claim(name=name, value=value, tier=tier, support=source))
 
     mapped = member.display if member else None
-    comparison = mapped is not None
+    dimensions = set()
+    if mapped:
+        if known_context(mapped.comparison) and known_context(member.context.basis):
+            dimensions.add("comparison-context")
+        if isinstance(mapped, c.StrengthFact):
+            dimensions.update(_strength_dimensions(mapped, mapped.load_convention))
+        elif known_context(mapped.role):
+            dimensions.add("running-role")
     interval = False
     interval_indices: tuple[int, ...] = ()
     if member:
@@ -101,7 +123,7 @@ def _task(
         add("session_manageable", report.manageable, "manual-actual", tip.id)
         add("session_feedback", report.feedback, "manual-actual", tip.id)
         if item:
-            comparison = True  # Explicit member of the originating approved task.
+            dimensions.add("comparison-context")  # Explicit ordinal of the approved task.
             add("status", item.status, "manual-actual", tip.id)
             add("reps", item.reps, "manual-actual", tip.id)
             add("set_rpe", item.achieved_rpe, "manual-actual", tip.id)
@@ -110,13 +132,16 @@ def _task(
             exercise = next(
                 x for x in prescribed.exercises if (x.movement, x.variation) == item.key[:2]
             )
+            dimensions.update(_strength_dimensions(item, exercise.load_convention))
             if item.kg is not None and item.load_convention != exercise.load_convention:
                 blockers += ("reported load convention differs from prescription",)
                 add(f"kg.{item.load_convention}", item.kg, "manual-actual", tip.id)
             else:
                 add("kg", item.kg, "manual-actual", tip.id)
         elif isinstance(report, actual.RunExecution):
-            comparison = True
+            dimensions.add("comparison-context")
+            if known_context(report.role):
+                dimensions.add("running-role")
             add("outing", report.confirmed_outing, "manual-actual", tip.id)
             for name in (
                 "elapsed_seconds",
@@ -174,11 +199,12 @@ def _task(
             sport,
             fields,
             blockers,
-            comparison,
+            dimensions,
             interval,
             interval_indices,
             manual,
-            member is not None,
+            member,
+            item is not None,
         ),
     )
 
@@ -187,11 +213,12 @@ def _qualifications(
     sport: str,
     fields: dict[str, e.FieldEvidence],
     blockers: tuple[str, ...],
-    comparison: bool,
+    dimensions: set[str],
     interval: bool,
     interval_indices: tuple[int, ...],
     manual: e.Manual | None,
-    retained: bool,
+    member: e.NativeMember | None,
+    manual_set: bool,
 ) -> tuple[e.Qualification, ...]:
     strength = sport == "strength"
     execution_field = "status" if strength else "outing"
@@ -206,8 +233,7 @@ def _qualifications(
     ):
         # A provider completion timestamp or retained outing is source evidence of execution.
         available.add("execution")
-    if comparison:
-        available.add("comparison-context")
+    available.update(dimensions)
     if fields["session_manageable"].value is True:
         available.add("confirmed-manageable")
     if fields["session_manageable"].state == "actual" or fields["tolerance"].state == "actual":
@@ -216,18 +242,27 @@ def _qualifications(
         not strength and performed and manual and manual.history[-1].actual.status == "completed"
     ):
         available.add("complete-task")
-    if retained or (manual and manual.history[-1].actual.performed):
+    if performed and manual_set:
+        available.add("performed-set")
+    if member or (manual and manual.history[-1].actual.performed):
         available.add("recorded")
     interval_required: tuple[str, ...] = ()
     if interval:
         interval_required = ("completed_work_repetitions", "aligned-work-durations")
-        if interval_indices and all(
-            fields.get(f"step.{i}.status")
-            and fields[f"step.{i}.status"].value == "completed"
-            and f"step.{i}.elapsed_seconds" in available
+        timed = sum(
+            1
             for i in interval_indices
-        ):
+            if (status := fields.get(f"step.{i}.status"))
+            and status.value == "completed"
+            and f"step.{i}.elapsed_seconds" in available
+        )
+        count = fields["completed_work_repetitions"].value
+        if interval_indices and timed == len(interval_indices) and timed == count:
             available.add("aligned-work-durations")
+        if isinstance(count, int) and timed < count:
+            blockers += (
+                f"{timed} of {count} reported work repetitions have aligned achieved durations",
+            )
 
     conflicts = tuple(
         f"contradictory {name}" for name, field in fields.items() if field.state == "conflict"
@@ -247,17 +282,20 @@ def _qualifications(
             exclusions=exclusions,
         )
 
-    dimensions = (
-        ("movement-variation", "equipment", "load-convention", "group-and-ordinal")
+    required_dimensions = (
+        ("movement", "variation", "equipment", "load-convention", "group", "ordinal")
         if strength
         else ("running-role",)
     )
-    if comparison:
-        available.update(dimensions)
-    base = ("execution", "comparison-context", *dimensions, *dose, *interval_required)
-    scoped = tuple(dict.fromkeys(blockers + conflicts))
+    base = ("execution", "comparison-context", *required_dimensions, *dose, *interval_required)
+    # A disputed listing can undermine an import-only outing claim. Independently
+    # supported execution stays available under its own receipt or manual assertion.
+    disputed = member.activity_discrepancies if member and observed.state == "source-only" else ()
+    scoped = tuple(dict.fromkeys(blockers + conflicts + disputed))
     return (
-        qualification("descriptive-exposure", ("recorded",), dose, ()),
+        qualification(
+            "descriptive-exposure", ("performed-set",) if manual_set else ("recorded",), dose, ()
+        ),
         qualification(
             "confirmed-execution",
             ("execution",),
@@ -271,6 +309,7 @@ def _qualifications(
                     "contradictory status",
                     "contradictory outing",
                 )
+                or b in disputed
                 or "duplicate" in b
             ),
         ),

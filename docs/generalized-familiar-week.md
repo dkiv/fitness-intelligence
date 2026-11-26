@@ -86,14 +86,14 @@ The columns use the original case numbers from [M01](research/curation/j3b-001-s
 | --- | --- | --- | --- | --- |
 | 01 | I · familiar hold with confirmed group/ordinal effort and cap | I · balanced familiar week | I · familiar hold with confirmed effort and cap on each expanded step | P · balanced hold works, comparable outcome review deferred |
 | 02 | P · top/backoff deviations scoped by ordinal, response deferred | I · strength emphasis with protected running | I · reject stale or absent running history | X · upper rep increase |
-| 03 | P · partial sets and actual reps reported, fallback programming deferred | D · outcome comparability | D · run/walk ledger | X · increase controlled work |
+| 03 | P · set exposure follows each reported ordinal in a partial session, fallback programming deferred | D · outcome comparability | D · run/walk ledger | X · increase controlled work |
 | 04 | P · explicit misses distinguished from unknown, rescheduling deferred | D · decline in protected performance | X · weekly duration increase | X · upper plus easy increase |
 | 05 | I · scoped athlete confirmation preserves original inference and hold | X · set trial | X · long extension | X · optional joint exception |
-| 06 | I · require matching equipment and load convention | X · load progression | D · distance novelty review | X · combined quality and lower increase |
+| 06 | I · require matching equipment and load convention, withhold set comparison for unknown dimensions | X · load progression | D · distance novelty review | X · combined quality and lower increase |
 | 07 | P · recent baseline enforced, restoration deferred | X · cumulative load change | X · work rep or duration change | X · aggregate set trial |
 | 08 | X · low-count set trial | X · joint increase | P · exact recoveries implemented, additional rep operator disabled | D · adverse squat review |
-| 09 | X · simultaneous set/load increase | I · reserved time grants no extra work | P · D1D duration retained, aggregate splits supply no achieved steps, follow-up deferred | X · Q0 entry |
-| 10 | P · D1D outing summary and E422 mask reconciled, protected-run decision deferred | P · fixed versus movable placement works, post-approval moves deferred | X · quality-duration progression | P · supplied achieved fields selectable, quality operator disabled |
+| 09 | X · simultaneous set/load increase | I · reserved time grants no extra work | P · known role and aligned timing for every reported work repetition required, follow-up deferred | X · Q0 entry |
+| 10 | P · partial-day outings supported, contradictory enumeration withholds import-only execution, protected-run decision deferred | P · fixed versus movable placement works, post-approval moves deferred | X · quality-duration progression | P · reported count and timed work preserved with explicit shortfalls, quality operator disabled |
 | 11 | P · current D1D content and mapping rechecked, approval-time scope check deferred | I · adjacent elapsed spacing | X · easy-duration progression | P · current projection retains inference and masks, joins each linked ordinal once, policy gate deferred |
 | 12 | X · RPE-free progression | P · D1D inference stays descriptive, scoped athlete actuals support review, automatic baseline selection deferred | D · HR/conditions | D · re-entry after travel |
 | 13 | P · decline and conflict supported, moves deferred | P · closure conflict and immutable execution supported, block revision deferred | D · pace comparability | I · restriction invalidates proposal and blocks affected work |
