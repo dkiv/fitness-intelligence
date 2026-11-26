@@ -298,8 +298,7 @@ def test_dated_receipts_replay_and_refs(db: Session, preview_cycle: tuple) -> No
         cmd.submit(cycle, head, Generate(1))
     with pytest.raises(ValueError, match="unsupported"):
         cmd.submit(cycle, head, f.ProposeBlock())
-    with pytest.raises(ValueError, match="unsupported"):
-        cmd.weekly_review(cycle, 1)
+    assert cmd.weekly_review(cycle, 1).origin_revision == versions[0]
     with pytest.raises(ValueError, match="unsupported"):
         cmd.record_outcome(
             cycle,

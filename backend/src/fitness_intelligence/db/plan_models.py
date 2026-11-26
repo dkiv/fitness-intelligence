@@ -152,14 +152,29 @@ class SessionOutcome(OwnedRecord, Base):
             name="fk_outcome_supersedes",
         ),
         CheckConstraint("choice = 'approve'", name="approved"),
-        CheckConstraint("week IN (1, 2)", name="week"),
+        ForeignKeyConstraint(
+            ["user_id", "plan_id", "origin_revision_id", "choice"],
+            [
+                "plan_decisions.user_id",
+                "plan_decisions.plan_id",
+                "plan_decisions.revision_id",
+                "plan_decisions.choice",
+            ],
+            name="fk_outcome_origin_approval",
+        ),
         CheckConstraint(
-            "slot IN ('first-press','second-press','short-run','long-run')", name="slot"
+            "(outcome_version = 1 AND origin_revision_id IS NULL AND week IN (1, 2) AND "
+            "slot IN ('first-press','second-press','short-run','long-run')) OR "
+            "(outcome_version = 2 AND origin_revision_id IS NOT NULL AND week > 0 "
+            "AND workout_id IS NULL)",
+            name="versioned_scope",
         ),
         CheckConstraint("occurred_at <= recorded_at", name="elapsed"),
         CheckConstraint("id <> supersedes_id", name="distinct_correction"),
     )
 
+    outcome_version: Mapped[int] = mapped_column(server_default=text("1"))
+    origin_revision_id: Mapped[UUID | None]
     plan_id: Mapped[UUID]
     revision_id: Mapped[UUID]
     choice: Mapped[str] = mapped_column(server_default="approve")
