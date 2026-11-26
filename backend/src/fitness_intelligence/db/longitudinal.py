@@ -15,8 +15,10 @@ from sqlalchemy.sql.elements import ColumnElement
 
 from fitness_intelligence.analytics.longitudinal import (
     Coverage,
+    DailyExpenditure,
     DailyIntake,
     DailyWeight,
+    ExpenditureObservation,
     IntakeObservation,
     Issue,
     LongitudinalReport,
@@ -28,10 +30,12 @@ from fitness_intelligence.analytics.longitudinal import (
     daily_median,
 )
 from fitness_intelligence.analytics.strength import DAY, Period
+from fitness_intelligence.analytics.weight import partition_weigh_ins
+from fitness_intelligence.db.endurance_models import DailyRecoveryObservation
 from fitness_intelligence.db.history_models import GarminCoverage, GarminIssue
 from fitness_intelligence.db.models import SourceAccount
 from fitness_intelligence.db.nutrition_models import BodyWeightObservation, DailyIntakeObservation
-from fitness_intelligence.domain.endurance import Source
+from fitness_intelligence.domain.endurance import DailyMetric, Source
 from fitness_intelligence.nutrition.intake import IntakeSelection, select_daily_intake
 from fitness_intelligence.nutrition.weight import WeightDay, select_weight_day
 
@@ -230,16 +234,27 @@ def _weight_day(
     if not selection.retained_ids:
         reasons.update(("no_weight_observation", coverage.status))
     reasons.update(reason for item in excluded for reason in item.reasons)
+    groups = partition_weigh_ins(eligible)
+    median = None
+    if len(groups) == 1:
+        median = daily_median(tuple(w.value for w in eligible))
+        status = "observed"
+    elif groups:
+        known_writers = {key.writer for key in groups if key.writer is not None}
+        reasons.add(
+            "incompatible_weight_regimes"
+            if len(known_writers) > 1
+            else "weight_comparability_unverified"
+        )
+        status = "withheld"
+    else:
+        status = "withheld" if excluded or selection.reasons else "missing"
     aligned = day_aligned and all(w.report_date == coverage.provider_date for w in eligible)
     return DailyWeight(
         Metric(
             scope="account_day",
-            status="observed"
-            if eligible
-            else "withheld"
-            if excluded or selection.reasons
-            else "missing",
-            value=daily_median(tuple(w.value for w in eligible)),
+            status=status,
+            value=median,
             unit="kg",
             report_date=coverage.provider_date if aligned else None,
             supporting=tuple(w.identity for w in eligible),
@@ -252,8 +267,77 @@ def _weight_day(
     )
 
 
+ENERGY = (DailyMetric.TOTAL_ENERGY, DailyMetric.ACTIVE_ENERGY, DailyMetric.BASAL_ENERGY)
+
+
+def _expenditure_day(
+    rows: Mapping[str, DailyRecoveryObservation], coverage: Coverage, aligned: bool
+) -> DailyExpenditure:
+    day = coverage.provider_date
+    report_date = day if aligned else None
+    facts = []
+    metrics = []
+    for component in ENERGY:
+        row = rows.get(component)
+        # Known component subjects qualify only that field. Unknown scopes hold the category.
+        reasons = {
+            issue.reason
+            for issue in coverage.issues
+            if issue.subject == component or issue.subject not in ENERGY
+        }
+        supporting = ()
+        if row is None:
+            reasons.update(("no_component_observation", coverage.status))
+            status = "missing"
+        else:
+            identity = ObservationId(coverage.source, "daily_recovery", row.id)
+            facts.append(
+                ExpenditureObservation(
+                    identity=identity,
+                    provider_date=day,
+                    report_date=report_date,
+                    occurred_at=None,
+                    retrieved_at=row.retrieved_at,
+                    recorded_at=None,
+                    value=row.value,
+                    unit=row.unit,
+                    method=row.method,
+                    source_field=row.source_field,
+                    mapping_version=row.mapping_version,
+                    upstream_writer=None,
+                    component=component,
+                    window_start=row.window_start,
+                    window_end=row.window_end,
+                )
+            )
+            if (row.method, row.unit) != ("wearable_estimate", "kcal"):
+                reasons.add("ineligible_method_or_unit")
+            status = "withheld" if reasons else "observed"
+            if not reasons:
+                supporting = (identity,)
+        metrics.append(
+            Metric(
+                "account_day",
+                status,
+                row.value if supporting else None,
+                "kcal",
+                report_date,
+                supporting,
+                int(row is not None),
+                tuple(sorted(reasons)),
+            )
+        )
+    total, active, basal = metrics
+    return DailyExpenditure(total, active, basal, tuple(facts), coverage)
+
+
 def _read(
-    db: Session, owner: UUID, period: Period, account: UUID, zones: Mapping[UUID, ZoneInfo]
+    db: Session,
+    owner: UUID,
+    period: Period,
+    account: UUID,
+    zones: Mapping[UUID, ZoneInfo],
+    expenditure_account: UUID | None,
 ) -> LongitudinalReport:
     accounts = {
         a.id: a
@@ -263,18 +347,24 @@ def _read(
             .order_by(SourceAccount.id)
         )
     }
-    weight_account = accounts.get(account)
-    if (
-        weight_account is None
-        or weight_account.provider != "garmin"
-        or weight_account.status == "legacy_unresolved"
-        or zones.keys() - accounts.keys()
+    selected = [account] if expenditure_account is None else [account, expenditure_account]
+    if zones.keys() - accounts.keys() or any(
+        i not in accounts
+        or accounts[i].provider != "garmin"
+        or accounts[i].status == "legacy_unresolved"
+        for i in selected
     ):
         raise ValueError("invalid source account for report")
     sources = {i: Source(owner, a.provider, i) for i, a in accounts.items()}
 
     def in_range(
-        model: type[DailyIntakeObservation | BodyWeightObservation | GarminCoverage | GarminIssue],
+        model: type[
+            DailyIntakeObservation
+            | BodyWeightObservation
+            | DailyRecoveryObservation
+            | GarminCoverage
+            | GarminIssue
+        ],
     ) -> tuple[ColumnElement[bool], ...]:
         return (
             model.user_id == owner,
@@ -308,10 +398,28 @@ def _read(
         )
     }
 
+    energy: dict[date, dict[str, DailyRecoveryObservation]] = defaultdict(dict)
+    if expenditure_account is not None:
+        for row in db.scalars(
+            select(DailyRecoveryObservation).where(
+                *in_range(DailyRecoveryObservation),
+                DailyRecoveryObservation.provider == "garmin",
+                DailyRecoveryObservation.source_account_id == expenditure_account,
+                DailyRecoveryObservation.metric.in_(ENERGY),
+            )
+        ):
+            energy[row.local_date][row.metric] = row
+
     def categories(model: type[GarminCoverage | GarminIssue]) -> ColumnElement[bool]:
-        return (model.category == "intake") | (
+        selected_categories = (model.category == "intake") | (
             (model.category == "weight") & (model.source_account_id == account)
         )
+
+        if expenditure_account is not None:
+            selected_categories |= (model.category == "expenditure") & (
+                model.source_account_id == expenditure_account
+            )
+        return selected_categories
 
     ledger = {
         (c.source_account_id, c.category, c.local_date): c
@@ -362,6 +470,14 @@ def _read(
                     period,
                     account in zones and zones[account].key == period.zone.key,
                 ),
+                _expenditure_day(
+                    energy[day],
+                    coverage(expenditure_account, "expenditure", day, len(energy[day])),
+                    expenditure_account in zones
+                    and zones[expenditure_account].key == period.zone.key,
+                )
+                if expenditure_account is not None
+                else None,
             )
         )
     return LongitudinalReport(
@@ -370,6 +486,9 @@ def _read(
         period,
         tuple(sorted((i, z.key) for i, z in zones.items())),
         tuple(days),
+        expenditure_source=sources[expenditure_account]
+        if expenditure_account is not None
+        else None,
     )
 
 
@@ -380,6 +499,7 @@ def query_longitudinal(
     period: Period,
     weight_account_id: UUID,
     source_zones: Mapping[UUID, ZoneInfo] | None = None,
+    expenditure_account_id: UUID | None = None,
 ) -> LongitudinalReport:
     """Own a fresh read-only snapshot. Source zones describe verified calendars for this period."""
     if not isinstance(engine, Engine) or engine.dialect.name != "postgresql":
@@ -402,4 +522,4 @@ def query_longitudinal(
             if tuple(settings) != ("repeatable read", "on"):
                 raise ValueError("unsuitable report transaction")
             with Session(conn, autoflush=False) as db:
-                return _read(db, owner_id, period, weight_account_id, zones)
+                return _read(db, owner_id, period, weight_account_id, zones, expenditure_account_id)
