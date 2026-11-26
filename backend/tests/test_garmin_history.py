@@ -349,6 +349,29 @@ def test_full_page_budget_resume_and_disappearance(
     assert len(list(db.scalars(select(Workout)))) == 10
 
 
+def test_empty_activity_receipt_starts_before_first_listing(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    _, provider = bound
+    provider.activity_rows = []
+    listing_times = []
+
+    def capture(offset: int, payload: list) -> list:
+        listing_times.append(datetime.now(UTC))
+        return payload
+
+    provider.mutation = capture
+    before = datetime.now(UTC)
+    run(db, bound, (Category.ACTIVITIES, Category.STEPS))
+    ledger = {r.category: r for r in db.scalars(select(GarminCoverage))}
+    empty = ledger[Category.ACTIVITIES]
+    started_at = datetime.fromisoformat(empty.receipts["empty_activity_scan"]["started_at"])
+    assert len(listing_times) == 2 and empty.status == "empty" and empty.eligible_count == 0
+    assert before <= started_at <= listing_times[0] <= listing_times[1] <= empty.last_success
+    assert empty.last_success == empty.attempted_at
+    assert ledger[Category.STEPS].receipts == {}
+
+
 @pytest.mark.parametrize("mutation", ["repeat", "overlap", "order", "edit"])
 def test_unstable_pagination_retains_verified_details(
     db: Session, bound: tuple[Evidence, HistoricalProvider], mutation: str

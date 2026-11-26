@@ -1,8 +1,9 @@
 """Synthetic source-scoped weekly report across the spring clock change."""
 
 from dataclasses import replace
-from datetime import UTC, datetime, time
+from datetime import UTC, date, datetime, time, timedelta
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 import pytest
 import test_adaptive_cycle as adaptive
@@ -24,7 +25,7 @@ from test_longitudinal import (
 from fitness_intelligence.adapters.hevy.analytics import HevyHistoryProfile
 from fitness_intelligence.analytics.longitudinal import LongitudinalReport
 from fitness_intelligence.analytics.strength import DAY, Period, StrengthFact
-from fitness_intelligence.analytics.weekly import aggregate_weeks
+from fitness_intelligence.analytics.weekly import Week, aggregate_weeks
 from fitness_intelligence.db import longitudinal
 from fitness_intelligence.db.endurance_models import (
     ActivitySplit,
@@ -196,7 +197,12 @@ def recovery(
 
 
 def read(
-    db: Session, src: SourceAccount, hevy: SourceAccount | None = None, p: Period = PERIOD
+    db: Session,
+    src: SourceAccount,
+    hevy: SourceAccount | None = None,
+    p: Period = PERIOD,
+    *,
+    provider_zone: ZoneInfo | None = ZONE,
 ) -> LongitudinalReport:
     return longitudinal.query_longitudinal(
         db.get_bind(),
@@ -209,7 +215,7 @@ def read(
         endurance_account_id=src.id,
         recovery_account_id=src.id,
         expenditure_account_id=src.id,
-        source_zones={src.id: ZONE},
+        source_zones={src.id: provider_zone} if provider_zone else {},
     )
 
 
@@ -352,7 +358,10 @@ def test_unified_week(db: Session) -> None:
     )
     assert report.days[1].endurance.days[0].instructions.status == "empty"
     assert report.days[1].endurance.sports[0].longest_observed.split_summary_rows is None
-    assert report.days[3].endurance.sports[0].sessions.value == 0
+    thursday = report.days[3].endurance
+    assert thursday.days[0].activities.last_success_count == 0
+    assert thursday.sports[0].sessions.status == "empty_at_retrieval"
+    assert thursday.sports[0].sessions.value is None
     assert report.days[4].endurance.sports[0].sessions.value is None
     assert report.days[5].endurance.days[0].activities.status == "never_queried"
     summaries = {v.metric: v for v in week.recovery.series}
@@ -400,10 +409,12 @@ def test_retained_membership_and_scoped_issues(db: Session) -> None:
     db.get(ExternalReference, tomb.reference_id).source_deleted_at = NOW
     i = issue(src, 1, "activities", "contradictory_revision")
     i.subject = "102"
+    empty_refresh = coverage(src, 0, "activities", "empty", 0)
+    empty_refresh.receipts = {"empty_activity_scan": {"started_at": (NOW - DAY).isoformat()}}
     db.add_all(
         [
             i,
-            coverage(src, 0, "activities", "empty", 0),
+            empty_refresh,
             coverage(src, 1, "activities", "observed", 1),
             coverage(src, 2, "activities", "empty", 0),
             coverage(src, 3, "activities", "failed", 4),
@@ -412,6 +423,7 @@ def test_retained_membership_and_scoped_issues(db: Session) -> None:
     db.commit()
     days = read(db, src).days
     assert days[0].endurance.days[0].discrepancies == ("retained_after_empty",)
+    assert days[0].endurance.days[0].full_day_empty_exclusion(PERIOD.stop) is not None
     (run,) = days[0].endurance.sports
     assert run.distance_m.status == "observed_only" and run.sessions.supporting_workouts == (
         kept.workout_id,
@@ -421,9 +433,9 @@ def test_retained_membership_and_scoped_issues(db: Session) -> None:
     assert next(
         f for f in days[1].endurance.days[0].facts if f.workout_id == held.workout_id
     ).activity_issues
-    assert (
-        days[2].endurance.days[0].facts == () and days[2].endurance.sports[0].distance_m.value == 0
-    )
+    assert days[2].endurance.days[0].facts == ()
+    assert days[2].endurance.sports[0].distance_m.status == "empty_at_retrieval"
+    assert days[2].endurance.sports[0].distance_m.value is None
     assert (
         days[3].endurance.days[0].activities.last_success_count == 4
         and days[3].endurance.sports[0].sessions.value is None
@@ -536,7 +548,6 @@ def test_empty_coverage_and_separate_recovery_series(db: Session) -> None:
     one = outing(db, src, 0, "101", "running", "trail_running", 0, None, None, None)
     link = db.get(ExternalReference, one.reference_id)
     link.sync_metadata = {"fields": {"steps": {"retrieved_at": NOW.isoformat()}}}
-    db.add_all(coverage(src, n, "activities", "empty", 0) for n in range(1, 7))
     baseline = recovery(src, 0, DailyMetric.SLEEP, 20000)
     revised = recovery(src, 1, DailyMetric.SLEEP, 26000)
     revised.mapping_version = "v2"
@@ -561,10 +572,100 @@ def test_empty_coverage_and_separate_recovery_series(db: Session) -> None:
         next(c for c in report.days[2].recovery.cells if c.metric == DailyMetric.SLEEP).status
         == "source_only"
     )
-    clipped = read(db, src, p=Period(START + DAY, PERIOD.stop, ZONE))
-    for cutoff, status in [
-        (PERIOD.stop, "complete_empty"),
-        (PERIOD.stop - DAY, "empty_at_retrieval"),
-    ]:
-        short = aggregate_weeks(clipped, reference_date=cutoff).weeks[0]
-        assert not short.fully_requested and short.endurance.sports[0].sessions.status == status
+
+
+@pytest.mark.parametrize(
+    ("day", "midnight_utc"),
+    [
+        (date(2025, 3, 9), datetime(2025, 3, 10, 4, tzinfo=UTC)),
+        (date(2025, 11, 2), datetime(2025, 11, 3, 5, tzinfo=UTC)),
+    ],
+)
+def test_empty_scan_and_provider_day_closure(
+    db: Session, day: date, midnight_utc: datetime
+) -> None:
+    src = account(db)
+    # The report zone differs from the verified Toronto provider calendar.
+    period = Period(day, day + DAY, ZoneInfo("UTC"))
+    ledger = coverage(src, (day - START).days, "activities", "empty", 0)
+    before = midnight_utc - timedelta(seconds=10)
+    ledger.receipts = {"empty_activity_scan": {"started_at": before.isoformat()}}
+    ledger.attempted_at = ledger.last_success = before + timedelta(seconds=5)
+    db.add(ledger)
+    db.commit()
+
+    def week(report: LongitudinalReport, cutoff: date) -> Week:
+        return aggregate_weeks(report, reference_date=cutoff).weeks[0]
+
+    original = read(db, src, p=period)
+    native = original.days[0].endurance.days[0]
+    assert native.verified_empty and not native.calendar_aligned
+    assert native.activities.last_success_count == 0 and native.activities.retained_count == 0
+    open_week = week(original, day)
+    closed_week = week(original, day + DAY)
+    assert not open_week.closed and closed_week.closed
+    assert "source_date_open_at_reference" in open_week.endurance.sports[0].reasons
+    assert "scan_started_before_source_date_closed" in closed_week.endurance.sports[0].reasons
+    for summary in (original.days[0].endurance, open_week.endurance, closed_week.endurance):
+        run = summary.sports[0]
+        assert all(
+            v.value is None and v.status == "empty_at_retrieval"
+            for v in (run.sessions, run.distance_m, run.duration_s, run.moving_s, run.elapsed_s)
+        )
+
+    # Even a fresh success timestamp after midnight can belong to a crossing scan.
+    ledger.attempted_at = ledger.last_success = midnight_utc + timedelta(seconds=5)
+    db.commit()
+    crossing = week(read(db, src, p=period), day + DAY).endurance.sports[0]
+    assert (
+        crossing.sessions.value is None
+        and "scan_started_before_source_date_closed" in crossing.reasons
+    )
+
+    # Both listings of the next acquisition take place on the closed side of the boundary.
+    after = midnight_utc + timedelta(seconds=10)
+    ledger.receipts = {"empty_activity_scan": {"started_at": after.isoformat()}}
+    ledger.attempted_at = ledger.last_success = after + timedelta(seconds=5)
+    db.commit()
+    refreshed = read(db, src, p=period)
+    for summary in (refreshed.days[0].endurance, week(refreshed, day + DAY).endurance):
+        run = summary.sports[0]
+        assert all(
+            v.value == 0 and v.status == "complete_empty"
+            for v in (run.sessions, run.distance_m, run.duration_s, run.moving_s, run.elapsed_s)
+        )
+    native = refreshed.days[0].endurance.days[0]
+    assert replace(native, scan_started_at=midnight_utc).full_day_empty_exclusion(day + DAY) is None
+    unknown_policy = replace(native, activities=replace(native.activities, policy="unreviewed"))
+    assert unknown_policy.full_day_empty_exclusion(day + DAY) == "unverified_scan_timing"
+    assert week(refreshed, day).endurance.sports[0].sessions.value is None
+    unknown = week(read(db, src, p=period, provider_zone=None), day + DAY).endurance.sports[0]
+    assert unknown.sessions.value is None and "unknown_provider_calendar" in unknown.reasons
+
+
+def test_weekly_zero_requires_every_empty_scan_to_cover_its_closed_date(db: Session) -> None:
+    src = account(db)
+    rows = [coverage(src, n, "activities", "empty", 0) for n in range(7)]
+    for row in rows:
+        row.receipts = {"empty_activity_scan": {"started_at": (NOW - DAY).isoformat()}}
+    # Legacy history-v1 stores only the time that success was recorded.
+    rows[-1].receipts = {}
+    db.add_all(rows)
+    db.commit()
+    report = read(db, src)
+    week = aggregate_weeks(report, reference_date=PERIOD.stop).weeks[0]
+    assert week.fully_requested and week.closed
+    statuses = [d.endurance.sports[0].sessions.status for d in report.days]
+    assert statuses == ["complete_empty"] * 6 + ["empty_at_retrieval"]
+    run = week.endurance.sports[0]
+    assert run.reasons == ("unverified_scan_timing",)
+    assert all(
+        v.value is None and v.status == "empty_at_retrieval"
+        for v in (run.sessions, run.distance_m, run.duration_s, run.moving_s, run.elapsed_s)
+    )
+
+    rows[-1].receipts = {"empty_activity_scan": {"started_at": (NOW - DAY).isoformat()}}
+    db.commit()
+    complete = aggregate_weeks(read(db, src), reference_date=PERIOD.stop).weeks[0]
+    assert complete.endurance.sports[0].distance_m.value == 0
+    assert complete.endurance.sports[0].distance_m.status == "complete_empty"

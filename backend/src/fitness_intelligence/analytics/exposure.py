@@ -2,9 +2,10 @@
 
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import UTC, date, datetime, time
 from decimal import Decimal
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 import polars as pl
 
@@ -14,7 +15,7 @@ from fitness_intelligence.analytics.longitudinal import (
     RecoveryObservation,
     daily_median,
 )
-from fitness_intelligence.analytics.strength import CATEGORIES, StrengthFact, measured_sum
+from fitness_intelligence.analytics.strength import CATEGORIES, DAY, StrengthFact, measured_sum
 from fitness_intelligence.domain.endurance import DailyMetric, PaceState, Source, running_pace
 
 
@@ -193,6 +194,8 @@ class ActivityDay:
     instructions: Coverage
     facts: tuple[Outing, ...]
     calendar_aligned: bool
+    provider_zone: ZoneInfo | None = None
+    scan_started_at: datetime | None = None
 
     @property
     def discrepancies(self) -> tuple[str, ...]:
@@ -210,6 +213,30 @@ class ActivityDay:
         return self.activities.status == "empty" and not (
             self.facts or self.activities.issues or self.discrepancies
         )
+
+    def full_day_empty_exclusion(self, reference_date: date | None) -> str | None:
+        """A zero needs a clean empty scan begun after the entire native date elapsed."""
+        c = self.activities
+        if not self.verified_empty:
+            return "no_clean_empty_acquisition"
+        if reference_date is not None and c.provider_date >= reference_date:
+            return "source_date_open_at_reference"
+        if self.provider_zone is None:
+            return "unknown_provider_calendar"
+        if (
+            c.policy != "history-v1"
+            or self.scan_started_at is None
+            or c.last_success is None
+            or c.last_success != c.attempted_at
+            or self.scan_started_at > c.last_success
+        ):
+            return "unverified_scan_timing"
+        midnight = datetime.combine(c.provider_date + DAY, time.min, self.provider_zone)
+        # A clock rollback can repeat midnight. Use the later boundary in UTC.
+        closed_at = max(midnight.replace(fold=fold).astimezone(UTC) for fold in (0, 1))
+        if self.scan_started_at < closed_at:
+            return "scan_started_before_source_date_closed"
+        return None
 
 
 @dataclass(frozen=True)
@@ -249,8 +276,14 @@ class EnduranceExposure:
         groups: dict[tuple[str, str | None], list[Outing]] = defaultdict(list)
         groups["running", None] = []
         reasons = set()
+        complete_empty = bool(self.days)
         for d in self.days:
             c = d.activities
+            exclusion = d.full_day_empty_exclusion(self.reference_date)
+            if exclusion is not None:
+                complete_empty = False
+                if d.verified_empty:
+                    reasons.add(exclusion)
             reasons.update(d.discrepancies)
             if c.status == "observed":
                 reasons.add("enumerated_identities_not_retained")
@@ -264,10 +297,7 @@ class EnduranceExposure:
                     reasons.add("unknown_sport")
                 if not f.activity_issues:
                     group.append(f)
-        empty = all(d.verified_empty for d in self.days)
-        closed = self.reference_date is not None and all(
-            d.activities.provider_date < self.reference_date for d in self.days
-        )
+        empty = bool(self.days) and all(d.verified_empty for d in self.days)
         observed_status = (
             "observed_only" if any(d.discrepancies for d in self.days) else "lower_bound"
         )
@@ -275,8 +305,10 @@ class EnduranceExposure:
         def value(
             amount: Decimal | int | None, ids: tuple[UUID, ...], missing: tuple[UUID, ...] = ()
         ) -> ExposureValue:
+            if complete_empty:
+                return ExposureValue(0, "complete_empty", ())
             if empty:
-                return ExposureValue(0, "complete_empty" if closed else "empty_at_retrieval", ())
+                return ExposureValue(None, "empty_at_retrieval", ())
             return ExposureValue(amount, observed_status if ids else "unknown", ids, missing)
 
         result = []

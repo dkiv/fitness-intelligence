@@ -3,7 +3,7 @@
 import re
 from collections import Counter, defaultdict
 from collections.abc import Mapping
-from datetime import date
+from datetime import date, datetime
 from decimal import localcontext
 from typing import Literal
 from uuid import UUID
@@ -50,6 +50,20 @@ from fitness_intelligence.nutrition.weight import WeightDay, select_weight_day
 GARMIN_NUTRITION_V1 = "garmin-personal-b3.2-v1"
 FOOD_FIELD = "DailyNutritionSummaryDTO.dailyNutritionContent.calories"
 type DayKey = tuple[UUID, str, date]
+
+
+def _empty_scan_start(row: GarminCoverage | None) -> datetime | None:
+    if row is None or row.status != "empty":
+        return None
+    receipt = row.receipts.get("empty_activity_scan")
+    stamp = receipt.get("started_at") if isinstance(receipt, dict) else None
+    if not isinstance(stamp, str):
+        return None
+    try:
+        start = datetime.fromisoformat(stamp)
+    except ValueError:
+        return None
+    return start if start.tzinfo is not None else None
 
 
 def _coverage(
@@ -504,6 +518,10 @@ def _read(
                 ),
                 activities,
                 aligned(endurance_account) and all(f.report_date == day for f in activities),
+                provider_zone=zones.get(endurance_account),
+                scan_started_at=_empty_scan_start(
+                    ledger.get((endurance_account, "activities", day))
+                ),
             )
             endurance_view = EnduranceExposure((native,))
         recovery_view = None
