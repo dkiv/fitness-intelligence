@@ -1,6 +1,6 @@
 # E4.1 · Synthetic familiar-week planner
 
-E4.1 builds a six-week example block for each of three priorities and details one week at a time. Every session repeats comparable, confirmed work. The supported block length is 1–52 weeks. Each week has a phase intention, seven local dates and its own approval. A future intention has no executable prescription. [E4.0 design](generalized-hybrid-planner-design.md)
+E4.1 validates supplied session templates against one selected representative week of synthetic, confirmed history and places those sessions on a calendar. The caller supplies the block, its phase intentions and the selected observations. The three examples each use a six-week block. Finding an optimal block or constructing a personalized program automatically from imported training history remains outside this slice. The supported block length is 1–52 weeks. Each week has a phase intention, seven local dates and its own approval. A future intention has no executable prescription. [E4.0 design](generalized-hybrid-planner-design.md)
 
 ## Try the three histories
 
@@ -24,9 +24,15 @@ Each gym visit reserves 26 minutes for preparation, transitions, ordered press a
 
 A context ranks outcomes, declares an IANA zone, equipped weekday windows, optional preferred weekdays, unavailable dates, fixed local session starts, fixed events and current task exclusions. Choose one complete synthetic representative week starting 7–28 days before the block. Each baseline template needs one distinct confirmed and manageable observed occurrence, with a support key, date, role and actual work. For strength the ordered actuals must match movement, variation, equipment, load convention, group, kind, ordinal, reps and kg. For runs the actual expanded step purposes and elapsed seconds must match. Inferred observations, missing members and ambiguous repeats fail initialization. An optional wider upper endpoint requires explicit confirmation of that jointly familiar upper workload in the synthetic report. The first slice accepts one representative week and a fixed baseline for the block.
 
+**Effort support.** Each numeric prescription needs an athlete-confirmed familiar instruction for the same template and running role or strength task. The confirmation identifies the exact low, nominal and high RPE and the explicit execution cap. Strength matches each exercise, group and working or warm-up ordinal. Running matches each position in the expanded work/recovery sequence, including an explicit final recovery. An athlete can affirm the listed instructions together without supplying achieved RPE measurements. The synthetic fixtures specify those confirmations independently of the proposed instructions.
+
+An optional observed RPE describes the effort actually reported for that set or step. It cannot establish the familiar target or stop cap. A reported effort above the cap blocks a repeat for that task under this rule. Manageability supplies tolerance feedback. If either the numeric instruction or its cap lacks support, the planner identifies the affected set or step and rejects the numeric proposal. Qualitative-only effort prescriptions remain deferred.
+
 A block pins its key, start, phase per week, protected outcome protocols, exposure floors, optional elapsed start-to-start spacing and exact baseline templates. Count working sets and elapsed running seconds at the minimum permitted endpoints when testing floors. Strength targets include discrete load convention/increment, per-set maximum execution-time allowance, rest after each ordinal, preparation and transition allowances. Running reservations sum the maximum expanded step durations and preparation. Session and exercise notes remain on the canonical prescription. The program records protected opportunities. Outcome-direction measurement belongs to E4.2 and later review.
 
 Placement considers a five-minute local grid plus exact fixed starts. It resolves windows to UTC, places higher-ranked disciplines first, tries preferred and habitual weekdays, checks fixed events, equipment, restrictions, overlaps and declared elapsed spacing, and backtracks when necessary. It checks approved previous weeks and fixed future occurrences. Gaps in the spring clock change and ambiguous unqualified starts are ineligible. A fixed start in a repeated hour can supply its fold. Ambiguous window boundaries require an unambiguous replacement window. The default search stops after 20,000 examined placement options. A feasible result carries exact starts. A `PlacementFailure` reports the domain, examined count, limit, reasons and whether search was incomplete. A proved contradiction or exhausted finite domain can establish infeasibility within those constraints.
+
+Each reservation must fit an equipped window, including preparation, transitions, rests and the largest allowed execution duration. Several disjoint reservations may fit the same day. Aggregate daily or weekly minute budgets, daily session-count limits, travel between locations, shared-equipment capacity and date-specific replacement windows remain deferred. The represented availability is weekly recurring windows, whole unavailable dates, fixed local starts and blocked event intervals.
 
 ## Trusted proposal, approval and replay
 
@@ -64,13 +70,21 @@ Each eligible next week requires its own sealed proposal and simulated receipt, 
 
 The v2 discriminator uses the existing immutable JSONB context/block/revision columns. Approval rechecks current head/context, retained future conditions, date and exact replay under the existing owner-then-cycle locks. The original receipt, decline and rollback semantics apply. V1 decoding, E1 rules, E2 approval and E3 attribution stay on their original path. The schema needs no migration. Generalized requests on other principals are rejected. A request cannot select operational mode. Approval on the reserved synthetic principal simulates approval only. Explicitly adding reviewed operational rule authorization is future work.
 
+**Rule and replay compatibility.** New proposals pin `synthetic.familiar.hold.v2`. A sealed proposal under `synthetic.familiar.hold.v1` can reproduce its original dose-only result. Its pending approval requires a fresh proposal with the corrected rule and supported effort. An already approved block with missing effort support keeps its sealed baseline. Continuing with newly confirmed instructions requires a new synthetic cycle because E4.1 has no block-revision command. An exact retry of an existing receipt returns its original result. The schema and the separate E1/E2/E3 fixture path are unchanged.
+
+### Rolling horizon still to implement
+
+The domain tests exercise independent valid week numbers. The persistence test seals, approves and replays all six consecutive weeks under one synthetic clock to check serialization, dated receipts and earlier prescription identities. A phase intention or that fixture’s six approvals supplies no operational authority to prescribe six future weeks from stale history.
+
+Later slices must restrict executable detail to the upcoming review window, keep subsequent weeks provisional, and pin the approved predecessor and the decision-time cutoff. Before generating or approving the next detailed week, recheck recent comparable actual work, source support, tolerance, interruptions, current restrictions and calendar commitments. Missing or stale evidence must limit the available actions, with a fresh review and a separate athlete decision for each dated week. Operational rule authorization remains a separate prerequisite.
+
 ## Archived conformance cases
 
 The columns use the original case numbers from [M01](research/curation/j3b-001-strength-progression-methodology.md), [M02](research/curation/j3b-002-hybrid-block-methodology.md), [M03](research/curation/j3b-003-running-methodology.md) and [J3I](research/curation/j3i-001-integrated-hybrid-methodology.md). **I** identifies an implemented behavior. **D** marks a deferred case, including partial coverage where specified. **X** marks a disabled operator or authorization. Of the 94 archived cases, 15 have an implemented behavior, 49 remain deferred or partial, and 30 involve disabled operators. Rejection of an unsupported command does not exercise a later operator’s eligibility test.
 
 | Number | M01 T | M02 B-T | M03 T | J3I I |
 | --- | --- | --- | --- | --- |
-| 01 | I · familiar maintenance hold | I · balanced familiar week | I · familiar running hold | D · balanced hold works, comparable outcome review deferred |
+| 01 | I · familiar hold with confirmed group/ordinal effort and cap | I · balanced familiar week | I · familiar hold with confirmed effort and cap on each expanded step | D · balanced hold works, comparable outcome review deferred |
 | 02 | D · top/backoff response | I · strength emphasis with protected running | I · reject stale or absent running history | X · upper rep increase |
 | 03 | D · partial set execution | D · outcome comparability | D · run/walk ledger | X · increase controlled work |
 | 04 | D · missed attribution | D · decline in protected performance | X · weekly duration increase | X · upper plus easy increase |
@@ -93,7 +107,7 @@ The columns use the original case numbers from [M01](research/curation/j3b-001-s
 | 21 | — | D · outcome denominators | D · protected performance review | X · adaptive review budgets |
 | 22 | — | D · block revision | D · adherence versus outcome report | X · run/walk fraction change |
 | 23 | — | — | I · new restriction blocks approval | D · final/between arithmetic implemented, increasing rep count disabled |
-| 24 | — | — | D · correction/deletion of provider support | D · local versus shared difficulty |
+| 24 | — | — | D · correction/deletion of provider support | D · scoped effort repeat checked, local versus shared difficulty review deferred |
 | 25 | — | — | D · interruption/resumption | X · frequency redistribution |
 | 26 | — | — | I · fixed start versus protected floor/window conflict | D · partial actual versus predecessor |
 | 27 | — | — | D · alternative proposals across competing goals | — |

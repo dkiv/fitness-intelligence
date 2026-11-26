@@ -438,3 +438,175 @@ def test_corrupt_sealed_generalized_week(db: Session, preview_cycle: tuple) -> N
     with pytest.raises(InvalidSnapshot, match="differs from replay"):
         cmd.decide(cycle, revision.id, expected_head=opening, choice="approve", command_id=uuid4())
     assert cmd.current(cycle).revision_id == opening
+
+
+@pytest.mark.parametrize(
+    ("sport", "change", "reason"),
+    [
+        ("strength", {"target": {"low": "6", "nominal": "8", "high": "8"}}, "range or nominal"),
+        ("strength", {"cap": "9"}, "execution cap"),
+        ("running", {"target": {"low": "5", "nominal": "7", "high": "7"}}, "range or nominal"),
+        (
+            "running",
+            {"target": {"low": "5", "nominal": "6", "high": "8"}, "cap": "8"},
+            "range or nominal",
+        ),
+        ("running", {"cap": "9"}, "execution cap"),
+    ],
+)
+def test_matched_work_cannot_change_effort(sport: str, change: dict, reason: str) -> None:
+    block, ctx = example("balanced")
+    raw = wire.snapshot(block)
+    templates = {t["key"]: t["prescription"] for t in raw["data"]["templates"]}
+    if sport == "strength":
+        effort = templates["gym-a"]["exercises"][0]["groups"][1]["effort"]
+    else:
+        effort = templates["cruise"]["segments"][1]["work"]["effort"]
+    effort.update(change)
+    with pytest.raises(ValueError, match=reason):
+        generate(CYCLE, wire.read(f.Block, raw), ctx, 1)
+
+
+@pytest.mark.parametrize(
+    ("support", "reason"),
+    [
+        (None, "no confirmed familiar instruction"),
+        (f.EffortEvidence(observed_rpe=Decimal(7)), "no confirmed familiar instruction"),
+        (
+            f.EffortEvidence(
+                observed_rpe=Decimal(8), confirmed_target=Target(Decimal(6), Decimal(7), Decimal(8))
+            ),
+            "execution cap lacks matching explicit confirmation",
+        ),
+        (
+            f.EffortEvidence(
+                observed_rpe=Decimal(9),
+                confirmed_target=Target(Decimal(6), Decimal(7), Decimal(8)),
+                confirmed_cap=Decimal(8),
+            ),
+            "observed effort exceeded",
+        ),
+    ],
+)
+def test_strength_evidence_scoped_to_each_ordinal(
+    support: f.EffortEvidence | None,
+    reason: str,
+) -> None:
+    block, ctx = example("strength")
+    report = ctx.observations[0]
+    assert report.manageable and report.sets[1].effort.confirmed_cap == 8
+    # Identical instruction is confirmed for the first primary set and the backoff group.
+    # Neither can supply the missing or contradictory evidence for primary ordinal two.
+    sets = list(report.sets)
+    sets[2] = sets[2].model_copy(update={"effort": support})
+    ctx = ctx.model_copy(
+        update={
+            "observations": (report.model_copy(update={"sets": tuple(sets)}), *ctx.observations[1:])
+        }
+    )
+    with pytest.raises(ValueError, match=f"gym-a/press/primary set 2: .*{reason}"):
+        generate(CYCLE, block, ctx, 1)
+
+
+def test_running_support_belongs_to_the_role_and_expanded_step() -> None:
+    block, ctx = example("running")
+    raw = wire.snapshot(ctx)
+    reports = {o["role"]: o for o in raw["data"]["observations"]}
+    # Other work reps remain confirmed. A recovery cue cannot cover this work rep.
+    steps = reports["controlled"]["steps"]
+    steps[3]["effort"] = steps[2]["effort"]
+    with pytest.raises(ValueError, match=r"cruise/controlled step 4 \(work\): effort range"):
+        generate(CYCLE, block, wire.read(f.Context, raw), 1)
+    # Easy and long have identical numeric cues. A confirmation on easy cannot cover long.
+    del reports["long"]["steps"][0]["effort"]
+    with pytest.raises(ValueError, match=r"long/long step 1 \(work\): numeric effort target"):
+        generate(CYCLE, block, wire.read(f.Context, raw), 1)
+
+
+@pytest.mark.parametrize("emphasis", ["strength", "running", "balanced"])
+def test_confirmed_instructions_without_measured_effort(emphasis: Emphasis) -> None:
+    block, ctx = example(emphasis)
+    sealed = wire.read(f.Context, wire.snapshot(ctx))
+    for report in sealed.observations:
+        for item in (*report.sets, *report.steps):
+            assert item.effort.confirmed_target and item.effort.confirmed_cap is not None
+            assert item.effort.observed_rpe is None
+    assert len(generate(CYCLE, block, sealed, 1)) == 7
+
+
+def test_pre_correction_snapshot_replay_is_read_only(
+    db: Session, preview_cycle: tuple[PlanCommands, UUID, UUID]
+) -> None:
+    cmd, cycle, initial = preview_cycle
+    block, ctx = example("running")
+    raw = wire.snapshot(ctx)
+    for observation in raw["data"]["observations"]:
+        for item in (*observation["sets"], *observation["steps"]):
+            del item["effort"]
+    historical_context = wire.read(f.Context, raw)
+    assert wire.snapshot(historical_context) == raw
+    context_id = cmd.capture_context(historical_context, expected_context=initial)
+
+    def sealed(base: UUID | None, candidate: f.Candidate) -> PlanRevision:
+        revision = PlanRevision(
+            user_id=wire.PREVIEW_OWNER,
+            plan_id=cycle,
+            context_id=context_id,
+            base_id=base,
+            snapshot=wire.snapshot(candidate),
+        )
+        db.add(revision)
+        db.flush()
+        return revision
+
+    old_rule = "synthetic.familiar.hold.v1"
+    opening = sealed(
+        None,
+        f.Candidate(
+            rules=old_rule,
+            request=f.ProposeBlock(),
+            cycle=cycle,
+            block_key=block.key,
+            block_revision=None,
+            prior_weeks=(),
+            days=(),
+            supports=tuple(sorted(o.support for o in ctx.observations)),
+        ),
+    )
+    # An already sealed approving receipt from the pre-correction implementation.
+    command = uuid4()
+    db.add(
+        PlanDecision(
+            user_id=wire.PREVIEW_OWNER,
+            plan_id=cycle,
+            revision_id=opening.id,
+            choice="approve",
+            command_id=command,
+            decided_at=NOW,
+        )
+    )
+    db.flush()
+    expected = f.Candidate(
+        rules=old_rule,
+        request=f.FamiliarWeek(number=1),
+        cycle=cycle,
+        block_key=block.key,
+        block_revision=opening.id,
+        prior_weeks=(),
+        days=generate(cycle, block, ctx, 1),
+        supports=tuple(sorted(o.support for o in ctx.observations)),
+    )
+    pending = sealed(opening.id, expected)
+    assert wire.snapshot(cmd.replay_familiar(cycle, pending.id)) == pending.snapshot
+    assert (
+        cmd.decide(
+            cycle, opening.id, expected_head=None, choice="approve", command_id=command
+        ).revision_id
+        == opening.id
+    )
+    with pytest.raises(StalePlan, match="effort rule changed"):
+        cmd.decide(
+            cycle, pending.id, expected_head=opening.id, choice="approve", command_id=uuid4()
+        )
+    with pytest.raises(ValueError, match="no confirmed familiar instruction"):
+        cmd.submit(cycle, opening.id, f.FamiliarWeek(number=1))

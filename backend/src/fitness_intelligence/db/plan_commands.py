@@ -387,6 +387,7 @@ class PlanCommands:
         request: f.ProposeBlock | f.FamiliarWeek,
         *,
         today: date | None,
+        rule: f.FamiliarRule = f.RULE,
     ) -> f.Candidate:
         v2.require_preview_owner(self._owner)
         block = v2.read(f.Block, plan.block)
@@ -424,7 +425,9 @@ class PlanCommands:
                         )
                     except ValueError as exc:
                         raise StalePlan(str(exc)) from exc
-        candidate = v2.build(plan.id, block, context, request, block_revision, tuple(weeks))
+        candidate = v2.build(
+            plan.id, block, context, request, block_revision, tuple(weeks), rule=rule
+        )
         if today is not None:
             try:
                 v2.check_dates(candidate, block, today)
@@ -443,7 +446,9 @@ class PlanCommands:
                 AthleteContext.id == revision.context_id, AthleteContext.user_id == self._owner
             )
         ).one()
-        replay = self._familiar_candidate(plan, revision.base_id, ctx, saved.request, today=None)
+        replay = self._familiar_candidate(
+            plan, revision.base_id, ctx, saved.request, today=None, rule=saved.rules
+        )
         if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
             raise InvalidSnapshot("generalized historical replay mismatch")
         return replay
@@ -620,6 +625,8 @@ class PlanCommands:
                 raise StalePlan("planning context changed")
             if plan.block.get("schema_version") == 2:
                 candidate_v2 = v2.read(f.Candidate, revision.snapshot)
+                if candidate_v2.rules != f.RULE:
+                    raise StalePlan("familiar effort rule changed; submit a fresh proposal")
                 context_v2 = v2.read(f.Context, ctx.snapshot)
                 today = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
                 replay = self._familiar_candidate(

@@ -6,7 +6,7 @@ from typing import Any
 from uuid import UUID
 
 from ..planning import familiar as f
-from ..planning.familiar_calendar import generate
+from ..planning.familiar_calendar import generate_for_rule
 from .plan_snapshot import InvalidSnapshot, canonical
 
 # Dedicated fixture principal. Trusted process owner binding is still required for every command.
@@ -45,20 +45,25 @@ def build(
     request: f.ProposeBlock | f.FamiliarWeek,
     block_revision: UUID | None,
     weeks: tuple[ApprovedWeek, ...],
+    *,
+    rule: f.FamiliarRule,
 ) -> f.Candidate:
     if isinstance(request, f.ProposeBlock):
         if block_revision is not None or weeks:
             raise ValueError("block revisions and successor blocks are unsupported")
-        generate(cycle, block, ctx, 1)  # Do not propose an unusable initial contract.
+        generate_for_rule(
+            cycle, block, ctx, 1, (), rule=rule
+        )  # Do not propose an unusable initial contract.
         days = ()
     elif isinstance(request, f.FamiliarWeek):
         if block_revision is None or request.number != len(weeks) + 1:
             raise ValueError("approve the block, then detail consecutive new weeks")
         neighbors = tuple(s for week in weeks for day in week.days for s in day.sessions)
-        days = generate(cycle, block, ctx, request.number, neighbors)
+        days = generate_for_rule(cycle, block, ctx, request.number, neighbors, rule=rule)
     else:
         raise ValueError("unsupported generalized planning request")
     return f.Candidate(
+        rules=rule,
         request=request,
         cycle=cycle,
         block_key=block.key,

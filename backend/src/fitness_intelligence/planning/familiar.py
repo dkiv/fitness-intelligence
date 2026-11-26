@@ -18,7 +18,9 @@ type Seconds = Annotated[int, Field(ge=0, le=86400)]
 type Minute = Annotated[int, Field(ge=0, lt=1440)]
 type Sport = Literal["strength", "running"]
 type LoadConvention = Literal["total-external-kg", "per-hand-kg", "bodyweight"]
-RULE = "synthetic.familiar.hold.v1"
+type FamiliarRule = Literal["synthetic.familiar.hold.v1", "synthetic.familiar.hold.v2"]
+RULE: FamiliarRule = "synthetic.familiar.hold.v2"
+type RPE = Annotated[Decimal, Field(ge=0, le=10, allow_inf_nan=False)]
 
 
 class Record(BaseModel):
@@ -36,7 +38,7 @@ def unique[T](values: Iterable[T], label: str) -> None:
 class Effort(Record):
     scale: Literal["set-rpe-0-10", "run-step-rpe-0-10"]
     target: Target[Decimal]
-    cap: Annotated[Decimal, Field(ge=0, le=10, allow_inf_nan=False)]
+    cap: RPE
 
     @model_validator(mode="after")
     def valid_target(self) -> Self:
@@ -222,6 +224,21 @@ class Objective(Record):
     outcome: Text
 
 
+class EffortEvidence(Record):
+    """Independent athlete report in the containing set or run step's 0–10 RPE scale."""
+
+    observed_rpe: RPE | None = None
+    confirmed_target: Target[Decimal] | None = None
+    confirmed_cap: RPE | None = None
+
+    @model_validator(mode="after")
+    def instruction_bounds(self) -> Self:
+        ceiling = self.confirmed_cap if self.confirmed_cap is not None else 10
+        if self.confirmed_target is not None and self.confirmed_target.high > ceiling:
+            raise ValueError("confirmed effort target exceeds its scale or confirmed cap")
+        return self
+
+
 class ActualSet(Record):
     movement: Key
     variation: Key
@@ -233,6 +250,8 @@ class ActualSet(Record):
     reps: Positive
     kg: Annotated[Decimal, Field(ge=0, allow_inf_nan=False)]
 
+    effort: EffortEvidence | None = Field(default=None, exclude_if=lambda value: value is None)
+
     # Optional jointly confirmed, previously performed upper endpoints on this same template.
     familiar_max_reps: Positive | None = None
     familiar_max_kg: Annotated[Decimal, Field(ge=0)] | None = None
@@ -241,6 +260,7 @@ class ActualSet(Record):
 class ActualStep(Record):
     purpose: Literal["warmup", "work", "recovery", "cooldown"]
     elapsed_seconds: Positive
+    effort: EffortEvidence | None = Field(default=None, exclude_if=lambda value: value is None)
     familiar_max_seconds: Positive | None = None
 
 
@@ -410,7 +430,7 @@ class WeekRef(Record):
 
 
 class Candidate(Record):
-    rules: Literal["synthetic.familiar.hold.v1"] = RULE
+    rules: FamiliarRule = RULE
     mode: Literal["synthetic-research-preview"] = "synthetic-research-preview"
     request: ProposeBlock | FamiliarWeek
     cycle: UUID

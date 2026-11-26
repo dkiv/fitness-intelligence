@@ -28,7 +28,20 @@ class PlacementFailure(ValueError):
         )
 
 
-def _validate_baseline(block: f.Block, ctx: f.Context, limit: int) -> None:
+def _require_familiar_effort(
+    proposed: f.Effort, evidence: f.EffortEvidence | None, scope: str
+) -> None:
+    if evidence is None or evidence.confirmed_target is None:
+        raise ValueError(f"{scope}: numeric effort target has no confirmed familiar instruction")
+    if proposed.target != evidence.confirmed_target:
+        raise ValueError(f"{scope}: effort range or nominal differs from confirmed instruction")
+    if proposed.cap != evidence.confirmed_cap:
+        raise ValueError(f"{scope}: execution cap lacks matching explicit confirmation")
+    if evidence.observed_rpe is not None and evidence.observed_rpe > proposed.cap:
+        raise ValueError(f"{scope}: observed effort exceeded the confirmed execution cap")
+
+
+def _validate_baseline(block: f.Block, ctx: f.Context, limit: int, rule: f.FamiliarRule) -> None:
     """One distinct reported occurrence per template from the same recent representative week."""
     if not 7 <= (block.start - ctx.history_start).days <= 28:
         raise ValueError("baseline requires a recent completed representative week")
@@ -45,33 +58,40 @@ def _validate_baseline(block: f.Block, ctx: f.Context, limit: int) -> None:
         ):
             raise ValueError("familiar baseline requires confirmed, manageable role-specific work")
         if isinstance(p, f.Strength):
-            expected = tuple(
-                f.ActualSet(
-                    movement=e.movement,
-                    variation=e.variation,
-                    equipment=e.equipment,
-                    convention=e.load_convention,
-                    group=g.key,
-                    kind=g.kind,
-                    ordinal=s.ordinal,
-                    reps=s.reps.nominal,
-                    kg=s.load.nominal,
-                )
-                for e in p.exercises
-                for g in e.groups
-                for s in g.sets
-            )
-            reported = tuple(
-                a.model_copy(update={"familiar_max_reps": None, "familiar_max_kg": None})
-                for a in o.sets
-            )
-            targets = (s for e in p.exercises for g in e.groups for s in g.sets)
-            if reported != expected or any(
-                s.reps.high > (a.familiar_max_reps or a.reps)
-                or s.load.high > (a.kg if a.familiar_max_kg is None else a.familiar_max_kg)
-                for s, a in zip(targets, o.sets, strict=True)
-            ):
+            prescribed = tuple((e, g, s) for e in p.exercises for g in e.groups for s in g.sets)
+            if len(o.sets) != len(prescribed):
                 raise ValueError("strength baseline differs from comparable actual work")
+            for (exercise, group, target), actual in zip(prescribed, o.sets, strict=True):
+                identity = (
+                    exercise.movement,
+                    exercise.variation,
+                    exercise.equipment,
+                    exercise.load_convention,
+                    group.key,
+                    group.kind,
+                    target.ordinal,
+                )
+                reported = (
+                    actual.movement,
+                    actual.variation,
+                    actual.equipment,
+                    actual.convention,
+                    actual.group,
+                    actual.kind,
+                    actual.ordinal,
+                )
+                if (
+                    identity != reported
+                    or actual.reps != target.reps.nominal
+                    or actual.kg != target.load.nominal
+                    or target.reps.high > (actual.familiar_max_reps or actual.reps)
+                    or target.load.high
+                    > (actual.kg if actual.familiar_max_kg is None else actual.familiar_max_kg)
+                ):
+                    raise ValueError("strength baseline differs from comparable actual work")
+                if rule == f.RULE:
+                    scope = f"{o.template}/{exercise.movement}/{group.key} set {target.ordinal}"
+                    _require_familiar_effort(group.effort, actual.effort, scope)
         elif len(o.steps) != len(p.steps) or any(
             a.purpose != s.purpose
             or a.elapsed_seconds != s.seconds.nominal
@@ -79,6 +99,10 @@ def _validate_baseline(block: f.Block, ctx: f.Context, limit: int) -> None:
             for a, s in zip(o.steps, p.steps, strict=True)
         ):
             raise ValueError("running baseline differs from confirmed elapsed work")
+        elif rule == f.RULE:
+            for index, (step, actual) in enumerate(zip(p.steps, o.steps, strict=True), 1):
+                scope = f"{o.template}/{o.role} step {index} ({step.purpose})"
+                _require_familiar_effort(step.effort, actual.effort, scope)
     for c in block.commitments:
         count = sum(
             p.sport == c.sport and p.role == c.role and p.minimum_exposure >= c.minimum_per_session
@@ -217,9 +241,25 @@ def generate(
     *,
     limit: int = SEARCH_LIMIT,
 ) -> tuple[f.Day, ...]:
+    return generate_for_rule(cycle, block, ctx, number, adjacent, rule=f.RULE, limit=limit)
+
+
+def generate_for_rule(
+    cycle: UUID,
+    block: f.Block,
+    ctx: f.Context,
+    number: int,
+    adjacent: tuple[f.Session, ...],
+    *,
+    rule: f.FamiliarRule,
+    limit: int = SEARCH_LIMIT,
+) -> tuple[f.Day, ...]:
+    """Pure regeneration. Only historical replay selects the earlier dose-only rule."""
+    if rule not in ("synthetic.familiar.hold.v1", f.RULE):
+        raise ValueError("unknown familiar planner rule")
     if type(number) is not int or not 1 <= number <= len(block.phases):
         raise ValueError("week number outside block")
-    _validate_baseline(block, ctx, limit)
+    _validate_baseline(block, ctx, limit, rule)
     ordered = sorted(block.templates, key=lambda t: (ctx.rank(t.prescription.sport), t.key))
     examined = 0
     reasons: set[str] = set()

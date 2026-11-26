@@ -120,7 +120,24 @@ def example(emphasis: Emphasis, start: date = date(2027, 1, 4)) -> tuple[f.Block
     )
     history = start - timedelta(days=14)
     observations = []
+
     # Invented actual work, specified independently of the prescription objects.
+    # The athlete confirms the familiar instructions, including the stated stop caps.
+    # No achieved set or step RPE was recorded in these histories.
+    def reported_effort(low: int, nominal: int, high: int, cap: int) -> f.EffortEvidence:
+        return f.EffortEvidence(
+            confirmed_target=Target(Decimal(low), Decimal(nominal), Decimal(high)),
+            confirmed_cap=Decimal(cap),
+        )
+
+    group_cues = {
+        "prepare": reported_effort(4, 5, 6, 6),
+        "primary": reported_effort(6, 7, 8, 8),
+        "backoff": reported_effort(6, 7, 8, 8),
+    }
+    easy_cue = reported_effort(2, 3, 4, 4)
+    cruise_cue = reported_effort(5, 6, 7, 7)
+    recovery_cue = reported_effort(1, 2, 3, 3)
     reported_sets = tuple(
         f.ActualSet(
             movement=movement,
@@ -132,6 +149,7 @@ def example(emphasis: Emphasis, start: date = date(2027, 1, 4)) -> tuple[f.Block
             ordinal=ordinal,
             reps=5,
             kg=Decimal(kg),
+            effort=group_cues[group],
         )
         for movement, work in (("press", 40), ("squat", 50))
         for group, ordinal, kg in (
@@ -142,16 +160,16 @@ def example(emphasis: Emphasis, start: date = date(2027, 1, 4)) -> tuple[f.Block
         )
     )
     runs = {
-        "easy": (("work", 1200),),
-        "long": (("work", 1800),),
+        "easy": (("work", 1200, easy_cue),),
+        "long": (("work", 1800, easy_cue),),
         "cruise": (
-            ("warmup", 600),
-            ("work", 240),
-            ("recovery", 120),
-            ("work", 240),
-            ("recovery", 120),
-            ("work", 240),
-            ("cooldown", 300),
+            ("warmup", 600, easy_cue),
+            ("work", 240, cruise_cue),
+            ("recovery", 120, recovery_cue),
+            ("work", 240, cruise_cue),
+            ("recovery", 120, recovery_cue),
+            ("work", 240, cruise_cue),
+            ("cooldown", 300, easy_cue),
         ),
     }
     usual_days = {
@@ -173,7 +191,8 @@ def example(emphasis: Emphasis, start: date = date(2027, 1, 4)) -> tuple[f.Block
                 manageable=True,
                 sets=reported_sets if t.key.startswith("gym") else (),
                 steps=tuple(
-                    f.ActualStep(purpose=k, elapsed_seconds=v) for k, v in runs.get(t.key, ())
+                    f.ActualStep(purpose=purpose, elapsed_seconds=seconds, effort=cue)
+                    for purpose, seconds, cue in runs.get(t.key, ())
                 ),
             )
         )
