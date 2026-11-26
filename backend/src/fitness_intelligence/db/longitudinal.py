@@ -30,6 +30,7 @@ from fitness_intelligence.analytics.longitudinal import (
     daily_median,
 )
 from fitness_intelligence.analytics.strength import DAY, Period
+from fitness_intelligence.analytics.weight import partition_weigh_ins
 from fitness_intelligence.db.endurance_models import DailyRecoveryObservation
 from fitness_intelligence.db.history_models import GarminCoverage, GarminIssue
 from fitness_intelligence.db.models import SourceAccount
@@ -233,16 +234,27 @@ def _weight_day(
     if not selection.retained_ids:
         reasons.update(("no_weight_observation", coverage.status))
     reasons.update(reason for item in excluded for reason in item.reasons)
+    groups = partition_weigh_ins(eligible)
+    median = None
+    if len(groups) == 1:
+        median = daily_median(tuple(w.value for w in eligible))
+        status = "observed"
+    elif groups:
+        known_writers = {key.writer for key in groups if key.writer is not None}
+        reasons.add(
+            "incompatible_weight_regimes"
+            if len(known_writers) > 1
+            else "weight_comparability_unverified"
+        )
+        status = "withheld"
+    else:
+        status = "withheld" if excluded or selection.reasons else "missing"
     aligned = day_aligned and all(w.report_date == coverage.provider_date for w in eligible)
     return DailyWeight(
         Metric(
             scope="account_day",
-            status="observed"
-            if eligible
-            else "withheld"
-            if excluded or selection.reasons
-            else "missing",
-            value=daily_median(tuple(w.value for w in eligible)),
+            status=status,
+            value=median,
             unit="kg",
             report_date=coverage.provider_date if aligned else None,
             supporting=tuple(w.identity for w in eligible),

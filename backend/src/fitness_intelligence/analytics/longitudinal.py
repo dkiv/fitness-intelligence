@@ -160,7 +160,7 @@ class LongitudinalReport:
     source_zones: tuple[tuple[UUID, str], ...]
     days: tuple[ReportDay, ...]
     contract_version: str = "d1c-v1"
-    policy_version: str = "intake-weight-v1"
+    policy_version: str = "intake-weight-v2"
     date_basis: str = "provider_local"
     observation_state: str = "latest_accepted"
     expenditure_source: Source | None = None

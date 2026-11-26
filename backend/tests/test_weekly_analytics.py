@@ -246,18 +246,89 @@ def test_weight_comparisons_require_closed_supported_comparable_weeks(db: Sessio
 
 def test_mixed_regimes_within_a_day_and_all_selected_dates(db: Session) -> None:
     src = account(db)
+    first = weight(src, 0, "70000")
+    first.upstream_writer = "scale-a"
     second = weight(src, 0, "80000", hour=14)
-    second.upstream_writer = "other-scale"
+    second.upstream_writer = "scale-b"
     db.add_all([intake(src, n, 1500 + n) for n in range(7)])
-    db.add_all([weight(src, 0, "70000"), second])
+    db.add_all([first, second])
     db.commit()
     daily = query_longitudinal(
         db.get_bind(), owner_id=src.user_id, period=PERIOD, weight_account_id=src.id
     )
-    assert daily.days[0].weight.metric.value == 75
+    weight_day = daily.days[0].weight
+    assert weight_day.metric.status == "withheld" and weight_day.metric.value is None
+    assert weight_day.metric.reasons == ("incompatible_weight_regimes",)
+    assert weight_day.excluded == ()
+    assert weight_day.metric.eligible_count == weight_day.metric.retained_count == 2
+    assert [w.identity.id for w in weight_day.measurements] == [first.id, second.id]
+    assert weight_day.metric.supporting == tuple(w.identity for w in weight_day.measurements)
     week = aggregate_weeks(daily, reference_date=PERIOD.stop).weeks[0]
-    assert sorted(s.median_kg for s in week.weight.series) == [70, 80]
+    assert {
+        s.key.writer: (s.median_kg, s.dates[0].measurements[0].identity.id)
+        for s in week.weight.series
+    } == {"scale-a": (70, first.id), "scale-b": (80, second.id)}
+    assert week.weight.sample.eligible_dates == ()
+    assert week.weight.sample.eligible_observation_count == 2
     assert week.intake.calories.observed_subtotal_kcal == 10521
     assert week.intake.calories.subtotal_status == "all_requested_dates"
     assert week.intake.calories.mean_per_eligible_date_kcal == 1503
     assert week.intake.coverage[0].acquisition_counts == (("never_queried", 7),)
+
+
+@pytest.mark.parametrize(
+    ("writers", "reason"),
+    [
+        (("scale-a", "scale-a"), None),
+        ((None, None), None),
+        (("scale-a", None), "weight_comparability_unverified"),
+    ],
+)
+def test_same_day_writer_evidence(
+    db: Session, writers: tuple[str | None, str | None], reason: str | None
+) -> None:
+    src = account(db)
+    first, second = weight(src, 0, "70000"), weight(src, 0, "80000", hour=14)
+    first.upstream_writer, second.upstream_writer = writers
+    db.add_all([first, second])
+    db.commit()
+    daily = query_longitudinal(
+        db.get_bind(), owner_id=src.user_id, period=PERIOD, weight_account_id=src.id
+    )
+    metric = daily.days[0].weight.metric
+    series = aggregate_weeks(daily, reference_date=PERIOD.stop).weeks[0].weight.series
+    assert metric.eligible_count == 2
+    if reason:
+        assert (metric.status, metric.value, metric.reasons) == ("withheld", None, (reason,))
+        assert sorted(s.median_kg for s in series) == [70, 80]
+    else:
+        assert (metric.status, metric.value, metric.reasons) == ("observed", 75, ())
+        assert [s.median_kg for s in series] == [75]
+
+
+def test_reviewed_continuity_combines_same_day_verified_partitions(db: Session) -> None:
+    src = account(db)
+    second_scope = "b" * 64
+    db.add_all([weight(src, 0, "70000"), weight(src, 0, "80000", hour=14, scope=second_scope)])
+    db.commit()
+    daily = query_longitudinal(
+        db.get_bind(), owner_id=src.user_id, period=PERIOD, weight_account_id=src.id
+    )
+    weight_day = daily.days[0].weight
+    assert weight_day.metric.value is None
+    assert weight_day.metric.reasons == ("weight_comparability_unverified",)
+    separate = aggregate_weeks(daily, reference_date=PERIOD.stop).weeks[0].weight.series
+    assert sorted(s.median_kg for s in separate) == [70, 80]
+    continuity = WeightContinuity(
+        daily.weight_source,
+        PERIOD.start,
+        PERIOD.stop,
+        frozenset({SEGMENT, second_scope}),
+        "synthetic-common-scale-review",
+    )
+    (combined,) = (
+        aggregate_weeks(daily, reference_date=PERIOD.stop, weight_continuity=continuity)
+        .weeks[0]
+        .weight.series
+    )
+    assert combined.median_kg == 75 and combined.dates[0].measurements == weight_day.measurements
