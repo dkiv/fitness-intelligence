@@ -16,8 +16,8 @@ and individual response warrant. The athlete can see
 how lifting and running sessions fit together and, as evidence permits, how to fuel them.
 Fitness Intelligence owns the canonical prescription and its revision history. Hevy and Garmin
 serve as execution platforms. With athlete approval and authorized write access, the platform
-can publish strength routines to Hevy and structured running workouts to Garmin. An approved
-plan must also be usable through manual entry or export.
+can publish strength routines to Hevy and structured running workouts to Garmin. Athletes can use the
+exported plan if they prefer manual entry.
 
 At review time, the coach compares the prescription with completed sessions, tracks progress,
 adherence and training exposure, and asks how the week felt. For example, if the athlete says
