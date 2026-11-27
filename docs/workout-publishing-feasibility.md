@@ -4,13 +4,13 @@ Fitness Intelligence (FI) owns the approved prescription and its revision histor
 
 ## G1C.2B · Garmin delivery decision
 
-The athlete wants to approve a workout in FI and have FI create and schedule it through an API. The manual-entry rehearsal stopped at worksheet preparation. The 17-minute baseline and 18-minute revision were checked offline. Connect calendar placement, Forerunner 955 step order and cue visibility, and propagation of an edit to an existing occurrence all remain unverified. The worksheet is an optional fallback if the athlete requests it. MVP acceptance and future API work can proceed without a manual-entry rehearsal.
+The athlete wants to approve a workout in FI and have FI create and schedule it through an API. At the **25 November 2026 worksheet checkpoint**, both revisions had passed offline checks. On **27 November 2026**, the Connect and watch rehearsal confirmed corrected calendar placement, baseline RPE note visibility and the added final recovery on the 955 after editing the same workout. [Connect and watch readback](#g1c2b--connect-and-forerunner-955-rehearsal) The worksheet is an optional fallback if the athlete requests it. MVP acceptance and future API work can proceed without a manual-entry rehearsal.
 
 An acceptable, authorized write interface is the outstanding dependency for Garmin publishing. Garmin’s Training API is the documented candidate. FI needs confirmation that this project is eligible, an approved grant for workout publishing and athlete consent. The existing Personal API integration continues to acquire history. The 17- and 18-minute fixtures can test the eventual publisher without asking the athlete to transcribe them. For G1D, a Google Calendar event can reserve the local time independently of Garmin workout delivery. [Training API][gt] · [Personal API FAQ][gp] · [Draft eligibility inquiry](#draft-inquiry-for-operator-review)
 
 ## What the evidence establishes
 
-All provider sources linked here were reviewed on **2026-11-25**. The current Hevy REST schema, Garmin application form and Hevy connector tool signatures were inspected without making account calls. **Documented** means the provider describes the capability. **Observed** below refers to source or interface inspection, or explicitly to the athlete's report. The later G1C.1 rehearsal verified one Hevy routine. Garmin delivery to the Forerunner 955 remains unverified. The translation and reconciliation rules are proposed Fitness Intelligence (FI) design.
+All provider sources linked here were reviewed on **2026-11-25**. The current Hevy REST schema, Garmin application form and Hevy connector tool signatures were inspected without making account calls. **Documented** means the provider describes the capability. **Observed** below refers to source or interface inspection, or explicitly to the athlete's report. The later G1C.1 rehearsal verified one Hevy routine. The later G1C.2B rehearsal verified the web-interface and watch preview for one synthetic run. [Device observations and limits](#g1c2b--connect-and-forerunner-955-rehearsal) The translation and reconciliation rules are proposed Fitness Intelligence (FI) design.
 
 | Route | What the athlete gets | Calendar or remote identity | Decision |
 | --- | --- | --- | --- |
@@ -73,7 +73,7 @@ If a required target, range, cue or safety limit cannot reach the athlete when n
 
 ## G1C.2A · Open-source planned running workouts
 
-**G1C.2A offline feasibility decision, 25 November 2026.** The released Python models can express the two synthetic interval workouts. FI has no established permission to automate consumer Connect writes. G1C.2B records the resulting delivery decision and the remaining device checks. [G1C.2B Garmin delivery decision](#g1c2b--garmin-delivery-decision) · [G1B worksheet](workout-handoff.md#entering-the-garmin-worksheet) · [Personal API][gp] · [Training API][gt]
+**G1C.2A offline feasibility decision, 25 November 2026.** The released Python models can express the two synthetic interval workouts. FI has no established permission to automate consumer Connect writes. G1C.2B records the delivery decision and the subsequent device observations. [G1C.2B Garmin delivery decision](#g1c2b--garmin-delivery-decision) · [G1B worksheet](workout-handoff.md#entering-the-garmin-worksheet) · [Personal API][gp] · [Training API][gt]
 
 ### Source and lifecycle evidence
 
@@ -105,11 +105,11 @@ In a disposable Python 3.12.13 environment, the proof used the released `garminc
 
 For example, baseline step 2 serialized as `ExecutableStepDTO`, order 2, type `interval`, end condition `time`, value `120.0`, target `no.target`. Its description was `work · 120 s · run-step-rpe-0-10 6 (permitted 5–7), cap 7`. The walking recoveries carried an explicit walk cue. Every step retained its effort target, range and cap in text. No pace or heart-rate bounds were generated. FI computed the duration from expanded steps and excluded the synthetic 180 s preparation. The upstream sample illustrates why this matters: its declared 1,800 s estimate differs from its 1,140 s of expanded steps. [Step builders and serializer][gcmodel] · [Upstream sample][gcsample]
 
-The separate, unsent schedule value was `{"date":"2027-01-06"}` for a fixture starting at 01:00 UTC on January 7, still January 6 in Toronto. The date field carries no time of day, IANA zone or reservation. FI retains those, the canonical revision and occurrence identity, repeat structure and execution constraints. The JSON preserves instructions for manual interpretation. Server acceptance, cue length and visibility, lap behavior, and enforcement or display of effort caps on the 955 still need verification.
+The separate, unsent schedule value was `{"date":"2027-01-06"}` for a fixture starting at 01:00 UTC on January 7, still January 6 in Toronto. The date field carries no time of day, IANA zone or reservation. FI retains those, the canonical revision and occurrence identity, repeat structure and execution constraints. The JSON preserves instructions for manual interpretation. This offline test did not establish API acceptance, cue length limits, manual lap behavior or effort-cap enforcement. The later web-interface rehearsal established baseline RPE note visibility. [Watch readback](#g1c2b--connect-and-forerunner-955-rehearsal)
 
 ### G1C.2B · Connect and Forerunner 955 rehearsal
 
-FI's two synthetic interval prescriptions were entered as individual timed steps through the signed-in Garmin Connect web interface. The athlete inspected both versions on one Forerunner 955 before starting an activity.
+By **27 November 2026**, FI's two synthetic interval prescriptions had been entered as individual timed steps through the signed-in Garmin Connect web interface. The athlete inspected both versions on one Forerunner 955 before starting an activity.
 
 | Revision | Connect readback | Athlete's watch preview |
 | --- | --- | --- |
@@ -128,7 +128,7 @@ FI's two synthetic interval prescriptions were entered as individual timed steps
 | --- | --- |
 | Pinned Python package behind a narrow adapter | Preferred candidate for further **offline** model work. Use the workout extra and lock the resolved versions and hashes. It brings a full transport stack, including native curl bindings, requests and user-agent generation. Permissive model fields can accept ignored or unsupported provider values. Re-run field and arithmetic checks on upgrades. [Package metadata][gcmeta] · [Models][gcmodel] |
 | Select MIT-licensed source | Copying a small serializer is possible with copyright and permission notices retained. FI would own schema drift, tests and fixes. There is no running-specific advantage in the hevy2garmin strength builder. Avoid importing its auth, database, web application or reconciliation logic. Retaining upstream code also requires tracking its original revision and reviewing later fixes. Both projects' MIT grants cover software reuse. [Python license][gclicense] · [hevy2garmin license][h2license] |
-| Manual Connect entry | The athlete may use the worksheet to enter a run and verify its placement and steps. G1C.2B stopped at worksheet preparation. [Garmin calendar][calendar] · [955 calendar][watch] |
+| Manual Connect entry | The athlete may use the worksheet to enter a run and verify its placement and steps. The 25 November worksheet checkpoint preceded the [27 November readback](#g1c2b--connect-and-forerunner-955-rehearsal). [Garmin calendar][calendar] · [955 calendar][watch] |
 | Google Calendar scheduling | G1D can reserve local training time independently of Garmin eligibility, publication and device sync. |
 | Official Training API | Preferred future automated route if Garmin confirms eligibility and grants FI the required authorizations. Garmin documents workout and plan publication and compatible-device sync. Obtain the approved lifecycle contract before selecting transport or assuming the consumer DTO is compatible. [Training API][gt] · [Starter eligibility][form] |
 
