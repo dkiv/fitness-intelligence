@@ -116,7 +116,9 @@ and reconciliation. Retain Hevy REST for historical acquisition. The Garmin targ
 creation and scheduling of approved runs in Connect. FI can already generate the structured
 workouts offline. Delivery consumes E’s versioned prescription and requires athlete approval of
 the exact version and destination. Garmin publishing awaits an acceptable authorized write interface.
-G1D Google Calendar scheduling can proceed independently. [Publishing decisions](workout-publishing-feasibility.md)
+G1D demonstrates availability checks and approved reservation updates using synthetic Google
+Calendar data. [Calendar rehearsal and proposed live scope](google-calendar-reservations.md) ·
+[Publishing decisions](workout-publishing-feasibility.md)
 
 Accept each adapter when retrying the same approved version avoids duplicates, an update maps
 to its intended remote item, and a partial failure shows which items succeeded and which need
