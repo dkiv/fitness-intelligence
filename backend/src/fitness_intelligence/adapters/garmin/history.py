@@ -14,7 +14,7 @@ from fitness_intelligence.domain.endurance import DailyMetric, DailyObservation
 
 from .binding import Evidence, EvidenceType, Feed, feed_for, verify
 from .client import Endpoint, GarminClient, GarminError
-from .history_activities import activity_window
+from .history_activities import ListingNonconvergence, activity_window
 from .history_feeds import (
     DAILY,
     expenditure,
@@ -385,9 +385,7 @@ class HistoryRun:
                     break
                 except (MappingError, GarminError) as exc:
                     reason = str(exc)
-                    dated = (
-                        unavailable_read(reason) or reason == "activity listing did not converge"
-                    )
+                    dated = unavailable_read(reason) or isinstance(exc, ListingNonconvergence)
                     if self.client.requests > attempts and reason not in (
                         "budget_exhausted",
                         "verified session expired",

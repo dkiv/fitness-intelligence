@@ -61,6 +61,7 @@ class HistoricalProvider(Provider):
         self.hrv_rows = [self.hrv["hrvSummary"]]
         self.activity_rows = deepcopy(self.summaries[DAY])
         self.pages = []
+        self.page_limits: list[int] = []
         self.mutation = None
         self.daily["consumedKilocalories"] = 1900
 
@@ -80,6 +81,7 @@ class HistoricalProvider(Provider):
             offset = int(params["start"])
             assert params["sortOrder"] == "asc" and params["excludeChildren"] == "true"
             self.pages.append(offset)
+            self.page_limits.append(int(params["limit"]))
             payload = self.activity_rows[offset : offset + int(params["limit"])]
             if self.mutation:
                 payload = self.mutation(offset, payload)
@@ -87,15 +89,15 @@ class HistoricalProvider(Provider):
             return super().handle(req)
         return httpx.Response(200, content=json.dumps(payload).replace('"wire-decimal"', "1234.0"))
 
-    def page_of_ten(self) -> None:
+    def set_activity_count(self, count: int) -> None:
         self.activity_rows = []
-        for k in range(10):
+        for k in range(count):
             row = deepcopy(self.summaries[DAY][0])
             self.details[IDENT + k] = deepcopy(self.details[IDENT]) | {"activityId": IDENT + k}
             row.update(
                 activityId=IDENT + k,
-                startTimeLocal=f"{DAY} 10:00:{k:02}",
-                startTimeGMT=f"{DAY} 14:00:{k:02}",
+                startTimeLocal=f"{DAY} 10:{k // 60:02}:{k % 60:02}",
+                startTimeGMT=f"{DAY} 14:{k // 60:02}:{k % 60:02}",
                 activityType={"typeKey": "cycling"},
             )
             row.pop("beginTimestamp")
@@ -327,11 +329,11 @@ def test_weight_segment_and_quarantine(
     assert status["acquisition"] == "observed" and status["last_eligible_count"] == 0
 
 
-def test_full_page_budget_resume_and_disappearance(
+def test_single_day_budget_resume_and_disappearance(
     db: Session, bound: tuple[Evidence, HistoricalProvider]
 ) -> None:
     ev, p = bound
-    p.page_of_ten()
+    p.set_activity_count(10)
     cats = (Category.ACTIVITIES, Category.STEPS)
     result = run(db, bound, cats, limit=12)
     assert result["stopped"] == "budget_exhausted" and result["observations"]["created"] == 5
@@ -339,7 +341,8 @@ def test_full_page_budget_resume_and_disappearance(
     assert state["acquisition"] == "partial" and state["last_success"] is None
     result = run(db, bound, cats)
     assert result["stopped"] is None and result["observations"]["created"] == 5
-    assert p.pages == [0, 0, 10, 0, 10]
+    assert p.pages == [0, 0, 0]
+    assert p.page_limits == [99, 99, 99]
     assert "workouts" not in result["requests"]
     assert len(list(db.scalars(select(Workout)))) == 10
     p.activity_rows = []
@@ -347,6 +350,64 @@ def test_full_page_budget_resume_and_disappearance(
     assert result["categories"]["activities"]["remaining"] == 0
     assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["acquisition"] == "empty"
     assert len(list(db.scalars(select(Workout)))) == 10
+
+
+def test_tied_page_overlap_remains_retryable_in_a_single_day(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, provider = bound
+    provider.set_activity_count(10)
+    provider.append_tied_activity()
+    provider.append_tied_activity()
+    provider.activity_rows[-1]["activityType"] = {"typeKey": "running"}
+
+    # The second page repeats the last ID from page one and omits another tied ID.
+    def overlap(offset: int, page: list[dict]) -> list[dict]:
+        if offset == 10:
+            return [page[0], provider.activity_rows[9]]
+        return page
+
+    provider.mutation = overlap
+    cats = (Category.ACTIVITIES, Category.STEPS)
+    failed = run(db, bound, cats, end=DAY + timedelta(days=1))
+    assert failed["stopped"] == "duplicate activity ID across pages"
+    assert provider.pages == [0, 10] and provider.page_limits == [10, 10]
+    for row in db.scalars(select(GarminCoverage)):
+        assert row.status == "partial" and row.last_success is None
+        assert row.receipts["unavailable"]["reason"] == failed["stopped"]
+
+    prior = set(db.execute(select(ExternalReference.external_id, ExternalReference.workout_id)))
+    assert len(prior) == 11
+    resumed = run(db, bound, cats)
+    assert resumed["stopped"] is None and resumed["observations"]["created"] == 1
+    assert provider.pages[-2:] == [0, 0] and provider.page_limits[-2:] == [99, 99]
+    assert resumed["requests"]["detail"] == 2  # Anchor plus the previously missing ID.
+    final = set(db.execute(select(ExternalReference.external_id, ExternalReference.workout_id)))
+    assert prior < final and len(final) == len(db.scalars(select(Workout)).all()) == 12
+    assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["last_eligible_count"] == 12
+    steps = day_status(db, ev.source, Category.STEPS, DAY)
+    assert steps["acquisition"] == "observed" and steps["last_eligible_count"] == 1
+    assert len(db.scalars(select(ActivityStep)).all()) == 1
+
+
+def test_full_single_day_page_requires_terminal_read_on_both_scans(
+    db: Session, bound: tuple[Evidence, HistoricalProvider]
+) -> None:
+    ev, provider = bound
+    provider.set_activity_count(99)
+    cats = (Category.ACTIVITIES,)
+    # Three bounded runs commit the details. Even with all 99 receipts, coverage is partial.
+    for _ in range(3):
+        result = run(db, bound, cats)
+        assert result["stopped"] == "budget_exhausted"
+        assert result["observations"]["created"] == 33
+        assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["acquisition"] == "partial"
+    provider.pages.clear()
+    result = run(db, bound, cats)
+    assert result["stopped"] is None and result["requests"]["detail"] == 1
+    assert provider.pages == [0, 99, 0, 99] and set(provider.page_limits) == {99}
+    assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["last_eligible_count"] == 99
+    assert len(db.scalars(select(Workout)).all()) == 99
 
 
 def test_empty_activity_receipt_starts_before_first_listing(
@@ -377,7 +438,7 @@ def test_unstable_pagination_retains_verified_details(
     db: Session, bound: tuple[Evidence, HistoricalProvider], mutation: str
 ) -> None:
     ev, p = bound
-    p.page_of_ten()
+    p.set_activity_count(10)
 
     def mutate(offset, page):
         if mutation == "repeat" and offset:
@@ -391,8 +452,13 @@ def test_unstable_pagination_retains_verified_details(
         return page
 
     p.mutation = mutate
-    result = run(db, bound, (Category.ACTIVITIES,))
-    assert result["stopped"] == "activity listing did not converge"
+    result = run(db, bound, (Category.ACTIVITIES,), end=DAY + timedelta(days=1))
+    expected = (
+        "duplicate activity ID across pages"
+        if mutation in ("repeat", "overlap")
+        else "activity listing did not converge"
+    )
+    assert result["stopped"] == expected
     assert len(list(db.scalars(select(Workout)))) == 10
     assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["acquisition"] == "partial"
 
@@ -434,7 +500,7 @@ def test_tied_starts_cross_page_boundary_in_different_orders(
     db: Session, bound: tuple[Evidence, HistoricalProvider]
 ) -> None:
     ev, provider = bound
-    provider.page_of_ten()
+    provider.set_activity_count(10)
     provider.append_tied_activity()
     second_scan = provider.activity_rows.copy()
     second_scan[-2:] = reversed(second_scan[-2:])
@@ -445,7 +511,7 @@ def test_tied_starts_cross_page_boundary_in_different_orders(
         return page
 
     provider.mutation = reorder
-    result = run(db, bound, (Category.ACTIVITIES,))
+    result = run(db, bound, (Category.ACTIVITIES,), end=DAY + timedelta(days=1))
     assert result["stopped"] is None and result["observations"]["created"] == 11
     assert provider.pages == [0, 10, 0, 10]
     assert day_status(db, ev.source, Category.ACTIVITIES, DAY)["last_eligible_count"] == 11
@@ -737,14 +803,19 @@ def test_full_then_short_page_and_verified_anchor_failure(
     db: Session, bound: tuple[Evidence, HistoricalProvider]
 ) -> None:
     ev, p = bound
-    p.page_of_ten()
+    p.set_activity_count(10)
     row = deepcopy(p.activity_rows[-1])
     row.update(
         activityId=IDENT + 10, startTimeLocal=f"{DAY} 11:00:00", startTimeGMT=f"{DAY} 15:00:00"
     )
     p.details[IDENT + 10] = p.details[IDENT] | {"activityId": IDENT + 10}
     p.activity_rows.append(row)
-    assert run(db, bound, (Category.ACTIVITIES,))["observations"]["created"] == 11
+    assert (
+        run(db, bound, (Category.ACTIVITIES,), end=DAY + timedelta(days=1))["observations"][
+            "created"
+        ]
+        == 11
+    )
     assert p.pages == [0, 10, 0, 10]
     p.summaries[DAY][0]["ownerId"] += 1
     result = run(db, bound, (Category.SLEEP,))

@@ -18,11 +18,17 @@ from .projection import activity_inputs
 if TYPE_CHECKING:
     from .history import HistoryRun
 
-PAGE_SIZE = 10
+MULTI_DAY_PAGE_SIZE = 10
+SINGLE_DAY_PAGE_SIZE = 99
+
+
+class ListingNonconvergence(GarminError):
+    """A dated activity window that remains outstanding for retry."""
 
 
 def listing(run: "HistoryRun", first: date, last: date) -> Iterator[tuple[int, date, str, Row]]:
-    seen = set()
+    page_size = SINGLE_DAY_PAGE_SIZE if first == last else MULTI_DAY_PAGE_SIZE
+    first_offset: dict[int, int] = {}
     previous = None
     offset = 0
     while True:
@@ -33,14 +39,14 @@ def listing(run: "HistoryRun", first: date, last: date) -> Iterator[tuple[int, d
                     "startDate": first.isoformat(),
                     "endDate": last.isoformat(),
                     "start": offset,
-                    "limit": PAGE_SIZE,
+                    "limit": page_size,
                     "excludeChildren": "true",
                     "sortBy": "startLocal",
                     "sortOrder": "asc",
                 },
             )
         )
-        if len(page) > PAGE_SIZE:
+        if len(page) > page_size:
             raise GarminError("activity page exceeds bound")
         for row in page:
             item = map_activity(run.binding, row)
@@ -48,13 +54,16 @@ def listing(run: "HistoryRun", first: date, last: date) -> Iterator[tuple[int, d
             local = stamp(row.get("startTimeLocal"), LIST_STAMP)
             if not first <= local.date() <= last:
                 raise GarminError("activity outside requested range")
-            if ident in seen or (previous is not None and local < previous):
-                raise GarminError("activity listing did not converge")
+            seen_at = first_offset.get(ident)
+            if seen_at is not None and seen_at != offset:
+                raise ListingNonconvergence("duplicate activity ID across pages")
+            if seen_at is not None or (previous is not None and local < previous):
+                raise ListingNonconvergence("activity listing did not converge")
             previous = local
-            seen.add(ident)
+            first_offset[ident] = offset
             signature = digest(activity_inputs(item, row, {}, None)["search"])
             yield ident, local.date(), signature, row
-        if len(page) < PAGE_SIZE:
+        if len(page) < page_size:
             break
         offset += len(page)
 
@@ -178,7 +187,7 @@ def activity_window(run: "HistoryRun", first: date, last: date) -> None:
         # the local start, so comparing by ID allows ties to reorder across pages.
         confirmed = {ident: sig for ident, _, sig, _ in listing(run, first, last)}
         if signatures != confirmed:
-            raise GarminError("activity listing did not converge")
+            raise ListingNonconvergence("activity listing did not converge")
     except (GarminError, MappingError) as exc:
         if run.client.requests > attempts and str(exc) != "verified session expired":
             with run.write():
