@@ -111,17 +111,18 @@ running load, recovery and fueling guidance as B–D supply evidence for them.
 
 ### G · Workout publishing integrations
 
-Research Hevy routine write authorization and Garmin developer eligibility for the Training API
-while A proceeds. Verify structured workout and training-calendar permissions separately from
-activity read access. Publishing depends on E, explicit athlete approval of the exact version
-and destination, and authorized APIs. Separate provider adapters handle Hevy routine creation
-and updates and Garmin structured workout and calendar publishing.
+Use Hevy MCP for interactive strength publishing, including preview, athlete-initiated save
+and reconciliation. Retain Hevy REST for historical acquisition. The Garmin target is automatic
+creation and scheduling of approved runs in Connect. FI can already generate the structured
+workouts offline. Delivery consumes E’s versioned prescription and requires athlete approval of
+the exact version and destination. Garmin publishing awaits an acceptable authorized write interface.
+G1D Google Calendar scheduling can proceed independently. [Publishing decisions](workout-publishing-feasibility.md)
 
 Accept each adapter when retrying the same approved version avoids duplicates, an update maps
 to its intended remote item, and a partial failure shows which items succeeded and which need
 reconciliation before retry. Keep the canonical plan and per-version delivery status available
-through failures. Where writes are unavailable, accept a manual or export path when an athlete
-can enter the approved week using its dates, exercises, sets and running steps.
+through failures. Offer the Garmin worksheet as an optional fallback. MVP acceptance can proceed
+without manual entry or a manual device rehearsal.
 
 ### H · Personalized modeling and evaluation
 
