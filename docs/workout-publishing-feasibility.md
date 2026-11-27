@@ -101,6 +101,21 @@ For example, baseline step 2 serialized as `ExecutableStepDTO`, order 2, type `i
 
 The separate, unsent schedule value was `{"date":"2027-01-06"}` for a fixture starting at 01:00 UTC on January 7, still January 6 in Toronto. The date field carries no time of day, IANA zone or reservation. FI retains those, the canonical revision and occurrence identity, repeat structure and execution constraints. The JSON preserves instructions for manual interpretation. Server acceptance, cue length and visibility, lap behavior, and enforcement or display of effort caps on the 955 still need verification.
 
+### G1C.2B · Connect and Forerunner 955 rehearsal
+
+FI's two synthetic interval prescriptions were entered as individual timed steps through the signed-in Garmin Connect web interface. The athlete inspected both versions on one Forerunner 955 before starting an activity.
+
+| Revision | Connect readback | Athlete's watch preview |
+| --- | --- | --- |
+| 17 minutes | Five-minute warm-up, three two-minute runs, one-minute walking recoveries between runs, four-minute cool-down. | All seven steps appeared in order. The third run led directly into cool-down. An RPE note was visible. |
+| 18 minutes | The same workout gained one minute of walking recovery after the third run. Reopening the original workout showed all eight steps, the original cues and the workout note. | The athlete read back all eight steps and durations in order, including the final one-minute recovery before the four-minute cool-down. |
+
+**Calendar placement.** Connect acknowledged the initial scheduling action, but the reloaded month view showed the test two weeks early. Moving the existing entry to the intended Friday and reloading showed one matching entry that month. After the workout edit, the reloaded calendar still showed one matching entry on that Friday. The revised steps reached the watch without a second scheduling action.
+
+**Evidence limits.** The original workout link established definition identity across the edit. Calendar checks established the visible date and count. Continuity of the provider's schedule ID and a machine-readable device receipt remain unverified. The athlete confirmed RPE note visibility on the baseline. Exact cap text, in-run alerts, pace targets, cleanup and API delivery remain untested.
+
+**G1D handoff.** Google Calendar can independently reserve the time for an FI occurrence. Use a synthetic occurrence with a local start, time zone and reservation duration for its rehearsal. Check that revising it updates the same event. Track its event ID separately from Garmin workout identity, Connect placement and watch visibility.
+
 ### Reuse, permission and rehearsal decision
 
 | Option | Decision |
