@@ -20,6 +20,7 @@ from fitness_intelligence.db.models import (
     WorkoutExercise,
     WorkoutTombstone,
 )
+from fitness_intelligence.db.owner_lock import lock_owner
 from fitness_intelligence.domain.strength import StrengthSet
 
 from .client import HevyClient, HevyError
@@ -125,6 +126,7 @@ class Importer:
         self._clock(mapped.source_updated_at)
         needs_detail = False
         with session.begin():
+            lock_owner(session, self.binding.user_id)
             check_active_binding(session, self.binding)
             tombstone = self._tombstone(session, source.id)
             ref = self._reference(session, source.id)
@@ -236,6 +238,7 @@ class Importer:
         if instant is not None:
             self._clock(instant)
         with session.begin():
+            lock_owner(session, self.binding.user_id)
             check_active_binding(session, self.binding)
             tombstone = self._tombstone(session, event.id)
             ref = self._reference(session, event.id)

@@ -347,6 +347,29 @@ class TrainingDay:
     open_issues: tuple[OpenIssue, ...]
 
 
+def training_ledger_scope(
+    model: type[GarminCoverage | GarminIssue],
+    owner: UUID,
+    start: date,
+    stop: date,
+    endurance_account: UUID | None,
+    recovery_account: UUID | None,
+) -> tuple[ColumnElement[bool], ...]:
+    selected = (
+        (model.source_account_id == endurance_account)
+        & model.category.in_(("activities", "running_steps"))
+    ) | (
+        (model.source_account_id == recovery_account)
+        & model.category.in_(set(RECOVERY_CATEGORIES.values()))
+    )
+    return (
+        model.user_id == owner,
+        model.local_date >= start,
+        model.local_date < stop,
+        selected,
+    )
+
+
 def read_training_days(
     db: Session,
     owner: UUID,
@@ -372,30 +395,18 @@ def read_training_days(
     endurance_account = endurance.source_account_id if endurance else None
     recovery_account = recovery_source.source_account_id if recovery_source else None
 
-    def scope(model: type[GarminCoverage | GarminIssue]) -> tuple:
-        selected = (
-            (model.source_account_id == endurance_account)
-            & model.category.in_(("activities", "running_steps"))
-        ) | (
-            (model.source_account_id == recovery_account)
-            & model.category.in_(set(RECOVERY_CATEGORIES.values()))
-        )
-        return (
-            model.user_id == owner,
-            model.local_date >= period.start,
-            model.local_date < period.stop,
-            selected,
-        )
-
+    selection = owner, period.start, period.stop, endurance_account, recovery_account
     ledger = {
         (r.source_account_id, r.category, r.local_date): r
-        for r in db.scalars(select(GarminCoverage).where(*scope(GarminCoverage)))
+        for r in db.scalars(
+            select(GarminCoverage).where(*training_ledger_scope(GarminCoverage, *selection))
+        )
     }
     issues: dict[DayKey, list[Issue]] = defaultdict(list)
     open_issues: dict[date, list[OpenIssue]] = defaultdict(list)
     for r in db.scalars(
         select(GarminIssue)
-        .where(*scope(GarminIssue), GarminIssue.resolved_at.is_(None))
+        .where(*training_ledger_scope(GarminIssue, *selection), GarminIssue.resolved_at.is_(None))
         .order_by(
             GarminIssue.source_account_id,
             GarminIssue.category,

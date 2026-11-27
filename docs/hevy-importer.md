@@ -61,7 +61,8 @@ with open(path, "x", opener=lambda p, flags: os.open(p, flags, 0o600)) as stream
 
 If binding-file creation fails, the account is already committed; retrieve its IDs from the trusted
 administration session instead of creating another user. For existing users/accounts, construct the
-same three-field JSON after verifying ownership. Use a private directory and mode `0600`. The CLI
+same three-field JSON after verifying ownership. When administering a binding for an existing user,
+acquire `db.owner_lock.lock_owner(session, user.id)` before reading for mutation and hold it through commit. Use a private directory and mode `0600`. The CLI
 opens without following symlinks and checks file type, size, ownership (real OS UID) and
 permissions on the opened descriptor. Binding identities must also match an active database account
 and the identity returned for the current key. Legacy unresolved accounts are rejected; explicit

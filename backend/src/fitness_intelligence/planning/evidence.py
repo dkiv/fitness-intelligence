@@ -8,7 +8,14 @@ from typing import Annotated, Literal, Self
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from pydantic import BeforeValidator, Field, TypeAdapter, ValidationInfo, model_validator
+from pydantic import (
+    AwareDatetime,
+    BeforeValidator,
+    Field,
+    TypeAdapter,
+    ValidationInfo,
+    model_validator,
+)
 
 from ..analytics.exposure import Outing, RecoveryExposure
 from ..analytics.longitudinal import Coverage, OpenIssue
@@ -350,3 +357,31 @@ class Projection(f.Record):
     days: tuple[Day, ...]
     confirmations: tuple[Confirmation, ...]
     performances: tuple[Performance, ...]
+
+
+class SelectedAccount(f.Record):
+    id: UUID
+    provider: str
+    provider_account_id: str
+    status: str
+
+
+class CoverageReceipt(f.Record):
+    account: UUID
+    day: date
+    category: str
+    receipts_json: str  # Canonical JSON of the selected acquisition ledger entry.
+
+
+class DecisionInputs(f.Record):
+    version: Literal["decision-inputs-v1"] = "decision-inputs-v1"
+    policy: str
+    selection: Literal["explicit", "representative-week"]
+    cutoff: AwareDatetime
+    accounts: tuple[SelectedAccount, ...]
+    coverage_receipts: tuple[CoverageReceipt, ...]
+    projection: Projection
+
+
+class ReviewedCandidate(f.Candidate):
+    decision_inputs: DecisionInputs

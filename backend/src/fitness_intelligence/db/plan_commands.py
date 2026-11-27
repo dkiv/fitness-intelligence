@@ -4,7 +4,6 @@ Call within a short Session.begin() transaction. The caller owns commit and roll
 """
 
 import json
-import os
 from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
 from typing import Literal
@@ -15,6 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.planning import confirmation as cf
+from fitness_intelligence.planning import evidence as pe
 from fitness_intelligence.planning import familiar as f
 from fitness_intelligence.planning import familiar_outcomes as fo
 from fitness_intelligence.planning import rationale
@@ -33,9 +33,9 @@ from fitness_intelligence.planning.planner import Session as PlannedSession
 from fitness_intelligence.planning.press_block import PressBlock
 from fitness_intelligence.planning.rationale import Rationale
 
-from . import confirmations, execution
+from . import confirmations, execution, planning_evidence
 from . import familiar_snapshot as v2
-from .models import User
+from .owner_lock import lock_owner, trusted_owner
 from .plan_models import AthleteContext, PlanDecision, PlanRevision, SessionOutcome, TrainingPlan
 from .plan_snapshot import (
     BLOCK,
@@ -193,20 +193,13 @@ def _effective_dates(before: WeekPlan | None, after: WeekPlan, today: date) -> N
         raise StalePlan("a retained week's constraints changed")
 
 
-def trusted_owner() -> UUID:
-    binding = os.environ.get("FITNESS_PLANNING_OWNER_ID")
-    if not binding:
-        raise PermissionError("trusted local planning owner binding required")
-    return UUID(binding)
-
-
 class PlanCommands:
     def __init__(self, session: Session) -> None:
         self._owner = trusted_owner()
         self._db = session
 
     def _lock_owner(self) -> None:
-        self._db.execute(select(User.id).where(User.id == self._owner).with_for_update()).one()
+        lock_owner(self._db, self._owner)
 
     def _context(self) -> AthleteContext | None:
         return self._db.scalar(
@@ -442,7 +435,7 @@ class PlanCommands:
         weeks: list[v2.ApprovedWeek] = []
         if base_id is not None:
             base = self._revision(plan.id, base_id)
-            head = v2.read(f.Candidate, base.snapshot)
+            head = v2.read_candidate(base.snapshot)
             block_revision = head.block_revision or base.id
             opening = self._revision(plan.id, block_revision)
             initial = self._familiar_context(opening.context_id)
@@ -455,7 +448,7 @@ class PlanCommands:
                 raise StalePlan("block objectives, planning zone or initial baseline changed")
             for ref in head.prior_weeks:
                 previous = self._revision(plan.id, ref.revision)
-                known = v2.read(f.Candidate, previous.snapshot)
+                known = v2.read_candidate(previous.snapshot)
                 weeks.append(v2.ApprovedWeek(ref, known.days))
             if isinstance(head.request, f.FamiliarWeek):
                 weeks.append(
@@ -486,7 +479,7 @@ class PlanCommands:
         self._lock_owner()
         plan = self._plan(plan_id, lock=False)
         revision = self._revision(plan_id, revision_id)
-        saved = v2.read(f.Candidate, revision.snapshot)
+        saved = v2.read_candidate(revision.snapshot)
         ctx = self._db.scalars(
             select(AthleteContext).where(
                 AthleteContext.id == revision.context_id, AthleteContext.user_id == self._owner
@@ -495,6 +488,8 @@ class PlanCommands:
         replay = self._familiar_candidate(
             plan, revision.base_id, ctx, saved.request, today=None, rule=saved.rules
         )
+        if isinstance(saved, pe.ReviewedCandidate):
+            replay = v2.with_inputs(replay, saved.decision_inputs)
         if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
             raise InvalidSnapshot("generalized historical replay mismatch")
         return replay
@@ -514,6 +509,7 @@ class PlanCommands:
         request: Generate | Move | f.ProposeBlock | f.FamiliarWeek,
         *,
         evidence: tuple[EvidenceRef, ...] = (),
+        evidence_scope: pe.Scope | None = None,
     ) -> UUID:
         self._lock_owner()
         plan = self._plan(plan_id, lock=True)
@@ -528,12 +524,18 @@ class PlanCommands:
             if not isinstance(request, (f.ProposeBlock, f.FamiliarWeek)):
                 raise ValueError("unsupported generalized planning request")
             context_v2 = v2.read(f.Context, ctx.snapshot)
-            today = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
+            cutoff = self._now()
+            today = cutoff.astimezone(ZoneInfo(context_v2.zone)).date()
             candidate = self._familiar_candidate(plan, expected_head, ctx, request, today=today)
-            payload = v2.snapshot(candidate)
-            v2.read(f.Candidate, payload)
+            inputs = planning_evidence.freeze_inputs(
+                self._db, self._owner, context_v2, evidence_scope, cutoff
+            )
+            payload = v2.snapshot(v2.with_inputs(candidate, inputs))
+            v2.read_candidate(payload)
             why = None
         else:
+            if evidence_scope is not None:
+                raise ValueError("evidence scope requires a generalized synthetic cycle")
             if not isinstance(request, (Generate, Move)):
                 raise ValueError("unsupported legacy planning request")
             context = read(CONTEXT, ctx.snapshot)
@@ -598,7 +600,7 @@ class PlanCommands:
                 ctx.id,
                 self._familiar_context(revision.context_id),
                 v2.read(f.Block, plan.block),
-                v2.read(f.Candidate, revision.snapshot),
+                v2.read_candidate(revision.snapshot),
                 self._receipt(decision) if decision else None,
             )
         candidate = read(CANDIDATE, revision.snapshot)
@@ -670,22 +672,7 @@ class PlanCommands:
             if ctx is None or ctx.id != revision.context_id:
                 raise StalePlan("planning context changed")
             if plan.block.get("schema_version") == 2:
-                candidate_v2 = v2.read(f.Candidate, revision.snapshot)
-                if candidate_v2.rules != f.RULE:
-                    raise StalePlan("familiar effort rule changed; submit a fresh proposal")
-                context_v2 = v2.read(f.Context, ctx.snapshot)
-                today = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
-                replay = self._familiar_candidate(
-                    plan, expected_head, ctx, candidate_v2.request, today=today
-                )
-                decision_day = self._now().astimezone(ZoneInfo(context_v2.zone)).date()
-                if decision_day != today:
-                    try:
-                        v2.check_dates(replay, v2.read(f.Block, plan.block), decision_day)
-                    except ValueError as exc:
-                        raise StalePlan(str(exc)) from exc
-                if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
-                    raise InvalidSnapshot("stored generalized prescription differs from replay")
+                self._approve_familiar(plan, revision, ctx)
             else:
                 self._approve_legacy(plan, revision, ctx)
         row = PlanDecision(
@@ -701,6 +688,44 @@ class PlanCommands:
         self._db.flush()  # PostgreSQL advances the approved head in this statement.
         self._db.expire(plan)
         return self._receipt(row)
+
+    def _approve_familiar(
+        self, plan: TrainingPlan, revision: PlanRevision, ctx: AthleteContext
+    ) -> None:
+        candidate = v2.read_candidate(revision.snapshot)
+        if candidate.rules != f.RULE:
+            raise StalePlan("familiar effort rule changed; submit a fresh proposal")
+        context = v2.read(f.Context, ctx.snapshot)
+        today = self._now().astimezone(ZoneInfo(context.zone)).date()
+        replay = self._familiar_candidate(
+            plan, revision.base_id, ctx, candidate.request, today=today
+        )
+        if isinstance(candidate, pe.ReviewedCandidate):
+            sealed = candidate.decision_inputs
+            scope = sealed.projection.scope if sealed.selection == "explicit" else None
+            try:
+                current = planning_evidence.freeze_inputs(
+                    self._db, self._owner, context, scope, sealed.cutoff
+                )
+            except planning_evidence.EvidenceScopeUnavailable as exc:
+                raise StalePlan(
+                    "planning evidence scope unavailable; submit a fresh proposal"
+                ) from exc
+            if canonical(current.model_dump(mode="json")) != canonical(
+                sealed.model_dump(mode="json")
+            ):
+                raise StalePlan("planning evidence changed; submit a fresh proposal and review")
+            replay = v2.with_inputs(replay, sealed)
+        if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
+            raise InvalidSnapshot("stored generalized prescription differs from replay")
+        if not isinstance(candidate, pe.ReviewedCandidate):
+            raise StalePlan("proposal predates frozen planning evidence; submit a fresh proposal")
+        decision_day = self._now().astimezone(ZoneInfo(context.zone)).date()
+        if decision_day != today:
+            try:
+                v2.check_dates(replay, v2.read(f.Block, plan.block), decision_day)
+            except ValueError as exc:
+                raise StalePlan(str(exc)) from exc
 
     def _approve_legacy(
         self, plan: TrainingPlan, revision: PlanRevision, ctx: AthleteContext
