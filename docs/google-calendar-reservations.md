@@ -1,4 +1,6 @@
-# G1D · Google Calendar availability and workout reservations
+# G1D · Archived Google Calendar rehearsal
+
+**Decision · 27 November 2026.** The athlete chose Hevy for strength routines and Garmin Connect for running workouts. Google Calendar workout reservations are retired. G1D closed with the offline rehearsal below. The proposed live rehearsal was withdrawn before any Google account was accessed.
 
 FI uses its owner-bound plan revision, occurrence, IANA time zone and full reserved duration to schedule time. The offline rehearsal uses real FI proposal and approval transactions in disposable PostgreSQL. Two synthetic Google calendars run behind an HTTP test double. No Google account, credentials or network transport participate.
 
@@ -25,14 +27,3 @@ Run from `backend` with `TEST_DATABASE_URL` pointing to a disposable PostgreSQL 
 ```sh
 uv run pytest -q tests/test_google_calendar.py
 ```
-
-## Proposed live rehearsal for separate approval
-
-Use a designated test account, one availability calendar containing an operator-prepared synthetic busy interval, and one dedicated empty destination calendar. Confirm the account, calendars, approved access mechanism and exact future windows privately before access. The proposed times below use America/Toronto.
-
-1. Read free/busy only for the January 9, 2027 09:00–09:25, January 9 10:00–10:25 and January 10 09:00–09:25 windows. Confirm the prepared conflict in the first window and availability in the others. Check the destination for existing test entries.
-2. With approval for the free Saturday slot and named destination, create one private timed event titled **FI synthetic workout reservation**, with no invitees or reminders. Read back the Google calendar/event ID, local date, start, end, zone and 25-minute duration.
-3. With approval of the Sunday revision, update that event by its verified ID and ETag. Read it back and check both windows for one destination event at the intended time. Stop on a changed precondition, an ambiguous write or conflicting readback.
-4. Retain only the synthetic times and sanitized outcome in Git. Keep the provider receipt private. Offer cleanup of that one event under separate deletion approval and verify absence if authorized.
-
-This proposal requests no access to personal event titles, primary calendars, Garmin or workout history. The operator can select different future dates before authorizing the rehearsal.

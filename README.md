@@ -34,6 +34,7 @@ The initial five claims await independent review. [Corpus and retrieval contract
 - `backend/tests/`: synthetic API and database tests
 - `docs/`: [vision](docs/product-vision.md), [architecture](docs/architecture.md),
   [roadmap](docs/roadmap.md), [data sources](docs/data-sources.md)
+- [Project state and orchestration handoff](docs/orchestration/project-state.md) for current work, decisions and the restart prompt
 - `AGENTS.md`: contribution conventions
 
 ## Docker development
