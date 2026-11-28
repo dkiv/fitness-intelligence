@@ -5,6 +5,7 @@ from datetime import date
 from typing import Any
 from uuid import UUID
 
+from ..planning import evidence as e
 from ..planning import familiar as f
 from ..planning.familiar_calendar import generate_for_rule
 from .plan_snapshot import InvalidSnapshot, canonical
@@ -30,6 +31,20 @@ def read[T: f.Record](model: type[T], raw: dict[str, Any]) -> T:
     except (KeyError, ValueError, ArithmeticError, TypeError) as exc:
         raise InvalidSnapshot("invalid generalized planning snapshot") from exc
     return value
+
+
+def read_candidate(raw: dict[str, Any]) -> f.Candidate:
+    if isinstance(raw.get("data"), dict) and "decision_inputs" in raw["data"]:
+        return read(e.ReviewedCandidate, raw)
+    return read(f.Candidate, raw)
+
+
+def with_inputs(candidate: f.Candidate, inputs: e.DecisionInputs) -> e.ReviewedCandidate:
+    return e.ReviewedCandidate.model_validate_json(
+        canonical(
+            candidate.model_dump(mode="json") | {"decision_inputs": inputs.model_dump(mode="json")}
+        )
+    )
 
 
 @dataclass(frozen=True)

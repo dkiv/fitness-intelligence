@@ -3,6 +3,7 @@
 from zoneinfo import ZoneInfo
 
 from fitness_intelligence.evidence.retrieval import Evidence
+from fitness_intelligence.planning import evidence as pe
 from fitness_intelligence.planning import familiar
 from fitness_intelligence.planning.outcomes import WeeklyOutcomes
 from fitness_intelligence.planning.planner import Session, Slot, WeekPlan
@@ -173,6 +174,27 @@ def _familiar_review(preview: FamiliarPreview) -> str:
         f"{ctx.emphasis} · {block.key} · {ctx.zone} · starts {block.start}",
         f"Rule {candidate.rules} · confirmed support {', '.join(candidate.supports)}",
     ]
+    if isinstance(candidate, pe.ReviewedCandidate):
+        inputs = candidate.decision_inputs
+        scope = inputs.projection.scope
+        lines.append(
+            f"Evidence reviewed at {inputs.cutoff.isoformat()} · {inputs.policy} · "
+            f"{scope.start} to {scope.stop} (exclusive), {scope.zone}"
+        )
+        lines.append(
+            f"{len(inputs.projection.performances)} performance records · "
+            f"{len(inputs.projection.confirmations)} member confirmations · "
+            f"{sum(len(d.open_issues) for d in inputs.projection.days)} open issues"
+        )
+        for day in inputs.projection.days:
+            running = day.activities.status if day.activities else "unselected"
+            issues = ", ".join(i.issue.reason for i in day.open_issues) or "none"
+            lines.append(f"{day.day} · activity acquisition {running} · open issues {issues}")
+        for performance in inputs.projection.performances:
+            lines.append(
+                f"{performance.occurred_at.isoformat()} · {performance.sport} · "
+                f"{performance.execution_state}"
+            )
     if preview.current_context_id != preview.context_id:
         lines.append("The planning context has changed since this proposal.")
     for objective in sorted(ctx.objectives, key=lambda obj: obj.rank):

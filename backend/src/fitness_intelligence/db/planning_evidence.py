@@ -1,7 +1,7 @@
-"""One owner-bound read-only PostgreSQL snapshot of D1D, E421 and E422 evidence."""
+"""Project owner-bound D1D, E421 and E422 evidence for standalone reads and planning decisions."""
 
 from collections import Counter, defaultdict
-from datetime import UTC, datetime, time
+from datetime import UTC, datetime, time, timedelta
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -16,10 +16,12 @@ from ..planning import evidence as e
 from ..planning import familiar as f
 from ..planning.evidence_reconciliation import identity, reconcile
 from . import confirmations, execution, familiar_snapshot
-from .longitudinal import read_snapshot, read_training_days
+from .history_models import GarminCoverage
+from .longitudinal import read_snapshot, read_training_days, training_ledger_scope
 from .models import ExternalReference, SourceAccount, Workout, WorkoutTombstone
-from .plan_commands import trusted_owner
+from .owner_lock import trusted_owner
 from .plan_models import PlanRevision, SessionOutcome
+from .plan_snapshot import canonical
 
 
 def _manuals(
@@ -52,7 +54,7 @@ def _manuals(
     for revision in db.scalars(
         select(PlanRevision).where(PlanRevision.user_id == owner, PlanRevision.id.in_(origins))
     ):
-        candidate = familiar_snapshot.read(f.Candidate, revision.snapshot)
+        candidate = familiar_snapshot.read_candidate(revision.snapshot)
         blocks[revision.id] = candidate.block_key, candidate.block_revision
         for day in candidate.days:
             for occurrence in day.sessions:
@@ -163,9 +165,19 @@ def _current_members(
     return tuple(result)
 
 
+class EvidenceScopeUnavailable(ValueError):
+    """An account selection is no longer valid for this owner and policy."""
+
+
 def query_planning_evidence(engine: Engine, scope: e.Scope) -> e.Projection:
     """Read current synthetic evidence. No historical as-of or approval-time guarantee."""
     owner = trusted_owner()
+    familiar_snapshot.require_preview_owner(owner)
+    with read_snapshot(engine) as db:
+        return _read_projection(db, owner, scope)
+
+
+def _read_projection(db: Session, owner: UUID, scope: e.Scope) -> e.Projection:
     familiar_snapshot.require_preview_owner(owner)
     scope = e.Scope.model_validate(scope)
     period = Period(scope.start, scope.stop, ZoneInfo(scope.zone))
@@ -174,143 +186,238 @@ def query_planning_evidence(engine: Engine, scope: e.Scope) -> e.Projection:
         for d in (scope.start, scope.stop)
     )
     contexts = {(ctx.account, ctx.member): ctx for ctx in scope.contexts}
-    with read_snapshot(engine) as db:
-        expected = [
-            (scope.strength_account, "hevy"),
-            (scope.endurance_account, "garmin"),
-            (scope.recovery_account, "garmin"),
-        ]
-        accounts = {
-            r.id: r
-            for r in db.scalars(
-                select(SourceAccount).where(
-                    SourceAccount.user_id == owner,
-                    SourceAccount.id.in_([i for i, _ in expected if i]),
-                )
+    expected = [
+        (scope.strength_account, "hevy"),
+        (scope.endurance_account, "garmin"),
+        (scope.recovery_account, "garmin"),
+    ]
+    accounts = {
+        r.id: r
+        for r in db.scalars(
+            select(SourceAccount).where(
+                SourceAccount.user_id == owner,
+                SourceAccount.id.in_([i for i, _ in expected if i]),
             )
-        }
-        for i, provider in expected:
-            if i and (
-                i not in accounts
-                or accounts[i].provider != provider
-                or accounts[i].status == "legacy_unresolved"
-            ):
-                raise ValueError("invalid source account for planning evidence")
-        profile = (
-            HevyHistoryProfile(
-                scope.strength_account,
-                frozenset(scope.external_load_templates),
-                frozenset(scope.lower_body_templates),
-                frozenset(scope.non_lower_body_templates),
-            )
-            if scope.strength_account
+        )
+    }
+    for i, provider in expected:
+        if i and (
+            i not in accounts
+            or accounts[i].provider != provider
+            or accounts[i].status == "legacy_unresolved"
+        ):
+            raise EvidenceScopeUnavailable("invalid source account for planning evidence")
+    profile = (
+        HevyHistoryProfile(
+            scope.strength_account,
+            frozenset(scope.external_load_templates),
+            frozenset(scope.lower_body_templates),
+            frozenset(scope.non_lower_body_templates),
+        )
+        if scope.strength_account
+        else None
+    )
+    zones = {
+        i: ZoneInfo(z)
+        for i, z in (
+            (scope.endurance_account, scope.endurance_zone),
+            (scope.recovery_account, scope.recovery_zone),
+        )
+        if i and z
+    }
+
+    def garmin(i: UUID | None) -> Source | None:
+        return Source(owner, "garmin", i) if i else None
+
+    training = read_training_days(
+        db,
+        owner,
+        period,
+        zones,
+        profile,
+        garmin(scope.endurance_account),
+        garmin(scope.recovery_account),
+        {i: a.status for i, a in accounts.items()},
+    )
+    days = []
+    members = []
+    for day in training:
+        strength = day.strength
+        activity = day.endurance.days[0] if day.endurance else None
+        running = (
+            next((s for s in day.endurance.sports if s.sport == "running"), None)
+            if activity
             else None
         )
-        zones = {
-            i: ZoneInfo(z)
-            for i, z in (
-                (scope.endurance_account, scope.endurance_zone),
-                (scope.recovery_account, scope.recovery_zone),
-            )
-            if i and z
-        }
-
-        def garmin(i: UUID | None) -> Source | None:
-            return Source(owner, "garmin", i) if i else None
-
-        training = read_training_days(
-            db,
-            owner,
-            period,
-            zones,
-            profile,
-            garmin(scope.endurance_account),
-            garmin(scope.recovery_account),
-            {i: a.status for i, a in accounts.items()},
-        )
-        days = []
-        members = []
-        for day in training:
-            strength = day.strength
-            activity = day.endurance.days[0] if day.endurance else None
-            running = (
-                next((s for s in day.endurance.sports if s.sport == "running"), None)
+        days.append(
+            e.Day(
+                day=day.day,
+                open_issues=day.open_issues,
+                strength_acquisition=strength.acquisition if strength else None,
+                strength_account_status=strength.account_status if strength else None,
+                activities=activity.activities if activity else None,
+                instructions=activity.instructions if activity else None,
+                discrepancies=activity.discrepancies if activity else (),
+                scan_started_at=activity.scan_started_at if activity else None,
+                full_day_zero_exclusion=activity.full_day_empty_exclusion(None)
                 if activity
-                else None
+                else None,
+                running_count=running.sessions.value if running else None,
+                running_count_status=running.sessions.status if running else None,
+                recovery=day.recovery,
             )
-            days.append(
-                e.Day(
-                    day=day.day,
-                    open_issues=day.open_issues,
-                    strength_acquisition=strength.acquisition if strength else None,
-                    strength_account_status=strength.account_status if strength else None,
-                    activities=activity.activities if activity else None,
-                    instructions=activity.instructions if activity else None,
-                    discrepancies=activity.discrepancies if activity else (),
-                    scan_started_at=activity.scan_started_at if activity else None,
-                    full_day_zero_exclusion=activity.full_day_empty_exclusion(None)
-                    if activity
-                    else None,
-                    running_count=running.sessions.value if running else None,
-                    running_count_status=running.sessions.status if running else None,
-                    recovery=day.recovery,
+        )
+        for fact in (
+            *(strength.facts if strength else ()),
+            *(activity.facts if activity else ()),
+        ):
+            member = fact.row.set_id if isinstance(fact, StrengthFact) else fact.workout_id
+            members.append(
+                e.bridge(
+                    fact,
+                    contexts.get((fact.source.source_account_id, member)),
+                    activity_discrepancies=activity.discrepancies
+                    if activity and not isinstance(fact, StrengthFact)
+                    else (),
                 )
             )
-            for fact in (
-                *(strength.facts if strength else ()),
-                *(activity.facts if activity else ()),
-            ):
-                member = fact.row.set_id if isinstance(fact, StrengthFact) else fact.workout_id
-                members.append(
-                    e.bridge(
-                        fact,
-                        contexts.get((fact.source.source_account_id, member)),
-                        activity_discrepancies=activity.discrepancies
-                        if activity and not isinstance(fact, StrengthFact)
-                        else (),
+
+    members = _current_members(db, owner, set(accounts), members)
+    limitations = {
+        (m.fact.source.source_account_id, identity(m)): m.limitation
+        for m in members
+        if m.limitation
+    }
+    supports = {}
+    for account in dict.fromkeys((scope.strength_account, scope.endurance_account)):
+        if account:
+            selected = tuple(m for m in members if m.fact.source.source_account_id == account)
+            for support in _supports(db, owner, account, selected, start, stop):
+                supports[account, support.member] = support
+    manual = _manuals(
+        db,
+        owner,
+        start,
+        stop,
+        {s.effective_link.outcome for s in supports.values() if s.effective_link},
+    )
+    return e.Projection(
+        owner=owner,
+        scope=scope,
+        days=tuple(days),
+        confirmations=tuple(
+            e.Confirmation(
+                account=s.history[-1].source.account,
+                member=s.member,
+                state=s.state,
+                reason=(limitations.get((s.history[-1].source.account, s.member)) or s.reason)
+                if s.state == "stale"
+                else s.reason,
+                confirmed=tuple(sorted(s.confirmed.items())),
+                unconfirmed=s.unconfirmed,
+                history=s.history,
+                ambiguous_set_link=s.ambiguous_set_link,
+                effective_link=s.effective_link,
+            )
+            for s in sorted(
+                supports.values(), key=lambda s: (s.history[-1].source.account, s.member)
+            )
+        ),
+        performances=reconcile(tuple(members), supports, manual, period.zone),
+    )
+
+
+# Increment on a material change to selection or field/qualification semantics.
+DECISION_POLICY = "current-accepted-training-v1"
+
+
+def _representative_scope(db: Session, owner: UUID, context: f.Context) -> e.Scope:
+    selected = {}
+    for provider, account in db.execute(
+        select(SourceAccount.provider, SourceAccount.id).where(
+            SourceAccount.user_id == owner,
+            SourceAccount.provider.in_(("hevy", "garmin")),
+            SourceAccount.status != "legacy_unresolved",
+        )
+    ):
+        if provider in selected:
+            raise EvidenceScopeUnavailable(
+                "multiple bound accounts for provider; supply an explicit evidence scope"
+            )
+        selected[provider] = account
+    return e.Scope(
+        start=context.history_start,
+        stop=context.history_start + timedelta(days=7),
+        zone=context.zone,
+        strength_account=selected.get("hevy"),
+        endurance_account=selected.get("garmin"),
+        recovery_account=selected.get("garmin"),
+    )
+
+
+def freeze_inputs(
+    db: Session, owner: UUID, context: f.Context, scope: e.Scope | None, cutoff: datetime
+) -> e.DecisionInputs:
+    """Called under the owner lock. All reads use the command's physical transaction."""
+    familiar_snapshot.require_preview_owner(owner)
+    if trusted_owner() != owner:
+        raise PermissionError("planning evidence owner differs from the trusted binding")
+    if db.scalar(text("SHOW transaction_isolation")) != "read committed":
+        raise ValueError("planning evidence decisions require a read-committed transaction")
+    db.flush()
+    # Avoid cached ORM entities from before lock acquisition. Closing this read Session
+    # leaves the enclosing transaction, its writes and its locks with the command.
+    with Session(db.connection(), join_transaction_mode="rollback_only", autoflush=False) as reader:
+        reader.execute(text("SET LOCAL TIME ZONE 'UTC'"))
+        selection = "explicit" if scope is not None else "representative-week"
+        scope = scope if scope is not None else _representative_scope(reader, owner, context)
+        projection = _read_projection(reader, owner, scope)
+        accounts = tuple(
+            e.SelectedAccount(
+                id=row.id,
+                provider=row.provider,
+                provider_account_id=row.provider_account_id,
+                status=row.status,
+            )
+            for row in reader.scalars(
+                select(SourceAccount)
+                .where(
+                    SourceAccount.user_id == owner,
+                    SourceAccount.id.in_(
+                        [scope.strength_account, scope.endurance_account, scope.recovery_account]
+                    ),
+                )
+                .order_by(SourceAccount.id)
+            )
+        )
+        ledger = GarminCoverage
+        receipts = tuple(
+            e.CoverageReceipt(
+                account=row.source_account_id,
+                day=row.local_date,
+                category=row.category,
+                receipts_json=canonical(row.receipts),
+            )
+            for row in reader.scalars(
+                select(ledger)
+                .where(
+                    *training_ledger_scope(
+                        ledger,
+                        owner,
+                        scope.start,
+                        scope.stop,
+                        scope.endurance_account,
+                        scope.recovery_account,
                     )
                 )
-
-        members = _current_members(db, owner, set(accounts), members)
-        limitations = {
-            (m.fact.source.source_account_id, identity(m)): m.limitation
-            for m in members
-            if m.limitation
-        }
-        supports = {}
-        for account in dict.fromkeys((scope.strength_account, scope.endurance_account)):
-            if account:
-                selected = tuple(m for m in members if m.fact.source.source_account_id == account)
-                for support in _supports(db, owner, account, selected, start, stop):
-                    supports[account, support.member] = support
-        manual = _manuals(
-            db,
-            owner,
-            start,
-            stop,
-            {s.effective_link.outcome for s in supports.values() if s.effective_link},
+                .order_by(ledger.source_account_id, ledger.local_date, ledger.category)
+            )
         )
-        return e.Projection(
-            owner=owner,
-            scope=scope,
-            days=tuple(days),
-            confirmations=tuple(
-                e.Confirmation(
-                    account=s.history[-1].source.account,
-                    member=s.member,
-                    state=s.state,
-                    reason=(limitations.get((s.history[-1].source.account, s.member)) or s.reason)
-                    if s.state == "stale"
-                    else s.reason,
-                    confirmed=tuple(sorted(s.confirmed.items())),
-                    unconfirmed=s.unconfirmed,
-                    history=s.history,
-                    ambiguous_set_link=s.ambiguous_set_link,
-                    effective_link=s.effective_link,
-                )
-                for s in sorted(
-                    supports.values(), key=lambda s: (s.history[-1].source.account, s.member)
-                )
-            ),
-            performances=reconcile(tuple(members), supports, manual, period.zone),
+        return e.DecisionInputs(
+            policy=DECISION_POLICY,
+            selection=selection,
+            cutoff=cutoff,
+            projection=projection,
+            accounts=accounts,
+            coverage_receipts=receipts,
         )
