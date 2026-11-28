@@ -319,7 +319,14 @@ class Spacing(Record):
     elapsed_seconds: Positive  # Symmetric minimum start-to-start interval.
 
 
+class Interruption(Record):
+    template: Key
+    since: date
+    reason: Text
+
+
 class Context(Record):
+    interruptions: tuple[Interruption, ...] = Field(default=(), exclude_if=lambda x: not x)
     zone: str
     objectives: Annotated[tuple[Objective, ...], Field(min_length=2)]
     preferred_weekdays: tuple[Annotated[int, Field(ge=0, le=6)], ...] = ()
@@ -339,6 +346,7 @@ class Context(Record):
             raise ValueError("unknown IANA planning zone") from exc
         if {g.sport for g in self.objectives} != {"strength", "running"}:
             raise ValueError("rank objectives for both sports")
+        unique((i.template for i in self.interruptions), "interrupted template")
         unique(self.preferred_weekdays, "preferred weekday")
         unique((o.support for o in self.observations), "observation support")
         if any(
@@ -373,7 +381,37 @@ class Commitment(Record):
     minimum_per_session: Positive  # Working sets for strength, elapsed seconds for running.
 
 
+class DevelopingGroup(Record):
+    template: Key
+    movement: Key
+    variation: Key
+    group: Key
+    burden: Literal["upper", "lower", "unclassified"] = "unclassified"
+    # Omit both endpoints for fixed reps. The envelope is distinct from execution flexibility.
+    rep_range: tuple[Positive, Positive] | None = None
+    followup_template: Key | None = None
+    set_seconds: Positive  # Approved worst-case execution allowance over this envelope.
+
+
+class CoreProfile(Record):
+    version: Literal["synthetic.core.v1"] = "synthetic.core.v1"
+    joint: Literal["J-DEFAULT"] = "J-DEFAULT"
+    groups: tuple[DevelopingGroup, ...] = ()
+    easy_template: Key | None = None
+    easy_followup: Key | None = None
+    weekly_seconds: Positive | None = None
+    daily_seconds: Positive | None = None
+
+    @model_validator(mode="after")
+    def developing_tasks(self) -> Self:
+        unique((g.movement for g in self.groups), "developing movement")
+        if not self.groups and not self.easy_template:
+            raise ValueError("select at least one developing task")
+        return self
+
+
 class Block(Record):
+    adaptation: CoreProfile | None = Field(default=None, exclude_if=lambda x: x is None)
     key: Key
     start: date
     phases: Annotated[tuple[Text, ...], Field(min_length=1, max_length=52)]
@@ -390,6 +428,50 @@ class Block(Record):
             raise ValueError("hybrid baseline requires both sports")
         if any(s.first not in keys or s.second not in keys for s in self.spacing):
             raise ValueError("spacing names unknown template")
+        if profile := self.adaptation:
+            by_key = {t.key: t.prescription for t in self.templates}
+            followups = [g.followup_template for g in profile.groups] + [profile.easy_followup]
+            if any(k is not None and k not in by_key for k in followups):
+                raise ValueError("restoration follow-up must name a block template")
+            runs = [p for p in by_key.values() if isinstance(p, Running)]
+            nominal = sum(p.duration.nominal for p in runs)
+            if sum(p.duration.high for p in runs) > nominal + min(600, nominal // 10) or any(
+                p.role == "long" and p.duration.high > p.duration.nominal + 600 for p in runs
+            ):
+                raise ValueError("initial running endpoints exceed the core exposure envelope")
+            for g in profile.groups:
+                p = by_key.get(g.template)
+                targets = (
+                    [
+                        s
+                        for ex in p.exercises
+                        if (ex.movement, ex.variation) == (g.movement, g.variation)
+                        for group in ex.groups
+                        if group.kind == "working" and group.key == g.group
+                        for s in group.sets
+                    ]
+                    if isinstance(p, Strength)
+                    else []
+                )
+                if not targets or any(
+                    s.execution_seconds > g.set_seconds
+                    or s.reps.low != s.reps.high
+                    or s.load.low != s.load.high
+                    or (g.rep_range and not g.rep_range[0] <= s.reps.nominal <= g.rep_range[1])
+                    for s in targets
+                ):
+                    raise ValueError(
+                        "developing group requires fixed familiar targets within its envelope"
+                    )
+            if profile.easy_template:
+                p = by_key.get(profile.easy_template)
+                if (
+                    not isinstance(p, Running)
+                    or p.role != "easy"
+                    or len(p.steps) != 1
+                    or p.duration.low != p.duration.high
+                ):
+                    raise ValueError("easy operator requires one fixed continuous easy work step")
         return self
 
 
@@ -398,6 +480,9 @@ class ProposeBlock(Record):
 
 
 class FamiliarWeek(Record):
+    choice: Literal["hold", "strength", "running"] | None = Field(
+        default=None, exclude_if=lambda x: x is None
+    )
     kind: Literal["familiar-week"] = "familiar-week"
     number: Positive
 

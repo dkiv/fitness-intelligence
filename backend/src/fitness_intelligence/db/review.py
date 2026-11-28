@@ -195,6 +195,28 @@ def _familiar_review(preview: FamiliarPreview) -> str:
                 f"{performance.occurred_at.isoformat()} · {performance.sport} · "
                 f"{performance.execution_state}"
             )
+        if review := candidate.adaptation:
+            lines.append(
+                f"{review.version} · {review.joint} · approved predecessor {review.predecessor}"
+            )
+            origins = {
+                p.manual.prescribed.occurrence: p.manual
+                for p in inputs.projection.performances
+                if p.manual
+            }
+            for d in review.decisions:
+                lines.append(
+                    f"{d.template}/{d.task} · {d.action} · {d.before} → {d.after} · {d.reason}"
+                )
+                lines.append(f"Review anchor {d.anchor_revision} · {d.anchor_dose}")
+                if d.considered is not None:
+                    lines.append(f"Alternative considered · {d.considered}")
+                for occurrence, assertion in zip(d.performances, d.assertions, strict=True):
+                    m = origins[occurrence]
+                    lines.append(
+                        f"{m.prescribed.template} · {m.history[-1].occurred_at.isoformat()} · "
+                        f"occurrence {occurrence} · prescription {m.origin} · assertion {assertion}"
+                    )
     if preview.current_context_id != preview.context_id:
         lines.append("The planning context has changed since this proposal.")
     for objective in sorted(ctx.objectives, key=lambda obj: obj.rank):
@@ -207,6 +229,26 @@ def _familiar_review(preview: FamiliarPreview) -> str:
             f"Preserve {floor.sessions} × {floor.role}, each ≥ {floor.minimum_per_session} {unit}"
         )
     if isinstance(candidate.request, familiar.ProposeBlock):
+        if profile := block.adaptation:
+            lines.append(f"{profile.version} · {profile.joint} · review each upcoming week")
+            for group in profile.groups:
+                reps = (
+                    f"{group.rep_range[0]}–{group.rep_range[1]} reps"
+                    if group.rep_range
+                    else "fixed reps"
+                )
+                lines.append(
+                    f"Develop {group.template}/{group.movement}/{group.variation}/{group.group} · "
+                    f"{group.burden} · {reps} · {group.set_seconds}s per set"
+                )
+            if profile.easy_template:
+                lines.append(
+                    f"Develop {profile.easy_template} · up to 300 elapsed seconds per review"
+                )
+            if profile.weekly_seconds:
+                lines.append(f"Weekly reservation limit {profile.weekly_seconds}s")
+            if profile.daily_seconds:
+                lines.append(f"Daily reservation limit {profile.daily_seconds}s")
         for n, phase in enumerate(block.phases, 1):
             lines.append(f"Week {n} intent · {phase}")
         for template in block.templates:

@@ -135,6 +135,7 @@ class StrengthExecution(ManualExecution):
 
 
 class RunExecution(ManualExecution):
+    conversational: bool | None = Field(default=None, exclude_if=lambda x: x is None)
     sport: Literal["running"] = "running"
     role: f.Key
     confirmed_outing: bool
@@ -152,6 +153,7 @@ class RunExecution(ManualExecution):
             raise ValueError("completed or partial running requires a confirmed outing")
         if not self.performed and (
             self.steps
+            or self.conversational is not None
             or any(
                 x is not None
                 for x in (
