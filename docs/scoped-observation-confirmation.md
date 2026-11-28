@@ -75,4 +75,4 @@ Alembic `e422` follows `e421`. One owner-bound receipt stores the verified actor
 
 E4.2C.1 now builds the displayed synthetic members from real D1D projection types. It reads current support and superseded receipts in the same read-only transaction as the canonical observations and manual outcomes. A changed mapping, invalidated source or withdrawn answer withholds the affected support. Historical independent reports remain attached to their original member.
 
-E4.2C.2 must freeze the selected facts and exclusions, source scope, coverage, mappings, confirmation lineage, manual attribution and decision cutoff. Approval must revalidate that complete scope while coordinated with every relevant writer, including writers of new rows and newly opened issues. [Unified evidence and proposed coordination protocol](planning-evidence.md)
+E4.2C.2 freezes the selected facts and exclusions, source scope, coverage, mappings, confirmation lineage, manual attribution and decision cutoff. Approval takes the shared owner lock and rereads the complete selection, including newly inserted facts and newly opened issues. [Frozen evidence and writer coordination](planning-evidence.md)

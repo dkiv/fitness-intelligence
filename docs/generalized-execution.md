@@ -51,6 +51,6 @@ Migration `e421` follows `b330`. Existing rows take outcome version 1 and keep t
 
 **E4.2B** now supports field-scoped batch confirmation of supplied synthetic observations. A confirmation can reference a performed manual assertion and its exact in-force attribution. An import confirmation adds no session to the weekly report. [Scoped confirmation guide](scoped-observation-confirmation.md)
 
-**E4.2C.1** joins this manual lineage with current D1D source evidence and E4.2B member confirmations on the synthetic principal. A superseded manual assertion retains its historical links and releases its effective attribution. E4.2C.2 must freeze and revalidate the complete decision scope, including newly inserted facts and issues. [Hybrid-week rehearsal and writer inventory](planning-evidence.md)
+**E4.2C.1** joins this manual lineage with current D1D source evidence and E4.2B member confirmations on the synthetic principal. A superseded manual assertion retains its historical links and releases its effective attribution. E4.2C.2 freezes and revalidates the complete decision scope, including newly inserted facts and issues. [Hybrid-week rehearsal and writer inventory](planning-evidence.md)
 
 [Execution contract and report](../backend/src/fitness_intelligence/planning/familiar_outcomes.py) · [PostgreSQL rehearsals](../backend/tests/test_familiar_execution.py)

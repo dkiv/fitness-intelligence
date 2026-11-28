@@ -9,11 +9,13 @@ from pathlib import Path
 from uuid import UUID
 
 from sqlalchemy import or_, select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from fitness_intelligence.adapters.local_account import private_config
 from fitness_intelligence.db.endurance_models import GarminEnrollment
 from fitness_intelligence.db.models import SourceAccount, User
+from fitness_intelligence.db.owner_lock import lock_owner
 from fitness_intelligence.domain.endurance import Source
 
 from .client import Endpoint, GarminClient, GarminError
@@ -105,7 +107,12 @@ class Evidence:
     ) -> GarminBinding | None:
         """Resolve both account keys and the original enrollment policy under the local owner."""
         source = self.source
-        if session.scalar(select(User.id).where(User.id == source.owner_id)) is None:
+        if for_write:
+            try:
+                lock_owner(session, source.owner_id)
+            except NoResultFound as exc:
+                raise GarminError("local owner unresolved") from exc
+        elif session.scalar(select(User.id).where(User.id == source.owner_id)) is None:
             raise GarminError("local owner unresolved")
         profile = observed.profile_id if observed else self.profile_id
         keys = [SourceAccount.id == source.source_account_id]

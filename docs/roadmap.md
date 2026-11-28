@@ -97,7 +97,7 @@ same inputs and rules. An infeasible schedule must surface the conflicting const
 Preserve the original prescription and each approved revision, link completed sessions to
 the applicable version, and distinguish missed sessions from unknown completion in adherence.
 
-E4.0 specifies the versioned block, prescription and authorization contracts. E4.1 implements the synthetic familiar-week slice using the existing trusted approval path. E4.2A adds generalized manual execution attribution and descriptive weekly review. E4.2B adds field-scoped confirmation of supplied synthetic observations. E4.2C.1 reconciles D1D observations, E4.2A manual actuals and E4.2B confirmations in a synthetic read-only projection. E4.2C.2 will freeze inputs and coordinate writers at approval. [E4.2C.1 evidence](planning-evidence.md) · [E4.2B confirmation](scoped-observation-confirmation.md) · [E4.2A execution](generalized-execution.md) [E4.0 design](generalized-hybrid-planner-design.md) · [E4.1 usage and conformance](generalized-familiar-week.md)
+E4.0 specifies the versioned block, prescription and authorization contracts. E4.1 implements the synthetic familiar-week slice using the existing trusted approval path. E4.2A adds generalized manual execution attribution and descriptive weekly review. E4.2B adds field-scoped confirmation of supplied synthetic observations. E4.2C.1 reconciles D1D observations, E4.2A manual actuals and E4.2B confirmations in a synthetic read-only projection. E4.2C.2 freezes those inputs and checks the entire selected scope at approval under a shared owner lock. [E4.2C evidence and approval](planning-evidence.md) · [E4.2B confirmation](scoped-observation-confirmation.md) · [E4.2A execution](generalized-execution.md) [E4.0 design](generalized-hybrid-planner-design.md) · [E4.1 usage and conformance](generalized-familiar-week.md)
 
 ### F · Adaptive coaching MVP
 
@@ -111,17 +111,20 @@ running load, recovery and fueling guidance as B–D supply evidence for them.
 
 ### G · Workout publishing integrations
 
-Research Hevy routine write authorization and Garmin developer eligibility for the Training API
-while A proceeds. Verify structured workout and training-calendar permissions separately from
-activity read access. Publishing depends on E, explicit athlete approval of the exact version
-and destination, and authorized APIs. Separate provider adapters handle Hevy routine creation
-and updates and Garmin structured workout and calendar publishing.
+Use Hevy MCP for interactive strength publishing, including preview, athlete-initiated save
+and reconciliation. Retain Hevy REST for historical acquisition. The Garmin target is automatic
+creation and scheduling of approved runs in Connect. FI can already generate the structured
+workouts offline. Delivery consumes E’s versioned prescription and requires athlete approval of
+the exact version and destination. Garmin publishing awaits an acceptable authorized write interface.
+G1D demonstrates availability checks and approved reservation updates using synthetic Google
+Calendar data. [Calendar rehearsal and proposed live scope](google-calendar-reservations.md) ·
+[Publishing decisions](workout-publishing-feasibility.md)
 
 Accept each adapter when retrying the same approved version avoids duplicates, an update maps
 to its intended remote item, and a partial failure shows which items succeeded and which need
 reconciliation before retry. Keep the canonical plan and per-version delivery status available
-through failures. Where writes are unavailable, accept a manual or export path when an athlete
-can enter the approved week using its dates, exercises, sets and running steps.
+through failures. Offer the Garmin worksheet as an optional fallback. MVP acceptance can proceed
+without manual entry or a manual device rehearsal.
 
 ### H · Personalized modeling and evaluation
 

@@ -95,7 +95,7 @@ def _familiar_week(
         ).one()
 
     row = revision(head)
-    effective = v2.read(f.Candidate, row.snapshot)
+    effective = v2.read_candidate(row.snapshot)
     if not isinstance(effective.request, f.FamiliarWeek):
         raise OutcomeConflict("week has no approved prescription in the effective calendar")
     candidate = effective
@@ -104,7 +104,7 @@ def _familiar_week(
         if ref is None:
             raise OutcomeConflict("week has no approved prescription in the effective calendar")
         row = revision(ref.revision)
-        candidate = v2.read(f.Candidate, row.snapshot)
+        candidate = v2.read_candidate(row.snapshot)
     if (
         candidate.cycle != plan
         or candidate.block_revision != effective.block_revision
