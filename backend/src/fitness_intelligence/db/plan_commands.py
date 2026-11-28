@@ -581,6 +581,16 @@ class PlanCommands:
             row.revision_id, row.choice, row.command_id, row.decided_at.astimezone(UTC), row.reason
         )
 
+    def is_committed_head(self, plan_id: UUID, revision_id: UUID) -> bool:
+        """Check the durable approval while the calling preview holds the owner's lock."""
+        query = select(TrainingPlan.head_id).where(
+            TrainingPlan.user_id == self._owner, TrainingPlan.id == plan_id
+        )
+        # The head FK points to an approving decision. A separate checkout sees only commits.
+        engine = self._db.get_bind(mapper=TrainingPlan).engine
+        with engine.connect() as reader:
+            return reader.scalar(query) == revision_id
+
     def preview(self, plan_id: UUID, revision_id: UUID) -> Preview | FamiliarPreview:
         self._lock_owner()
         return self._preview(self._plan(plan_id, lock=False), revision_id)
