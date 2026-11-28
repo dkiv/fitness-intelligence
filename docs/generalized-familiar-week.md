@@ -74,47 +74,88 @@ The v2 discriminator uses the existing immutable JSONB context/block/revision co
 
 **Rule and replay compatibility.** New proposals pin `synthetic.familiar.hold.v2`. A sealed proposal under `synthetic.familiar.hold.v1` can reproduce its original dose-only result. Its pending approval requires a fresh proposal with the corrected rule and supported effort. An already approved block with missing effort support keeps its sealed baseline. Continuing with newly confirmed instructions requires a new synthetic cycle because E4.1 has no block-revision command. An exact retry of an existing receipt returns its original result. The schema and the separate E1/E2/E3 fixture path are unchanged.
 
-### Rolling horizon still to implement
+### Rolling horizon
 
 The domain tests exercise independent valid week numbers. The persistence test seals, approves and replays all six consecutive weeks under one synthetic clock to check serialization, dated receipts and earlier prescription identities. A phase intention or that fixture’s six approvals supplies no operational authority to prescribe six future weeks from stale history.
 
-Later slices must restrict executable detail to the upcoming review window, keep subsequent weeks provisional, and pin the approved predecessor and the decision-time cutoff. Before generating or approving the next detailed week, recheck recent comparable actual work, source support, tolerance, interruptions, current restrictions and calendar commitments. Missing or stale evidence must limit the available actions, with a fresh review and a separate athlete decision for each dated week. Operational rule authorization remains a separate prerequisite.
+E4.3 restricts detail in an opted-in synthetic block to a week starting in the next seven local days. After the familiar first week it also requires a current, same-local-day review against the last approved week. Each subsequent week requires its own decision. The six-week serialization fixture continues to exercise the familiar-only contract.
+
+## Synthetic core adaptation
+
+Opt in when creating the block. The approved profile names developing templates and groups, movement burden, a fixed-rep or variable-rep envelope, equipment increment (on the exercise), execution-time allowance and the single eligible easy template. The order of developing groups indicates preference within the strength objective. A follow-up template identifies the relevant subsequent work for restoration. Optional daily and weekly time budgets cover the entire reservation. The block, its reviewed initial doses and the profile remain immutable. A familiar-only block keeps its original behavior. [Contracts](../backend/src/fitness_intelligence/planning/familiar.py)
+
+```python
+profile = f.CoreProfile(
+    groups=(f.DevelopingGroup(
+        template="gym-a", movement="press", variation="standing", group="primary",
+        burden="upper", rep_range=(5, 6), set_seconds=65, followup_template="long",
+    ),),
+    easy_template="easy",
+)
+block = block.model_copy(update={"adaptation": profile})
+# Create and approve the block and familiar week through PlanCommands as above.
+# After recording actual occurrences, submit the next contiguous week.
+pending = plans.submit(cycle, approved_week, f.FamiliarWeek(number=2))
+print(render_review(plans.preview(cycle, pending)))
+```
+
+The initial approved block supplies the cumulative reference. The preceding approved week supplies the current prescription and per-review ceilings. The frozen projection supplies achieved dose, effort, tolerance and occurrence identities. The synthetic implementation requires current in-force attribution, both applicable C.1 qualifications, and a manageable completed predecessor week before proposing an increase. A strength session must account for all working ordinals. A run must account for its elapsed dose and any prescribed intervals. Easy effort requires a supported session effort in range or an explicit conversational report. The reader retains unlinked source evidence, conflicting fields and partial reports for review.
+
+The review selects the planning zone, bound training sources and dates covering the preceding 28 elapsed days through the review day. Explicit mappings may refine that full selection. The projection currently represents one account per provider in this review. Ambiguous multi-account selection defers adaptation. Positive credit requires a performance of the latest approved relevant prescription. Each decision stores the source review revision, dose and credited occurrences separately from the current calendar head. An unperformed trial can retain its approved allowance while its supporting performances remain current. Loss of that support defers the dose. Two ordinals or a corrected assertion for one occurrence still represent one performance. Approval reacquires the owner lock, rereads the complete selected scope and regenerates the decision. Historical replay uses the original cutoff, evidence, context, profile and predecessor. [Frozen evidence contract](planning-evidence.md#writer-inventory-and-e42c2)
+
+| Decision | Synthetic rule |
+| --- | --- |
+| Strength reps or load | One ordinary fully supported within-target success can support one total rep on the first eligible ordinal. Missing set effort or effort at the upper target requires two consecutive comparable manageable successes. At the top of every ordinal’s band, try the smallest equipment step and reset to the lower reps. Fixed-rep groups keep their rep counts. Every ordinal must fit the per-review upper/lower load caps of 2.5%/5% and initial caps of 105%/110%. |
+| Ordinary easy duration | Two distinct comparable manageable outings at the current dose can support up to 300 additional seconds on one continuous easy outing. The maximum weekly endpoints must fit predecessor nominal plus the smaller of 600 seconds and 10% rounded down to whole seconds, and initial weekly nominal plus 1,200 seconds. |
+| Joint selection | Keep protected doses, frequency and set counts. Recheck maximum time, exposure floors, equipment, fixed events, overlaps and elapsed spacing with the existing placement search. One positive lower group can proceed, or one positive run. An independently eligible upper group can accompany the run. At equal sport priority, the preview retains the common feasible changes and shows competing alternatives. Submit with `choice="strength"` or `"running"` to review a priority choice. `choice="hold"` requests a feasible hold. |
+| Interruption and re-entry | A context revision can name an interrupted template, start date and reason. Use a recent, comparable, manageable performance since the interruption to bound the affected dose at or below the approved predecessor. Insufficient support, an active restriction or a conflict with protection defers the numerical proposal. The reduced prescription binds later reviews. Restoration requires resolved interruption, two successes at the re-entry dose since the ceiling began, a representative predecessor week, and manageable subsequent work on the named follow-up task. Offer one ordinary bounded step from the reduced dose. |
+
+### Four decision rehearsals
+
+| Case | Result through the proposal and approval commands |
+| --- | --- |
+| Independently eligible upper and easy changes | The primary press changes from 5/5 to 6/5 at 40 kg. The ordinary easy outing changes from 1,200 to 1,500 seconds. The protected 1,800-second long outing stays in the week. Each decision identifies its approved predecessor, occurrences and assertion tips. |
+| Eligible lower and easy changes compete | With strength ranked first, the squat gets one total rep and the easy run holds at 1,200 seconds. Equal priorities expose the alternatives. Selecting running retains the squat and offers 1,500 seconds. |
+| Same performances reviewed again | A repeated preview reproduces the same dose and rationale. After approval, advancing the calendar with no newly performed predecessor retains 6/5 at 40 kg and 1,500 seconds. |
+| Corrected support before approval | Replacing the completed 1,200-second report with a partial 960-second outing invalidates the pending proposal. The approved head stays in place, historical replay retains the original review, and a fresh proposal withholds the increase. |
+
+These are synthetic decision and concurrency semantics. The profile makes a conservative representative-week check and supports only attributed performances. Comparable protected outcome direction, block amendments, set trials, long/quality progression and the optional joint exception remain later work. Real prescriptions require independently accepted methodology, operational release and athlete approval. [PostgreSQL rehearsals](../backend/tests/test_core_adaptation.py) · [Core rule](../backend/src/fitness_intelligence/planning/core_adaptation.py)
 
 ## Archived conformance cases
 
-The columns use the original case numbers from [M01](research/curation/j3b-001-strength-progression-methodology.md), [M02](research/curation/j3b-002-hybrid-block-methodology.md), [M03](research/curation/j3b-003-running-methodology.md) and [J3I](research/curation/j3i-001-integrated-hybrid-methodology.md). **I** identifies an implemented behavior. **P** marks a partially implemented case. **D** marks a deferred case. **X** marks a disabled operator or authorization. With E4.2C.2, the 94 archived cases have 22 implemented, 24 partial, 18 deferred and 30 disabled dispositions. Rejection of an unsupported command does not exercise a later operator’s eligibility test.
+The columns use the original case numbers from [M01](research/curation/j3b-001-strength-progression-methodology.md), [M02](research/curation/j3b-002-hybrid-block-methodology.md), [M03](research/curation/j3b-003-running-methodology.md) and [J3I](research/curation/j3i-001-integrated-hybrid-methodology.md). **I** identifies an implemented behavior. **P** marks a partially implemented case. **D** marks a deferred case. **X** marks a disabled operator or authorization. With E4.3, the 94 archived cases have 35 implemented, 27 partial, 13 deferred and 19 disabled dispositions. Rejection of an unsupported command does not exercise a later operator’s eligibility test.
 
 | Number | M01 T | M02 B-T | M03 T | J3I I |
 | --- | --- | --- | --- | --- |
 | 01 | I · familiar hold with confirmed group/ordinal effort and cap | I · balanced familiar week | I · familiar hold with confirmed effort and cap on each expanded step | P · balanced hold works, comparable outcome review deferred |
-| 02 | P · top/backoff deviations scoped by ordinal, response deferred | I · strength emphasis with protected running | I · reject stale or absent running history | X · upper rep increase |
+| 02 | P · top/backoff deviations scoped by ordinal, response deferred | I · strength emphasis with protected running | I · reject stale or absent running history | I · one total rep on the first eligible developing ordinal |
 | 03 | P · set exposure follows each reported ordinal in a partial session, fallback programming deferred | D · outcome comparability | D · run/walk ledger | X · increase controlled work |
-| 04 | P · explicit misses distinguished from unknown, rescheduling deferred | D · decline in protected performance | X · weekly duration increase | X · upper plus easy increase |
+| 04 | P · explicit misses distinguished from unknown, rescheduling deferred | D · decline in protected performance | I · easy increase bounded in whole seconds by predecessor weekly total | I · eligible upper plus easy, protected dose and calendar rechecked |
 | 05 | I · scoped athlete confirmation preserves original inference and hold | X · set trial | X · long extension | X · optional joint exception |
-| 06 | I · require matching equipment and load convention, withhold set comparison for unknown dimensions | X · load progression | D · distance novelty review | X · combined quality and lower increase |
-| 07 | P · recent baseline enforced, restoration deferred | X · cumulative load change | X · work rep or duration change | X · aggregate set trial |
-| 08 | X · low-count set trial | X · joint increase | P · exact recoveries implemented, additional rep operator disabled | D · adverse squat review |
+| 06 | I · require matching equipment and load convention, withhold set comparison for unknown dimensions | I · discrete step checked against per-review and initial limits | D · distance novelty review | X · combined quality and lower increase |
+| 07 | I · supported submaximal re-entry and bounded restoration | I · all load endpoints bounded against initial and predecessor nominals | X · work rep or duration change | X · aggregate set trial |
+| 08 | X · low-count set trial | P · J-DEFAULT chooses lower or easy, set trials disabled | P · exact recoveries implemented, additional rep operator disabled | D · adverse squat review |
 | 09 | X · simultaneous set/load increase | I · reserved time grants no extra work | P · known role and aligned timing for every reported work repetition required, follow-up deferred | X · Q0 entry |
 | 10 | P · partial-day outings supported, contradictory enumeration withholds import-only execution, protected-run decision deferred | P · fixed versus movable placement works, post-approval moves deferred | X · quality-duration progression | P · reported count and timed work preserved with explicit shortfalls, quality operator disabled |
-| 11 | I · restriction or corrected source stales approval and requires fresh review | I · adjacent elapsed spacing | X · easy-duration progression | P · current projection retains inference and masks, joins each linked ordinal once, policy gate deferred |
-| 12 | X · RPE-free progression | P · D1D inference stays descriptive, scoped athlete actuals support review, automatic baseline selection deferred | D · HR/conditions | D · re-entry after travel |
+| 11 | I · restriction or corrected source stales approval and requires fresh review | I · adjacent elapsed spacing | I · two manageable easy completions with effort or conversational evidence | P · qualified linked ordinal evidence supported, unlinked imports remain descriptive for adaptation |
+| 12 | I · two successes required, infeasible equipment step holds | P · D1D inference stays descriptive, scoped athlete actuals support review, automatic baseline selection deferred | D · HR/conditions | P · re-entry, persistent ceiling and restoration implemented for opted-in tasks |
 | 13 | P · decline and conflict supported, moves deferred | P · closure conflict and immutable execution supported, block revision deferred | D · pace comparability | I · restriction invalidates proposal and blocks affected work |
-| 14 | P · frozen replay supported, withdrawal deferred | D · interrupted baseline | P · manual partial work and tolerance visible, adaptive review deferred | P · adherence/exposure visible, comparable outcome direction deferred |
+| 14 | P · frozen replay supported, withdrawal deferred | P · scoped re-entry requires credible actual work after interruption | P · manual partial work and tolerance visible, adaptive review deferred | P · adherence/exposure visible, comparable outcome direction deferred |
 | 15 | X · stall-driven set trial | I · reject stale context/restricted session | D · subsequent lower-body tolerance | I · finite exhaustion versus incomplete search |
 | 16 | P · explicit exclusions enforced, symptom intake deferred | D · successor block | X · joint load/quality rise | D · goal revision and successor |
 | 17 | — | D · context change stales approval, block amendment deferred | X · optional lower/easy rise | I · corrected set with identical totals stales approval, exact receipt replay preserved |
 | 18 | — | I · late import and source correction checked under owner lock, frozen review retained | X · frequency redistribution | D · operational evidence withdrawal |
-| 19 | — | D · preference tradeoff alternatives | X · first quality entry | I · legacy E1/E2/E3 regression |
-| 20 | — | P · decline works, withdrawal deferred | X · uncertain Q0 entry | X · discrete load rise |
-| 21 | — | I · elapsed coverage and known completion denominators | P · actual deviations available, comparable protected outcome review deferred | X · adaptive review budgets |
+| 19 | — | P · competing core changes expose priority choices, broad block alternatives deferred | X · first quality entry | I · legacy E1/E2/E3 regression |
+| 20 | — | P · decline works, withdrawal deferred | X · uncertain Q0 entry | I · infeasible discrete load increase holds |
+| 21 | — | I · elapsed coverage and known completion denominators | P · actual deviations available, comparable protected outcome review deferred | I · fresh attributed predecessor performance required for further credit |
 | 22 | — | D · block revision | I · adherence reported, comparable outcome remains unknown | X · run/walk fraction change |
 | 23 | — | — | I · new restriction blocks approval | P · final/between arithmetic implemented, increasing rep count disabled |
-| 24 | — | — | I · changed provider evidence requires fresh review, original evidence replays | P · scoped effort repeat checked, local versus shared difficulty review deferred |
-| 25 | — | — | D · interruption/resumption | X · frequency redistribution |
-| 26 | — | — | I · fixed start versus protected floor/window conflict | P · partial actual kept separate from approved target, adaptive review deferred |
-| 27 | — | — | D · alternative proposals across competing goals | — |
-| 28 | — | — | X · cumulative progression | — |
-| 29 | — | — | P · upper duration/time checked, adaptive weekly ceiling deferred | — |
+| 24 | — | — | I · changed provider evidence requires fresh review, original evidence replays | P · adverse sibling effort blocks rise, isolated accessory exception deferred |
+| 25 | — | — | P · easy re-entry supported, broader running roles deferred | X · frequency redistribution |
+| 26 | — | — | I · fixed start versus protected floor/window conflict | I · partial exposure earns no catch-up or additional headroom |
+| 27 | — | — | P · equal-ranked lower/easy alternatives and explicit preference | — |
+| 28 | — | — | I · whole-week easy ceiling pinned to initial seconds | — |
+| 29 | — | — | I · maximum duration checked against calendar and weekly ceilings | — |
 | 30 | — | — | I · existing fixture replay | — |
 
 E4.2A implements generalized in-force attribution, append-only manual corrections and descriptive weekly review. E4.2B implements scoped batch confirmation and correction on supplied synthetic observations. E4.2C.1 joins D1D observations to effective confirmations and manual executions in one synthetic read transaction. E4.2C.2 seals the complete selected projection and revalidates it at approval under the shared owner lock. [Evidence rehearsal and writer inventory](planning-evidence.md) · [Execution guide](generalized-execution.md) · [Confirmation guide](scoped-observation-confirmation.md) · [Planning regressions](../backend/tests/test_familiar.py)

@@ -427,6 +427,7 @@ class PlanCommands:
         *,
         today: date | None,
         rule: f.FamiliarRule = f.RULE,
+        inputs: pe.DecisionInputs | None = None,
     ) -> f.Candidate:
         v2.require_preview_owner(self._owner)
         block = v2.read(f.Block, plan.block)
@@ -449,11 +450,19 @@ class PlanCommands:
             for ref in head.prior_weeks:
                 previous = self._revision(plan.id, ref.revision)
                 known = v2.read_candidate(previous.snapshot)
-                weeks.append(v2.ApprovedWeek(ref, known.days))
+                weeks.append(
+                    v2.ApprovedWeek(
+                        ref,
+                        known.days,
+                        known.adaptation if isinstance(known, pe.ReviewedCandidate) else None,
+                    )
+                )
             if isinstance(head.request, f.FamiliarWeek):
                 weeks.append(
                     v2.ApprovedWeek(
-                        f.WeekRef(number=head.request.number, revision=base.id), head.days
+                        f.WeekRef(number=head.request.number, revision=base.id),
+                        head.days,
+                        head.adaptation if isinstance(head, pe.ReviewedCandidate) else None,
                     )
                 )
             if today is not None and base.context_id != ctx.id:
@@ -465,11 +474,13 @@ class PlanCommands:
                     except ValueError as exc:
                         raise StalePlan(str(exc)) from exc
         candidate = v2.build(
-            plan.id, block, context, request, block_revision, tuple(weeks), rule=rule
+            plan.id, block, context, request, block_revision, tuple(weeks), rule=rule, inputs=inputs
         )
         if today is not None:
             try:
                 v2.check_dates(candidate, block, today)
+                if block.adaptation and candidate.days and (candidate.days[0].day - today).days > 7:
+                    raise ValueError("adaptive detail requires review within the upcoming week")
             except ValueError as exc:
                 raise StalePlan(str(exc)) from exc
         return candidate
@@ -486,10 +497,14 @@ class PlanCommands:
             )
         ).one()
         replay = self._familiar_candidate(
-            plan, revision.base_id, ctx, saved.request, today=None, rule=saved.rules
+            plan,
+            revision.base_id,
+            ctx,
+            saved.request,
+            today=None,
+            rule=saved.rules,
+            inputs=saved.decision_inputs if isinstance(saved, pe.ReviewedCandidate) else None,
         )
-        if isinstance(saved, pe.ReviewedCandidate):
-            replay = v2.with_inputs(replay, saved.decision_inputs)
         if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
             raise InvalidSnapshot("generalized historical replay mismatch")
         return replay
@@ -526,11 +541,20 @@ class PlanCommands:
             context_v2 = v2.read(f.Context, ctx.snapshot)
             cutoff = self._now()
             today = cutoff.astimezone(ZoneInfo(context_v2.zone)).date()
-            candidate = self._familiar_candidate(plan, expected_head, ctx, request, today=today)
             inputs = planning_evidence.freeze_inputs(
-                self._db, self._owner, context_v2, evidence_scope, cutoff
+                self._db,
+                self._owner,
+                context_v2,
+                evidence_scope,
+                cutoff,
+                adaptive=v2.read(f.Block, plan.block).adaptation is not None
+                and isinstance(request, f.FamiliarWeek)
+                and request.number > 1,
             )
-            payload = v2.snapshot(v2.with_inputs(candidate, inputs))
+            candidate = self._familiar_candidate(
+                plan, expected_head, ctx, request, today=today, inputs=inputs
+            )
+            payload = v2.snapshot(candidate)
             v2.read_candidate(payload)
             why = None
         else:
@@ -707,15 +731,18 @@ class PlanCommands:
             raise StalePlan("familiar effort rule changed; submit a fresh proposal")
         context = v2.read(f.Context, ctx.snapshot)
         today = self._now().astimezone(ZoneInfo(context.zone)).date()
-        replay = self._familiar_candidate(
-            plan, revision.base_id, ctx, candidate.request, today=today
-        )
+        inputs = None
         if isinstance(candidate, pe.ReviewedCandidate):
             sealed = candidate.decision_inputs
             scope = sealed.projection.scope if sealed.selection == "explicit" else None
             try:
                 current = planning_evidence.freeze_inputs(
-                    self._db, self._owner, context, scope, sealed.cutoff
+                    self._db,
+                    self._owner,
+                    context,
+                    scope,
+                    sealed.cutoff,
+                    adaptive=candidate.adaptation is not None,
                 )
             except planning_evidence.EvidenceScopeUnavailable as exc:
                 raise StalePlan(
@@ -725,13 +752,23 @@ class PlanCommands:
                 sealed.model_dump(mode="json")
             ):
                 raise StalePlan("planning evidence changed; submit a fresh proposal and review")
-            replay = v2.with_inputs(replay, sealed)
+            if (
+                candidate.adaptation
+                and today != sealed.cutoff.astimezone(ZoneInfo(context.zone)).date()
+            ):
+                raise StalePlan("adaptive review day changed; submit a fresh proposal")
+            inputs = sealed
+        replay = self._familiar_candidate(
+            plan, revision.base_id, ctx, candidate.request, today=today, inputs=inputs
+        )
         if canonical(v2.snapshot(replay)) != canonical(revision.snapshot):
             raise InvalidSnapshot("stored generalized prescription differs from replay")
         if not isinstance(candidate, pe.ReviewedCandidate):
             raise StalePlan("proposal predates frozen planning evidence; submit a fresh proposal")
         decision_day = self._now().astimezone(ZoneInfo(context.zone)).date()
         if decision_day != today:
+            if candidate.adaptation:
+                raise StalePlan("adaptive review day changed; submit a fresh proposal")
             try:
                 v2.check_dates(replay, v2.read(f.Block, plan.block), decision_day)
             except ValueError as exc:

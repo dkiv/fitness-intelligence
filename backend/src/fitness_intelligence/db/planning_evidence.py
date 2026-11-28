@@ -331,7 +331,9 @@ def _read_projection(db: Session, owner: UUID, scope: e.Scope) -> e.Projection:
 DECISION_POLICY = "current-accepted-training-v1"
 
 
-def _representative_scope(db: Session, owner: UUID, context: f.Context) -> e.Scope:
+def _representative_scope(
+    db: Session, owner: UUID, context: f.Context, *, adaptive: bool = False
+) -> e.Scope:
     selected = {}
     for provider, account in db.execute(
         select(SourceAccount.provider, SourceAccount.id).where(
@@ -342,7 +344,9 @@ def _representative_scope(db: Session, owner: UUID, context: f.Context) -> e.Sco
     ):
         if provider in selected:
             raise EvidenceScopeUnavailable(
-                "multiple bound accounts for provider; supply an explicit evidence scope"
+                "adaptive review cannot cover multiple bound accounts for one provider"
+                if adaptive
+                else "multiple bound accounts for provider; supply an explicit evidence scope"
             )
         selected[provider] = account
     return e.Scope(
@@ -356,7 +360,13 @@ def _representative_scope(db: Session, owner: UUID, context: f.Context) -> e.Sco
 
 
 def freeze_inputs(
-    db: Session, owner: UUID, context: f.Context, scope: e.Scope | None, cutoff: datetime
+    db: Session,
+    owner: UUID,
+    context: f.Context,
+    scope: e.Scope | None,
+    cutoff: datetime,
+    *,
+    adaptive: bool = False,
 ) -> e.DecisionInputs:
     """Called under the owner lock. All reads use the command's physical transaction."""
     familiar_snapshot.require_preview_owner(owner)
@@ -370,7 +380,30 @@ def freeze_inputs(
     with Session(db.connection(), join_transaction_mode="rollback_only", autoflush=False) as reader:
         reader.execute(text("SET LOCAL TIME ZONE 'UTC'"))
         selection = "explicit" if scope is not None else "representative-week"
-        scope = scope if scope is not None else _representative_scope(reader, owner, context)
+        if adaptive:
+            # Include every bound family and the full recent period even for an explicit mapping.
+            expected = _representative_scope(reader, owner, context, adaptive=True)
+            end = cutoff.astimezone(ZoneInfo(context.zone)).date() + timedelta(days=1)
+            expected = expected.model_copy(update={"start": end - timedelta(days=29), "stop": end})
+            if scope is None:
+                selection = "adaptation-window"
+                scope = expected
+            elif any(
+                getattr(scope, k) != getattr(expected, k)
+                for k in (
+                    "start",
+                    "stop",
+                    "zone",
+                    "strength_account",
+                    "endurance_account",
+                    "recovery_account",
+                )
+            ):
+                raise EvidenceScopeUnavailable(
+                    "adaptive review requires the full recent period and bound accounts"
+                )
+        else:
+            scope = scope if scope is not None else _representative_scope(reader, owner, context)
         projection = _read_projection(reader, owner, scope)
         accounts = tuple(
             e.SelectedAccount(

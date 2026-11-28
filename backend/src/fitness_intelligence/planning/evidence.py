@@ -376,12 +376,42 @@ class CoverageReceipt(f.Record):
 class DecisionInputs(f.Record):
     version: Literal["decision-inputs-v1"] = "decision-inputs-v1"
     policy: str
-    selection: Literal["explicit", "representative-week"]
+    selection: Literal["explicit", "representative-week", "adaptation-window"]
     cutoff: AwareDatetime
     accounts: tuple[SelectedAccount, ...]
     coverage_receipts: tuple[CoverageReceipt, ...]
     projection: Projection
 
 
+class CoreDecision(f.Record):
+    template: str
+    task: str
+    action: Literal["hold", "reps", "load", "duration", "resume"]
+    reason: str
+    anchor_revision: UUID
+    anchor_dose: str
+    anchor_occurrences: tuple[UUID, ...]
+    anchor_assertions: tuple[UUID, ...]
+    before: str
+    after: str
+    considered: str | None = None
+    # Stable occurrence identities and current assertion tips. Full claims live in the projection.
+    performances: tuple[UUID, ...]
+    assertions: tuple[UUID, ...]
+    ceiling_since_week: f.Positive | None = None
+
+    @property
+    def reentry(self) -> bool:
+        return self.ceiling_since_week is not None
+
+
+class CoreReview(f.Record):
+    version: Literal["synthetic.core.v1"] = "synthetic.core.v1"
+    joint: Literal["J-DEFAULT"] = "J-DEFAULT"
+    predecessor: UUID
+    decisions: tuple[CoreDecision, ...]
+
+
 class ReviewedCandidate(f.Candidate):
+    adaptation: CoreReview | None = Field(default=None, exclude_if=lambda x: x is None)
     decision_inputs: DecisionInputs

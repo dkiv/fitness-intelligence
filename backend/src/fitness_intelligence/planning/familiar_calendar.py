@@ -41,7 +41,7 @@ def _require_familiar_effort(
         raise ValueError(f"{scope}: observed effort exceeded the confirmed execution cap")
 
 
-def _validate_baseline(block: f.Block, ctx: f.Context, limit: int, rule: f.FamiliarRule) -> None:
+def validate_baseline(block: f.Block, ctx: f.Context, limit: int, rule: f.FamiliarRule) -> None:
     """One distinct reported occurrence per template from the same recent representative week."""
     if not 7 <= (block.start - ctx.history_start).days <= 28:
         raise ValueError("baseline requires a recent completed representative week")
@@ -103,6 +103,20 @@ def _validate_baseline(block: f.Block, ctx: f.Context, limit: int, rule: f.Famil
             for index, (step, actual) in enumerate(zip(p.steps, o.steps, strict=True), 1):
                 scope = f"{o.template}/{o.role} step {index} ({step.purpose})"
                 _require_familiar_effort(step.effort, actual.effort, scope)
+    _validate_commitments(block, by_template, limit)
+    for pin in ctx.fixed:
+        if pin.template not in by_template or not 0 <= (pin.day - block.start).days < 7 * len(
+            block.phases
+        ):
+            raise ValueError("fixed session outside block or unknown template")
+    f.unique(
+        (((pin.day - block.start).days // 7, pin.template) for pin in ctx.fixed), "fixed occurrence"
+    )
+
+
+def _validate_commitments(
+    block: f.Block, by_template: dict[str, f.Prescription], limit: int
+) -> None:
     for c in block.commitments:
         count = sum(
             p.sport == c.sport and p.role == c.role and p.minimum_exposure >= c.minimum_per_session
@@ -125,14 +139,6 @@ def _validate_baseline(block: f.Block, ctx: f.Context, limit: int, rule: f.Famil
             for p in by_template.values()
         ):
             raise ValueError("protected outcome task absent from baseline")
-    for pin in ctx.fixed:
-        if pin.template not in by_template or not 0 <= (pin.day - block.start).days < 7 * len(
-            block.phases
-        ):
-            raise ValueError("fixed session outside block or unknown template")
-    f.unique(
-        (((pin.day - block.start).days // 7, pin.template) for pin in ctx.fixed), "fixed occurrence"
-    )
 
 
 def _instant(day: date, minute: int, zone: ZoneInfo, fold: int | None = None) -> datetime | None:
@@ -259,8 +265,34 @@ def generate_for_rule(
         raise ValueError("unknown familiar planner rule")
     if type(number) is not int or not 1 <= number <= len(block.phases):
         raise ValueError("week number outside block")
-    _validate_baseline(block, ctx, limit, rule)
-    ordered = sorted(block.templates, key=lambda t: (ctx.rank(t.prescription.sport), t.key))
+    validate_baseline(block, ctx, limit, rule)
+    return place_week(cycle, block, ctx, number, adjacent, block.templates, limit=limit)
+
+
+def place_week(
+    cycle: UUID,
+    block: f.Block,
+    ctx: f.Context,
+    number: int,
+    adjacent: tuple[f.Session, ...],
+    templates: tuple[f.Template, ...],
+    *,
+    limit: int = SEARCH_LIMIT,
+) -> tuple[f.Day, ...]:
+    """Place a validated prescription vector and test its actual exposure and time endpoints."""
+    if not 1 <= number <= len(block.phases):
+        raise ValueError("week number outside block")
+    _validate_commitments(block, {t.key: t.prescription for t in templates}, limit)
+    profile = block.adaptation
+    if (
+        profile
+        and profile.weekly_seconds
+        and sum(t.prescription.reserved_seconds for t in templates) > profile.weekly_seconds
+    ):
+        raise PlacementFailure(
+            incomplete=False, examined=0, limit=limit, reasons=("weekly time budget exceeded",)
+        )
+    ordered = sorted(templates, key=lambda t: (ctx.rank(t.prescription.sport), t.key))
     examined = 0
     reasons: set[str] = set()
 
@@ -310,6 +342,17 @@ def generate_for_rule(
             if s is None:
                 reasons.add(option.reason)
                 continue
+            if (
+                profile
+                and profile.daily_seconds
+                and s.prescription.reserved_seconds
+                + sum(
+                    other.prescription.reserved_seconds for other in selected if other.day == s.day
+                )
+                > profile.daily_seconds
+            ):
+                reasons.add("daily time budget exceeded")
+                continue
             conflict = _conflicts(s, boundaries + selected, block)
             if conflict:
                 reasons.add(conflict)
@@ -337,7 +380,6 @@ def validate_retained(
     cycle: UUID, block: f.Block, ctx: f.Context, number: int, days: tuple[f.Day, ...], today: date
 ) -> None:
     """A changed context may retain future sessions only at their exact approved instants."""
-    templates = {t.key: t for t in block.templates}
     for day in days:
         for session in day.sessions:
             pins = (
@@ -349,6 +391,12 @@ def validate_retained(
                 raise ValueError("fixed date conflicts with retained prescription")
             if day.day >= today and not any(
                 option.session == session
-                for option in _options(cycle, block, ctx, number, templates[session.template])
+                for option in _options(
+                    cycle,
+                    block,
+                    ctx,
+                    number,
+                    f.Template(key=session.template, prescription=session.prescription),
+                )
             ):
                 raise ValueError("a retained prescription conflicts with current constraints")
