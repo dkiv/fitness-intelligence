@@ -197,8 +197,10 @@ class CalendarRehearsal:
     ) -> ReservationReceipt:
         """Create, replay, or revise the same synthetic occurrence using its last readback."""
         slot = self._slot(revision)
-        if not slot.approved_head:
-            raise ValueError("calendar reservation requires the currently approved revision")
+        if not slot.approved_head or not self.commands.is_committed_head(self.cycle, revision):
+            raise ValueError(
+                "calendar reservation requires the currently approved, committed revision"
+            )
         event_id = self._event_id(slot)
         expected = {
             "id": event_id,
@@ -223,6 +225,14 @@ class CalendarRehearsal:
                 current.get("extendedProperties", {}).get("private", {}).get("fiRevision")
             )
             if saved_revision == str(revision):
+                if (
+                    previous
+                    and previous.revision == saved_revision
+                    and current.get("etag") != previous.etag
+                ):
+                    raise ValueError(
+                        "event ETag changed since verified readback; reconcile before replay"
+                    )
                 return self._receipt(current, expected)
             if (
                 not previous

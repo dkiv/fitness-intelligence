@@ -1,10 +1,11 @@
 """Google-shaped wire requests with synthetic busy intervals and real FI approval commands."""
 
 import json
-from dataclasses import replace
+from copy import deepcopy
+from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, time
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import httpx
 import pytest
@@ -116,6 +117,7 @@ def test_conflict_approval_move_and_readback(db: Session, monkeypatch: pytest.Mo
     assert rehearsal.conflicts(first) == ()
     cmd.decide(plan, first, expected_head=None, choice="approve", command_id=uuid4())
 
+    db.commit()
     provider.errors = [{"reason": "notFound"}]
     with pytest.raises(ValueError, match="availability incomplete"):
         rehearsal.reserve(first)
@@ -154,6 +156,7 @@ def test_conflict_approval_move_and_readback(db: Session, monkeypatch: pytest.Mo
     with pytest.raises(ValueError, match="currently approved"):
         rehearsal.reserve(moved, created)
     cmd.decide(plan, moved, expected_head=first, choice="approve", command_id=uuid4())
+    db.commit()
     with pytest.raises(ValueError, match="currently approved"):
         rehearsal.reserve(first, created)
     event = provider.events[created.event_id]
@@ -161,6 +164,10 @@ def test_conflict_approval_move_and_readback(db: Session, monkeypatch: pytest.Mo
     with pytest.raises(ValueError, match="previous receipt"):
         rehearsal.reserve(moved, created)
     event["etag"] = created.etag
+    provider.lose_response = True
+    with pytest.raises(httpx.ReadTimeout):
+        rehearsal.reserve(moved, created)
+    provider.lose_response = False
     updated = rehearsal.reserve(moved, created)
     assert updated.event_id == created.event_id and updated.calendar_id == created.calendar_id
     assert updated.start.isoformat() == "2027-01-10T09:00:00-05:00"
@@ -205,8 +212,105 @@ def test_sealed_g1b_occurrence_includes_preparation(
     rehearsal = CalendarRehearsal(httpx.MockTransport(provider.handle), cmd, plan, run.occurrence)
     assert rehearsal.conflicts(week) == ()
     cmd.decide(plan, week, expected_head=base, choice="approve", command_id=uuid4())
+    db.commit()
     receipt = rehearsal.reserve(week)
     assert receipt.start.isoformat() == "2027-01-06T18:00:00-05:00"
     assert receipt.end.isoformat() == "2027-01-06T18:34:00-05:00"
     assert receipt.duration_seconds == 2040 and receipt.zone == "America/Toronto"
     assert receipt.event_id != run.occurrence.hex
+
+
+@dataclass(frozen=True)
+class ProposedReservation:
+    commands: PlanCommands
+    plan: UUID
+    first: UUID
+    calendar: CalendarRehearsal
+    provider: GoogleDouble
+
+
+@pytest.fixture
+def proposed(db: Session, monkeypatch: pytest.MonkeyPatch) -> ProposedReservation:
+    owner = User()
+    db.add(owner)
+    db.flush()
+    monkeypatch.setenv("FITNESS_PLANNING_OWNER_ID", str(owner.id))
+    monkeypatch.setattr(PlanCommands, "_now", lambda _: datetime(2027, 1, 2, tzinfo=UTC))
+    commands = PlanCommands(db)
+    commands.capture_context(PlanningContext(Availability()), expected_context=None)
+    plan = commands.create_cycle(PressBlock())
+    first = commands.submit(plan, None, Generate(1))
+    db.commit()
+    provider = GoogleDouble()
+    provider.busy.clear()
+    calendar = CalendarRehearsal(
+        httpx.MockTransport(provider.handle), commands, plan, (1, Slot.LONG_RUN)
+    )
+    return ProposedReservation(commands, plan, first, calendar, provider)
+
+
+def test_initial_approval_must_commit(db: Session, proposed: ProposedReservation) -> None:
+    p = proposed
+    p.commands.decide(p.plan, p.first, expected_head=None, choice="approve", command_id=uuid4())
+    with pytest.raises(ValueError, match="committed"):
+        p.calendar.reserve(p.first)
+    db.rollback()
+    assert p.commands.current(p.plan) is None
+    assert p.provider.calls == [] and p.provider.events == {}
+
+    p.commands.decide(p.plan, p.first, expected_head=None, choice="approve", command_id=uuid4())
+    db.commit()
+    created = p.calendar.reserve(p.first)
+    assert list(p.provider.events) == [created.event_id]
+    assert p.provider.calls.count("POST /v3/calendars/fixture-reservations/events") == 1
+
+
+def test_move_approval_must_commit(db: Session, proposed: ProposedReservation) -> None:
+    p = proposed
+    p.commands.decide(p.plan, p.first, expected_head=None, choice="approve", command_id=uuid4())
+    db.commit()
+    created = p.calendar.reserve(p.first)
+    original = deepcopy(p.provider.events)
+    moved = p.commands.submit(p.plan, p.first, Move(Slot.LONG_RUN, date(2027, 1, 10), time(9)))
+    db.commit()
+    p.commands.decide(p.plan, moved, expected_head=p.first, choice="approve", command_id=uuid4())
+    before = list(p.provider.calls)
+    with pytest.raises(ValueError, match="committed"):
+        p.calendar.reserve(moved, created)
+    db.rollback()
+    assert p.commands.current(p.plan).revision_id == p.first
+    assert p.provider.calls == before and p.provider.events == original
+
+    p.commands.decide(p.plan, moved, expected_head=p.first, choice="approve", command_id=uuid4())
+    db.commit()
+    updated = p.calendar.reserve(moved, created)
+    assert updated.event_id == created.event_id and updated.start.date() == date(2027, 1, 10)
+    assert list(p.provider.events) == [created.event_id]
+    collection = "/v3/calendars/fixture-reservations/events"
+    assert p.provider.calls.count(f"POST {collection}") == 1
+    assert p.provider.calls.count(f"PATCH {collection}/{created.event_id}") == 1
+
+
+def test_same_revision_replay_requires_verified_etag(
+    db: Session, proposed: ProposedReservation
+) -> None:
+    p = proposed
+    p.commands.decide(p.plan, p.first, expected_head=None, choice="approve", command_id=uuid4())
+    db.commit()
+    created = p.calendar.reserve(p.first)
+    assert p.calendar.reserve(p.first, created) == created
+    event = p.provider.events[created.event_id]
+    event.update(location="Synthetic track", etag='"external"')
+    assert event["extendedProperties"]["private"]["fiRevision"] == created.revision
+    with pytest.raises(ValueError, match="ETag"):
+        p.calendar.reserve(p.first, created)
+
+    moved = p.commands.submit(p.plan, p.first, Move(Slot.LONG_RUN, date(2027, 1, 10), time(9)))
+    p.commands.decide(p.plan, moved, expected_head=p.first, choice="approve", command_id=uuid4())
+    db.commit()
+    with pytest.raises(ValueError, match="previous receipt"):
+        p.calendar.reserve(moved, created)
+    assert list(p.provider.events) == [created.event_id]
+    assert event["location"] == "Synthetic track" and event["etag"] == '"external"'
+    assert p.provider.calls.count("POST /v3/calendars/fixture-reservations/events") == 1
+    assert not any(call.startswith("PATCH ") for call in p.provider.calls)
